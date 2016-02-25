@@ -31,13 +31,13 @@ app.use('/static',serveStatic(__dirname + '/static'));
 //app.use(multer({dest:"./static/"}));
 app.use(bodyParser.urlencoded({ extended: false }));
 
-mongoPool.acquire(function(err, db){
-    app.use(session({
-        secret: 'smartinsight',
-        store: new MongoStore({ db: db })
-    }))
-});
 
+app.use(session({
+    secret: 'smartinsight',
+    store: new MongoStore({
+        url: 'mongodb://localhost:27017/smartinsight'
+    })
+}));
 app.get('/', function (req, res) {
     res.send('Hello World!');
 });
@@ -71,6 +71,37 @@ app.post("/createsuperadmin",function(req,res){
             else{
                 res.status(200);
                 successMsg.body = null;
+
+                res.send(JSON.stringify(successMsg));
+            }
+        });
+    }
+    else{
+        res.status(406);
+        errorMsg.code = "wrong";
+        res.send(JSON.stringify(errorMsg));
+    }
+
+});
+
+app.post("/admin/login",function(req,res){
+
+    var pass = req.body.password;
+    var username = req.body.username;
+    console.log(req.session);
+    if(username && pass){
+        Admin.login(username,pass,function(err,msg){
+            if(msg == "error"){
+                res.status(400);
+                errorMsg.code = "error";
+                res.send(JSON.stringify(errorMsg));
+            }
+            else{
+                res.status(200);
+                successMsg.body = null;
+                console.log(msg.name);
+                req.session.userId = msg.name;
+
                 res.send(JSON.stringify(successMsg));
             }
         });

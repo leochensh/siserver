@@ -39,3 +39,27 @@ Admin.createSuperAdmin = function(passhash,callback){
         }
     });
 };
+
+Admin.login = function(uname,pass,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,collection){
+                const hash = crypto.createHash('sha256');
+                hash.update(pass);
+                collection.find({name:uname,passhash:hash.digest('hex')}).limit(1).next(function(err,admin){
+                    if(admin){
+                        mongoPool.release(db);
+                        callback(err,admin);
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"error");
+                    }
+                });
+            });
+        }
+    });
+};
