@@ -11,7 +11,21 @@ var mongoPool = require("./db");
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 
+var acl = require("./access/acl");
+
+var Admin = require("./model/admin");
+
 var app = express();
+
+var errorMsg = {
+    status:"error",
+    //code:"duplicate"
+};
+
+var successMsg = {
+    status:"ok",
+    body:null
+};
 
 app.use('/static',serveStatic(__dirname + '/static'));
 //app.use(multer({dest:"./static/"}));
@@ -41,6 +55,31 @@ app.post('/upload', function (req, res) {
             console.log(req.file.filename)
         }
     });
+
+});
+
+app.post("/createsuperadmin",function(req,res){
+
+    var passHash = req.body.password;
+    if(passHash){
+        Admin.createSuperAdmin(passHash,function(err,msg){
+            if(msg == "exist"){
+                res.status(409);
+                errorMsg.code = "duplicate";
+                res.send(JSON.stringify(errorMsg));
+            }
+            else{
+                res.status(200);
+                successMsg.body = null;
+                res.send(JSON.stringify(successMsg));
+            }
+        });
+    }
+    else{
+        res.status(406);
+        errorMsg.code = "wrong";
+        res.send(JSON.stringify(errorMsg));
+    }
 
 });
 
