@@ -22,7 +22,7 @@ Admin.createSuperAdmin = function(passhash,callback){
                         callback(err,"exist");
                     }
                     else{
-                        const hash = crypto.createHash('sha256');
+                        const hash = crypto.createHash('md5');
                         hash.update(passhash);
                         var superadmin = {
                             name:"superadmin",
@@ -47,9 +47,8 @@ Admin.login = function(uname,pass,callback){
         }
         else{
             db.collection("admins",function(err,collection){
-                const hash = crypto.createHash('sha256');
-                hash.update(pass);
-                collection.find({name:uname,passhash:hash.digest('hex')}).limit(1).next(function(err,admin){
+
+                collection.find({name:uname,passhash:pass}).limit(1).next(function(err,admin){
                     if(admin){
                         mongoPool.release(db);
                         callback(err,admin);
