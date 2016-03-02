@@ -15,6 +15,8 @@ var acl = require("./access/acl");
 
 var Admin = require("./model/admin");
 
+var aclHandler = require("./access/acl");
+
 var app = express();
 
 var errorMsg = {
@@ -34,10 +36,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(session({
     secret: 'smartinsight',
+    resave:false,
+    saveUninitialized:false,
     store: new MongoStore({
         url: 'mongodb://localhost:27017/smartinsight'
     })
 }));
+
 app.get('/', function (req, res) {
     res.send('Hello World!');
 });
@@ -112,6 +117,14 @@ app.post("/admin/login",function(req,res){
         res.send(JSON.stringify(errorMsg));
     }
 
+});
+
+
+
+aclHandler.registerWait(function(acl){
+    app.get("/testacl",acl.middleware(),function(req,res){
+        res.send("ok");
+    });
 });
 
 var server = app.listen(8080, function () {
