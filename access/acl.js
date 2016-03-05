@@ -1,10 +1,11 @@
 var acl = require('acl');
 var mongoPool = require("../db");
+var dict = require("../dict")
 
-var mycallback=null;
+var mycallback=[];
 var aclFunction = {
     registerWait:function(callback){
-        mycallback = callback;
+        mycallback.push(callback);
     }
 };
 
@@ -13,11 +14,41 @@ var aclHandler = null;
 mongoPool.acquire(function(err, db){
     aclHandler = new acl(new acl.mongodbBackend(db, "acl"));
 
-    aclHandler.allow('superadmin','/testacl','get');
-
-    aclHandler.addUserRoles('superadmin', 'superadmin');
-    if(mycallback){
-        mycallback(aclHandler);
+    aclHandler.allow([
+        {
+            roles:['sadmin'],
+            allows:[
+                {resources:'/testacl', permissions:'get'},
+                {resources:"/sadmin",permissions:["post","put","delete"]}
+            ]
+        },
+        {
+            roles:['admin'],
+            allows:[
+                {resources:'/admin/pass/change', permissions:'put'},
+                {resources:'/admin/staff/add',permissions:'post'},
+                {resources:'/admin/staff/resetpass',permissions:'put'},
+                {resources:'/admin/staff/delete',permissions:'delete'}
+            ]
+        },
+        {
+            roles:[dict.STAFF_EDITOR,dict.STAFF_INVESTIGATOR],
+            allows:[
+                {resources:'/staff/pass/change',permissions:'put'}
+            ]
+        },
+        {
+            roles:[dict.STAFF_EDITOR],
+            allows:[]
+        },
+        {
+            roles:[dict.STAFF_INVESTIGATOR],
+            allows:[]
+        }
+    ]);
+    aclHandler.addUserRoles('superadmin', 'sadmin');
+    for(var item in mycallback){
+        mycallback[item](aclHandler);
     }
 
 });

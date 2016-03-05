@@ -1,0 +1,4 @@
+module.exports = {
+    STAFF_EDITOR:"EDITOR",
+    STAFF_INVESTIGATOR:"INVESTIGATOR"
+};
