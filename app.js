@@ -1,6 +1,8 @@
 var express = require('express');
 var serveStatic = require('serve-static');
 
+var _ = require("underscore");
+
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 
@@ -35,6 +37,7 @@ var successMsg = {
 app.use('/static',serveStatic(__dirname + '/static'));
 //app.use(multer({dest:"./static/"}));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 
 app.use(session({
@@ -423,7 +426,108 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(errorMsg));
         }
     });
+
+    app.post("/editor/survey/create",acl.middleware(2),function(req,res){
+        var name = req.body.name;
+        var type = req.body.type;
+
+        if(name && (type == dict.TYPE_SURVEY || type == dict.TYPE_TEMPLATE)){
+            Staff.createSurvey(req.session.orgid,req.session.uid,name,type,function(err,sur){
+                logger.logger.log("info","staff create survey",{
+                    id:sur,
+                    editorid:req.session.uid});
+                res.status(200);
+                successMsg.body = sur;
+                console.log(JSON.stringify(successMsg));
+                res.send(JSON.stringify(successMsg));
+            });
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.post("/editor/survey/question/add",acl.middleware(2),function(req,res){
+        var surveydata = req.body;
+        if(checkSurveyData(surveydata)){
+            Staff.createQuestion(req.session.orgid,surveydata,function(err,msg){
+                if(msg == "forbidden"){
+                    res.status(403);
+                    errorMsg.code = "can not operate";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff create question",{
+                        id:msg,
+                        editorid:req.session.uid});
+                    res.status(200);
+                    successMsg.body = msg;
+                    console.log(JSON.stringify(successMsg));
+                    res.send(JSON.stringify(successMsg));
+                }
+            });
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
 });
+
+function checkSurveyData(data){
+    if(!data){
+        return false;
+    }
+    else if(!data.surveyid){
+        return false;
+    }
+    else if(!data.type || (data.type!=dict.QTYPE_DESCRIPTION &&
+        data.type!=dict.QTYPE_MULTISELECT &&
+        data.type!=dict.QTYPE_SEQUENCE &&
+        data.type!=dict.QTYPE_SINGLESELECT)){
+        return false;
+    }
+    else if(!data.title){
+        return false;
+    }
+    else if((data.type == dict.QTYPE_MULTISELECT ||
+        data.type == dict.QTYPE_SEQUENCE ||
+        data.type == dict.QTYPE_SINGLESELECT) &&
+        !_.isArray(data.selectlist)){
+        return false;
+    }
+    else if(data.type == dict.QTYPE_MULTISELECT ||
+        data.type == dict.QTYPE_SEQUENCE ||
+        data.type == dict.QTYPE_SINGLESELECT){
+        for(var i in data.selectlist){
+            var q = data.selectlist[i];
+            if(q.type!=dict.SELECTTYPE_AUDIO &&
+                q.type!=dict.SELECTTYPE_DESCRIPTION &&
+                q.type!=dict.SELECTTYPE_IMAGE &&
+                q.type!=dict.SELECTTYPE_TEXT &&
+                q.type!=dict.SELECTTYPE_VIDEO){
+                return false;
+            }
+        }
+    }
+    else if(data.precederid){
+        if(!data.precederselectindex){
+            return false;
+        }
+    }
+
+    return true;
+
+
+}
 
 var server = app.listen(8080, function () {
 

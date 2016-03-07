@@ -39,7 +39,9 @@ mongoPool.acquire(function(err, db){
         },
         {
             roles:[dict.STAFF_EDITOR],
-            allows:[]
+            allows:[
+                {resources:'/editor/survey',permissions:'post'}
+            ]
         },
         {
             roles:[dict.STAFF_INVESTIGATOR],
