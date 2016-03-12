@@ -42,14 +42,18 @@ Admin.createSuperAdmin = function(passhash,callback){
 };
 
 Admin.login = function(uname,pass,callback){
+    console.log(uname)
+    console.log(pass)
     mongoPool.acquire(function(err,db){
         if(err){
 
         }
         else{
             db.collection("admins",function(err,collection){
-
+                console.log(uname)
+                console.log(pass)
                 collection.find({name:uname,passhash:pass}).limit(1).next(function(err,admin){
+                    console.log(admin)
                     if(admin){
                         if(admin.disable){
                             callback(err,"error");
@@ -61,6 +65,7 @@ Admin.login = function(uname,pass,callback){
 
                     }
                     else{
+
                         mongoPool.release(db);
                         callback(err,"error");
                     }
@@ -90,7 +95,7 @@ Admin.createOrganization = function(orgname,callback){
                         };
                         collection.insertOne(neworg,function(err,org){
                             mongoPool.release(db);
-                            callback(err,neworg);
+                            callback(err,neworg,org.insertedId);
                         })
                     }
                 });
@@ -126,7 +131,7 @@ Admin.createOrgAdmin = function(orgid,name,pass,callback){
                                     };
                                     adcollection.insertOne(newadmin,function(err,result){
                                         mongoPool.release(db);
-                                        callback(err,newadmin);
+                                        callback(err,newadmin,result.insertedId);
                                     })
                                 }
                             });
@@ -252,7 +257,7 @@ Admin.addStaff = function(orgid,name,role,pass,callback){
                                     };
                                     adcollection.insertOne(newstaff,function(err,result){
                                         mongoPool.release(db);
-                                        callback(err,newstaff);
+                                        callback(err,newstaff,result.insertedId);
                                     })
                                 }
                             });

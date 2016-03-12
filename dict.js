@@ -15,6 +15,7 @@ module.exports = {
     QTYPE_MULTISELECT:"multiselect",
     QTYPE_DESCRIPTION:"description",
     QTYPE_SEQUENCE:"sequence",
+    QTYPE_SCORE:"score",
 
     SELECTTYPE_TEXT:"textselect",
     SELECTTYPE_IMAGE:"imageselect",

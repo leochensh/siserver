@@ -20,6 +20,7 @@ var acl = require("./access/acl");
 var Admin = require("./model/admin");
 var Staff = require("./model/staff");
 
+
 var aclHandler = require("./access/acl");
 
 var app = express();
@@ -99,7 +100,6 @@ app.post("/admin/login",function(req,res){
 
     var pass = req.body.password;
     var username = req.body.username;
-    console.log(req.session);
     if(username && pass){
         Admin.login(username,pass,function(err,msg){
             if(msg == "error"){
@@ -175,7 +175,7 @@ aclHandler.registerWait(function(acl){
         var orgname = req.body.name;
 
         if(orgname){
-            Admin.createOrganization(orgname,function(err,msg){
+            Admin.createOrganization(orgname,function(err,msg,insertedid){
                 if(msg == "duplicate"){
                     res.status(409);
                     errorMsg.code = "duplicate";
@@ -184,7 +184,7 @@ aclHandler.registerWait(function(acl){
                 else{
                     logger.logger.log("info","new organization created",{name:msg.name});
                     res.status(200);
-                    successMsg.body = null;
+                    successMsg.body = insertedid;
                     res.send(JSON.stringify(successMsg));
                 }
             })
@@ -202,7 +202,7 @@ aclHandler.registerWait(function(acl){
         var pass = req.body.password;
 
         if(orgid && name && pass){
-            Admin.createOrgAdmin(orgid,name,pass,function(err,msg){
+            Admin.createOrgAdmin(orgid,name,pass,function(err,msg,insertedid){
                 if(msg == "nameduplicate"){
                     res.status(409);
                     errorMsg.code = "name duplicate";
@@ -217,7 +217,7 @@ aclHandler.registerWait(function(acl){
                     logger.logger.log("info","new organization admin created",{name:msg.name});
                     res.status(200);
                     acl.addUserRoles(msg.name, 'admin');
-                    successMsg.body = null;
+                    successMsg.body = insertedid;
                     res.send(JSON.stringify(successMsg));
                 }
             })
@@ -318,7 +318,7 @@ aclHandler.registerWait(function(acl){
         var pass = req.body.password;
 
         if(name && (role == dict.STAFF_EDITOR || role == dict.STAFF_INVESTIGATOR) && pass){
-            Admin.addStaff(req.session.orgid,name,role,pass,function(err,msg){
+            Admin.addStaff(req.session.orgid,name,role,pass,function(err,msg,insertid){
                 if(msg == "nameduplicate"){
                     res.status(409);
                     errorMsg.code = "name duplicate";
@@ -333,7 +333,7 @@ aclHandler.registerWait(function(acl){
                     logger.logger.log("info","new staff created",{name:msg.name});
                     res.status(200);
                     acl.addUserRoles(msg.name, role);
-                    successMsg.body = null;
+                    successMsg.body = insertid;
                     res.send(JSON.stringify(successMsg));
                 }
             })
@@ -492,7 +492,8 @@ function checkSurveyData(data){
     else if(!data.type || (data.type!=dict.QTYPE_DESCRIPTION &&
         data.type!=dict.QTYPE_MULTISELECT &&
         data.type!=dict.QTYPE_SEQUENCE &&
-        data.type!=dict.QTYPE_SINGLESELECT)){
+        data.type!=dict.QTYPE_SINGLESELECT &&
+        data.type!=dict.QTYPE_SCORE)){
         return false;
     }
     else if(!data.title){
@@ -500,13 +501,15 @@ function checkSurveyData(data){
     }
     else if((data.type == dict.QTYPE_MULTISELECT ||
         data.type == dict.QTYPE_SEQUENCE ||
-        data.type == dict.QTYPE_SINGLESELECT) &&
+        data.type == dict.QTYPE_SINGLESELECT ||
+        data.type == dict.QTYPE_SCORE) &&
         !_.isArray(data.selectlist)){
         return false;
     }
     else if(data.type == dict.QTYPE_MULTISELECT ||
         data.type == dict.QTYPE_SEQUENCE ||
-        data.type == dict.QTYPE_SINGLESELECT){
+        data.type == dict.QTYPE_SINGLESELECT ||
+        data.type == dict.QTYPE_SCORE){
         for(var i in data.selectlist){
             var q = data.selectlist[i];
             if(q.type!=dict.SELECTTYPE_AUDIO &&
