@@ -341,6 +341,7 @@ Admin.auditSurvey = function(orgid,surveyid,status,callback){
                             collection.updateOne({_id:ObjectID(surveyid)},
                                 {$set:{status:status}},function(err,upres){
                                     callback(err,upres);
+                                    mongoPool.release(db);
                                 });
                         }
 
@@ -400,6 +401,7 @@ Admin.assignSurvey = function(orgid,surveyid,staffid,callback){
                                                     {$set:{surveyList:staff.surveyList}},
                                                     function(err,ures){
                                                         callback(err,ures);
+                                                        mongoPool.release(db);
                                                 });
                                             }
                                         }

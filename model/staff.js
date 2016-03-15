@@ -1,6 +1,7 @@
 var mongoPool = require("../db");
 var Staff = {};
 var dict = require("../dict");
+var async = require("async")
 
 var ObjectID=require('mongodb').ObjectID;
 
@@ -205,6 +206,7 @@ Staff.proposeSurvey = function(orgid,surveyid,callback){
                             collection.updateOne({_id:ObjectID(surveyid)},
                                 {$set:{status:dict.SURVEYSTATUS_PROPOSE}},function(err,upres){
                                     callback(err,upres);
+                                    mongoPool.release(db);
                                 });
                         }
 
@@ -241,6 +243,51 @@ Staff.getStaffSurveyList = function(staffid,callback){
                         callback(err,"notfound")
                     }
                 })
+            });
+        }
+    });
+};
+
+Staff.getSurveyDetail = function(surveyid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,surveycollection){
+                surveycollection.find({_id:ObjectID(surveyid)},{name:1,questionlist:1})
+                    .limit(1).next(function(err,survey){
+                        if(survey){
+                            var qList = [];
+                            var qDetailList = [];
+                            if(survey.questionlist){
+                                qList = survey.questionlist;
+
+                            }
+                            db.collection("questions",function(err,questioncollection){
+                                async.each(qList,function(q,cb){
+                                    questioncollection.find({_id:q},{surveyid:0,ctime:0}).limit(1).next(function(qerr,question){
+                                        if(question){
+                                            qDetailList.push(question);
+                                        }
+                                        cb()
+                                    })
+                                },function(err){
+                                    survey.questionlist = qDetailList;
+                                    mongoPool.release(db);
+                                    callback(err,survey);
+                                })
+                            });
+
+                        }
+                        else{
+                            mongoPool.release(db);
+                            callback(err,"notfound")
+                        }
+                    }
+                );
+
+
             });
         }
     });

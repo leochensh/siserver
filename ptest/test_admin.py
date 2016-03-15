@@ -75,7 +75,7 @@ class TestAdmin(unittest.TestCase):
 
 class TestEdtor(unittest.TestCase):
     def setUp(self):
-        helpfunc.cleanDb()  
+        helpfunc.cleanDb()
 
     def tearDown(self):
         helpfunc.cleanDb()
@@ -96,12 +96,12 @@ class TestEdtor(unittest.TestCase):
 
     def test_createsurvey(self):
         self.createStaff = helpfunc.editorLogin(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword)
-        
+
         self.csUrl = urlHeader + "/editor/survey/create"
         self.csData = {"name":surveyName,"type":surveyType}
         self.csReq = requests.post(self.csUrl,data=self.csData,cookies=self.createStaff.cookies)
         self.assertEqual(self.csReq.status_code,200)
-    
+
     def test_createquestion(self):
         self.createSurvey = helpfunc.createSurvey(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType)
         self.surveyId = json.loads(self.createSurvey["survey"].content)["body"]
@@ -110,7 +110,7 @@ class TestEdtor(unittest.TestCase):
         self.cqJson["surveyid"] = self.surveyId
         self.cqReq = requests.post(self.cqUrl,json=self.cqJson,cookies=self.createSurvey["editor"].cookies)
         self.assertEqual(self.cqReq.status_code,200)
-        
+
         self.cqJson2 = survey.QList[1]
         self.cqJson2["surveyid"] = self.surveyId
         self.cqReq2 = requests.post(self.cqUrl,json=self.cqJson2,cookies=self.createSurvey["editor"].cookies)
@@ -120,7 +120,7 @@ class TestEdtor(unittest.TestCase):
         self.createQlist = helpfunc.createQuestions(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType)
         self.qlist = self.createQlist["questions"]
         self.qid1 = json.loads(self.qlist[0].content)["body"]
-        
+
         self.deletequrl = urlHeader + "/editor/survey/question/delete"
         self.deleteqdata = {"questionid":self.qid1}
         self.deleteqreq = requests.delete(self.deletequrl,data=self.deleteqdata,cookies=self.createQlist["editor"].cookies)
@@ -145,7 +145,7 @@ class TestEdtor(unittest.TestCase):
         sloginUrl = urlHeader + "/admin/login"
         sloginData = {"password":hash.hexdigest(),"username":adminName}
         salRequest = requests.post(sloginUrl,data=sloginData)
-        
+
         audsUrl = urlHeader + "/admin/survey/audit"
         audsData = {"surveyid":surveyId,"status":"surveynormal"}
         audsReq = requests.put(audsUrl,data=audsData,cookies = salRequest.cookies)

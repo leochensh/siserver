@@ -113,6 +113,7 @@ def deleteQuestion(sapass,orgname,adminname,adminpass,editorname,editorpass,surv
 def proposeSurvey(sapass,orgname,adminname,adminpass,editorname,editorpass,surveyname,surveytype):
     createQ = createQuestions(sapass,orgname,adminname,adminpass,editorname,editorpass,surveyname,surveytype)
     surveyId = json.loads(createQ["survey"].content)["body"]
+    print surveyId
     psUrl = urlHeader + "/editor/survey/rfp"
     psData = {"surveyid":surveyId}
     psReq = requests.put(psUrl,data=psData,cookies=createQ["editor"].cookies)

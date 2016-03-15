@@ -630,6 +630,34 @@ aclHandler.registerWait(function(acl){
                 res.send(JSON.stringify(successMsg));
             }
         })
+    });
+
+    app.get("/investigator/survey/detail/:surveyid",acl.middleware(2),function(req,res){
+        var surveyid = req.params.surveyid;
+        if(surveyid && ObjectID.isValid(surveyid)){
+            Staff.getSurveyDetail(surveyid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff get survey detail",{
+                        id:req.session.uid,
+                        surveyid:surveyid
+                    });
+                    res.status(200);
+                    successMsg.body = msg;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
     })
 });
 

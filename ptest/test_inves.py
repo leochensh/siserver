@@ -46,7 +46,18 @@ class TestInves(unittest.TestCase):
         surlistUrl = urlHeader + "/investigator/survey/list"
         surlistReq = requests.get(surlistUrl,cookies=eloginReq.cookies)
         self.assertEqual(surlistReq.status_code,200)
-        print surlistReq.content
+
+        sList = json.loads(surlistReq.content)["body"]
+        self.assertEqual(sList[0]["name"],surveyName)
+
+        sdeataiUrl = urlHeader + "/investigator/survey/detail/"
+        sdid = sList[0]["surveyid"]
+        sdeataiUrl += sdid
+
+
+        sdeataiReq = requests.get(sdeataiUrl,cookies = eloginReq.cookies)
+        self.assertEqual(sdeataiReq.status_code,200)
+        print sdeataiReq.content
 
 if __name__ == '__main__':
     unittest.main()
