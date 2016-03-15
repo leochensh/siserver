@@ -28,7 +28,8 @@ mongoPool.acquire(function(err, db){
                 {resources:'/admin/pass/change', permissions:'put'},
                 {resources:'/admin/staff/add',permissions:'post'},
                 {resources:'/admin/staff/resetpass',permissions:'put'},
-                {resources:'/admin/staff/delete',permissions:'delete'}
+                {resources:'/admin/staff/delete',permissions:'delete'},
+                {resources:'/admin/survey',permissions:['put']}
             ]
         },
         {
@@ -40,12 +41,14 @@ mongoPool.acquire(function(err, db){
         {
             roles:[dict.STAFF_EDITOR],
             allows:[
-                {resources:'/editor/survey',permissions:'post'}
+                {resources:'/editor/survey',permissions:['post','delete','put']}
             ]
         },
         {
             roles:[dict.STAFF_INVESTIGATOR],
-            allows:[]
+            allows:[
+                {resources:'/investigator/survey',permissions:['get']}
+            ]
         }
     ]);
     aclHandler.addUserRoles('superadmin', 'sadmin');

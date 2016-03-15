@@ -24,6 +24,10 @@ QList = [
         "title" : "Which one do you like?",        
         "ifhasprecedent":False
     },
+    {   "type" : "description",
+        "title" : "What is your name?",        
+        "ifhasprecedent":False
+    },
     { 
         "selectlist" :
             [ 
@@ -44,7 +48,7 @@ QList = [
                     "title" : "four select" 
                 }
             ],        
-        "type" : "singleselect",
+        "type" : "multiselect",
         "title" : "Which one do you like?",
         
         "ifhasprecedent":False,

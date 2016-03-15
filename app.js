@@ -1,6 +1,6 @@
 var express = require('express');
 var serveStatic = require('serve-static');
-
+var ObjectID=require('mongodb').ObjectID;
 var _ = require("underscore");
 
 var multer  = require('multer');
@@ -480,6 +480,157 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(errorMsg));
         }
     });
+
+    app.delete("/editor/survey/question/delete",acl.middleware(2),function(req,res){
+        var qid = req.body.questionid;
+
+        if(qid){
+            Staff.deleteQuestion(req.session.orgid,qid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff delete question",{
+                        id:qid,
+                        editorid:req.session.uid});
+                    res.status(200);
+                    successMsg.body = msg;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.put("/editor/survey/rfp",acl.middleware(2),function(req,res){
+        var surveyid = req.body.surveyid;
+        console.log("haha")
+        if(surveyid){
+            Staff.proposeSurvey(req.session.orgid,surveyid,function(err,msg){
+                if(msg == "forbidden"){
+                    res.status(403);
+                    errorMsg.code = "can not operate";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff propose survey for audit",{
+                        id:surveyid,
+                        editorid:req.session.uid});
+                    res.status(200);
+                    successMsg.body = null;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.put("/admin/survey/audit",acl.middleware(2),function(req,res){
+        var surveyid = req.body.surveyid;
+        var status = req.body.status;
+        if(surveyid && ObjectID.isValid(surveyid) && status &&
+            (status == dict.SURVEYSTATUS_DISABLE || status == dict.SURVEYSTATUS_EDIT ||
+            status == dict.SURVEYSTATUS_NORMAL || status == dict.SURVEYSTATUS_REJECT)){
+            Admin.auditSurvey(req.session.orgid,surveyid,status,function(err,msg){
+                if(msg == "forbidden"){
+                    res.status(403);
+                    errorMsg.code = "can not operate";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","admin audit survey",{
+                        id:surveyid,
+                        adminid:req.session.uid,
+                        status:status});
+                    res.status(200);
+                    successMsg.body = null;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.put("/admin/survey/assign",acl.middleware(2),function(req,res){
+        var surveyid = req.body.surveyid;
+        var staffid = req.body.staffid;
+        if(surveyid && staffid &&
+            ObjectID.isValid(surveyid) && ObjectID.isValid(staffid)){
+            Admin.assignSurvey(req.session.orgid,surveyid,staffid,function(err,msg){
+                if(msg == "forbidden"){
+                    res.status(403);
+                    errorMsg.code = "can not operate";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","admin assign survey",{
+                        surveyid:surveyid,
+                        adminid:req.session.uid,
+                        staffid:staffid});
+                    res.status(200);
+                    successMsg.body = null;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    })
+
+    app.get('/investigator/survey/list',acl.middleware(2),function(req,res){
+        Staff.getStaffSurveyList(req.session.uid,function(err,msg){
+            if(msg == "notfound"){
+                res.status(404);
+                errorMsg.code = "survey not found";
+                res.send(JSON.stringify(errorMsg));
+            }
+            else{
+                logger.logger.log("info","staff get surveylist",{
+                    id:req.session.uid
+                });
+                res.status(200);
+                successMsg.body = msg;
+
+                res.send(JSON.stringify(successMsg));
+            }
+        })
+    })
 });
 
 function checkSurveyData(data){

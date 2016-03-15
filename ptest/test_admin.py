@@ -20,13 +20,17 @@ editorName = "myeditor"
 editorPassword = "123456"
 editorNewPassword = "654321"
 
+investigatorName = "myinvestigator"
+investigatorPassword = "123456"
+
 surveyName = "mysurvey"
 surveyType = "survey"
 
 class TestAdmin(unittest.TestCase):
     def setUp(self):
         helpfunc.cleanDb()
-    
+    def tearDown(self):
+        helpfunc.cleanDb()   
     def test_changepass(self):
         self.adminLoginReq = helpfunc.adminLogin(superAdminPass,orgName,adminName,adminPass)
         self.oldhash = hashlib.md5()
@@ -73,6 +77,9 @@ class TestEdtor(unittest.TestCase):
     def setUp(self):
         helpfunc.cleanDb()  
 
+    def tearDown(self):
+        helpfunc.cleanDb()
+
     def test_editorlogin(self):
         self.createStaff = helpfunc.createEditor(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword)
         self.hash = hashlib.md5()
@@ -103,8 +110,75 @@ class TestEdtor(unittest.TestCase):
         self.cqJson["surveyid"] = self.surveyId
         self.cqReq = requests.post(self.cqUrl,json=self.cqJson,cookies=self.createSurvey["editor"].cookies)
         self.assertEqual(self.cqReq.status_code,200)
-    
         
+        self.cqJson2 = survey.QList[1]
+        self.cqJson2["surveyid"] = self.surveyId
+        self.cqReq2 = requests.post(self.cqUrl,json=self.cqJson2,cookies=self.createSurvey["editor"].cookies)
+        self.assertEqual(self.cqReq2.status_code,200)
+
+    def test_deletequesion(self):
+        self.createQlist = helpfunc.createQuestions(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType)
+        self.qlist = self.createQlist["questions"]
+        self.qid1 = json.loads(self.qlist[0].content)["body"]
+        
+        self.deletequrl = urlHeader + "/editor/survey/question/delete"
+        self.deleteqdata = {"questionid":self.qid1}
+        self.deleteqreq = requests.delete(self.deletequrl,data=self.deleteqdata,cookies=self.createQlist["editor"].cookies)
+        self.assertEqual(self.deleteqreq.status_code,200)
+
+    def test_proposesurvey(self):
+        self.createQlist = helpfunc.createQuestions(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType)
+        self.surveyId = json.loads(self.createQlist["survey"].content)["body"]
+        self.psUrl = urlHeader + "/editor/survey/rfp"
+        self.psData = {"surveyid":"56e552450d8b79d0286e0ad6"}
+        self.psReq = requests.put(self.psUrl,data=self.psData,cookies=self.createQlist["editor"].cookies)
+        self.assertEqual(self.psReq.status_code,404)
+        self.psData = {"surveyid":self.surveyId}
+        self.psReq = requests.put(self.psUrl,data=self.psData,cookies=self.createQlist["editor"].cookies)
+        self.assertEqual(self.psReq.status_code,200)
+
+    def test_auditsurvey(self):
+        proposeReq = helpfunc.proposeSurvey(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType)
+        surveyId = json.loads(proposeReq["survey"].content)["body"]
+        hash = hashlib.md5()
+        hash.update(adminPass)
+        sloginUrl = urlHeader + "/admin/login"
+        sloginData = {"password":hash.hexdigest(),"username":adminName}
+        salRequest = requests.post(sloginUrl,data=sloginData)
+        
+        audsUrl = urlHeader + "/admin/survey/audit"
+        audsData = {"surveyid":surveyId,"status":"surveynormal"}
+        audsReq = requests.put(audsUrl,data=audsData,cookies = salRequest.cookies)
+        self.assertEqual(audsReq.status_code,200)
+        audsReq = requests.put(audsUrl,data=audsData)
+        self.assertEqual(audsReq.status_code,500)
+        audsData = {"surveyid":"123","status":"surveynormal"}
+        audsReq = requests.put(audsUrl,data=audsData,cookies = salRequest.cookies)
+        self.assertEqual(audsReq.status_code,406)
+
+    def test_assignsurvey(self):
+        createSurvey = helpfunc.auditSurvey(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType)
+        surveyId = json.loads(createSurvey["survey"].content)["body"]
+
+        hash = hashlib.md5()
+        hash.update(adminPass)
+        sloginUrl = urlHeader + "/admin/login"
+        sloginData = {"password":hash.hexdigest(),"username":adminName}
+        salRequest = requests.post(sloginUrl,data=sloginData)
+
+        invHash = hashlib.md5()
+        invHash.update(investigatorPassword)
+        asUrl = urlHeader+"/admin/staff/add"
+        asData = {"name":investigatorName,"role":"investigator","password":invHash.hexdigest()}
+        asReq = requests.post(asUrl,data=asData,cookies=salRequest.cookies)
+        self.assertEqual(asReq.status_code,200)
+
+        investigatorId = json.loads(asReq.content)["body"]
+        asignUrl = urlHeader + "/admin/survey/assign"
+        asignData = {"surveyid":surveyId,"staffid":investigatorId}
+        asignReq = requests.put(asignUrl,data=asignData,cookies=salRequest.cookies)
+        self.assertEqual(asignReq.status_code,200)
+
 
 if __name__ == '__main__':
     unittest.main()

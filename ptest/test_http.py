@@ -20,6 +20,9 @@ class TestSuperAdmin(unittest.TestCase):
     
     def setUp(self):
         helpfunc.cleanDb()
+
+    def tearDown(self):
+        helpfunc.cleanDb()
         
     def test_create(self):
         self.csaUrl = urlHeader + "/createsuperadmin"

@@ -1,4 +1,5 @@
 var mongoPool = require("../db");
+var dict = require("../dict")
 var Admin = {};
 
 var ObjectID=require('mongodb').ObjectID;
@@ -318,6 +319,105 @@ Admin.adminDisableStaff = function(orgid,staffid,callback){
                         callback(err,"notfound");
                     }
                 });
+            });
+        }
+    });
+};
+
+Admin.auditSurvey = function(orgid,surveyid,status,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+                collection.find({_id:ObjectID(surveyid)}).limit(1).next(function(err,survey){
+                    if(survey){
+                        if(survey.orgid != orgid){
+                            callback(err,"forbidden");
+                            mongoPool.release(db);
+                        }
+                        else{
+                            collection.updateOne({_id:ObjectID(surveyid)},
+                                {$set:{status:status}},function(err,upres){
+                                    callback(err,upres);
+                                });
+                        }
+
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound")
+                    }
+                })
+            });
+        }
+    });
+};
+
+Admin.assignSurvey = function(orgid,surveyid,staffid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+                collection.find({_id:ObjectID(surveyid)}).limit(1).next(function(err,survey){
+                    if(survey){
+                        if(survey.orgid != orgid){
+                            callback(err,"forbidden");
+                            mongoPool.release(db);
+                        }
+                        else{
+                            db.collection("staffs",function(err,staffcollection){
+                                staffcollection.find({_id:ObjectID(staffid)}).limit(1)
+                                    .next(function(err,staff){
+                                        if(staff){
+                                            if(staff.orgid != orgid){
+                                                console.log("++++++++++")
+                                                callback(err,"forbidden");
+                                                mongoPool.release(db);
+                                            }
+                                            else if(survey.status!=dict.SURVEYSTATUS_NORMAL){
+                                                console.log("---------------")
+                                                callback(err,"forbidden");
+                                                mongoPool.release(db);
+                                            }
+                                            else if(staff.role!=dict.STAFF_INVESTIGATOR){
+                                                console.log("!!!!!!!!!!!!!!!!")
+                                                callback(err,"forbidden");
+                                                mongoPool.release(db);
+                                            }
+                                            else{
+                                                if(!staff.surveyList){
+                                                    staff.surveyList = []
+                                                }
+                                                staff.surveyList.push({
+                                                    surveyid:surveyid,
+                                                    name:survey.name
+                                                });
+                                                staffcollection.updateOne({_id:ObjectID(staffid)},
+                                                    {$set:{surveyList:staff.surveyList}},
+                                                    function(err,ures){
+                                                        callback(err,ures);
+                                                });
+                                            }
+                                        }
+                                        else{
+                                            mongoPool.release(db);
+                                            callback(err,"notfound")
+                                        }
+                                    });
+                            });
+
+                        }
+
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound")
+                    }
+                })
             });
         }
     });
