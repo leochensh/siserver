@@ -30,6 +30,9 @@ class TestInves(unittest.TestCase):
     def setUp(self):
         helpfunc.cleanDb()
 
+    def tearDown(self):
+        helpfunc.cleanDb()
+
     def test_getsurlist(self):
         assignSurvey = helpfunc.assignSurvey(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType,investigatorName,investigatorPassword)
         # assignSurvey.close()
