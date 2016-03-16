@@ -21,5 +21,9 @@ module.exports = {
     SELECTTYPE_IMAGE:"imageselect",
     SELECTTYPE_VIDEO:"videoselect",
     SELECTTYPE_AUDIO:"audioselect",
-    SELECTTYPE_DESCRIPTION:"descriptionselect"
+    SELECTTYPE_DESCRIPTION:"descriptionselect",
+
+    PLATFORMTYPE_ANDROID:"android",
+    PLATFORMTYPE_IOS:"ios",
+    PLATFORMTYPE_WEB:"web"
 };

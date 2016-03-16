@@ -292,3 +292,142 @@ Staff.getSurveyDetail = function(surveyid,callback){
         }
     });
 };
+
+Staff.saveAnswers = function(answerdata,staffid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("answers",function(err,collection){
+                answerdata.ctime = new Date();
+                answerdata.investigatorid = staffid;
+                collection.insertOne(answerdata,function(err,res){
+                    mongoPool.release(db);
+                    callback(err,res.insertedId);
+                })
+            });
+        }
+    });
+};
+
+var processAnswers = function(answers,db,callback){
+    async.each(answers,function(answer,cb){
+        if(answer.surveyid){
+            db.collection("surveys",function(error,surveycollection){
+                surveycollection.find({_id:ObjectID(answer.surveyid)},{name:1})
+                    .limit(1).next(function(err,survey){
+                        if(survey){
+                            answer.surveyname = survey.name;
+                        }
+                        cb();
+                    })
+            });
+        }
+        else{
+            cb();
+        }
+
+    },function(err){
+        mongoPool.release(db);
+        callback(err,answers);
+    });
+};
+
+Staff.getAnswerList = function(pagesize,pagenum,staffid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("answers",function(err,collection){
+                if(pagesize == 0){
+                    collection.find({investigatorid:staffid},{_id:1,surveyid:1,ctime:1})
+                        .toArray(function(err,answers){
+                            processAnswers(answers,db,callback)
+                        });
+                }
+                else{
+                    collection.find({investigatorid:staffid},{_id:1,surveyid:1,ctime:1})
+                        .skip(pagenum*pagesize).limit(pagesize).toArray(function(err,answers){
+                            processAnswers(answers,db,callback)
+                        });
+                }
+
+            });
+        }
+    });
+};
+
+Staff.getAnswerDetail = function(answerid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("answers",function(err,collection){
+                collection.find({_id:ObjectID(answerid)})
+                    .limit(1).next(function(err,answer){
+                        mongoPool.release(db);
+                        if(answer){
+                            callback(err,answer);
+                        }
+                        else{
+                            callback(err,"notfound");
+                        }
+                    });
+            });
+        }
+    });
+};
+
+Staff.addFeedback = function(feeddata,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("feedbacks",function(err,collection){
+                feeddata.ctime = new Date();
+                collection.insertOne(feeddata,function(err,insresult){
+                    mongoPool.release(db);
+                    callback(err,insresult.insertedId);
+                });
+            });
+        }
+    });
+};
+
+Staff.getVersionInfo = function(orgid,platform,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("versions",function(err,collection){
+                collection.find({orgid:orgid,platform:platform},{_id:0,orgid:0}).sort({ctime:-1})
+                    .limit(1).next(function(err,ver){
+                        mongoPool.release(db);
+                        callback(err,ver);
+                    })
+            });
+        }
+    });
+};
+
+Staff.getAdInfo = function(orgid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("ads",function(err,collection){
+                collection.find({orgid:orgid},{_id:0,orgid:0}).sort({ctime:-1})
+                    .toArray(function(err,ads){
+                        mongoPool.release(db);
+                        callback(err,ads);
+                    })
+            });
+        }
+    });
+}

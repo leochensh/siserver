@@ -2,9 +2,34 @@ var express = require('express');
 var serveStatic = require('serve-static');
 var ObjectID=require('mongodb').ObjectID;
 var _ = require("underscore");
+var spawn = require('child_process').spawn;
+var im = require('imagemagick');
 
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, (file.originalname).split('.')[0]+ Date.now() + '.jpg') //Appending .jpg
+    }
+});
+
+var imageupload = multer({ storage: storage });
+
+var audiovideostorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+        var aArray = file.originalname.split('.');
+        cb(null, aArray[0]+ Date.now() + '.'+aArray[aArray.length-1]); //Appending .jpg
+    }
+});
+
+var videoaudioupload = multer({storage:audiovideostorage});
 
 var bodyParser = require('body-parser');
 
@@ -35,7 +60,7 @@ var successMsg = {
     body:null
 };
 
-app.use('/static',serveStatic(__dirname + '/static'));
+app.use('/uploads',serveStatic(__dirname + '/uploads'));
 //app.use(multer({dest:"./static/"}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -632,7 +657,7 @@ aclHandler.registerWait(function(acl){
         })
     });
 
-    app.get("/investigator/survey/detail/:surveyid",function(req,res){
+    app.get("/investigator/survey/detail/:surveyid",acl.middleware(2),function(req,res){
         var surveyid = req.params.surveyid;
         if(surveyid && ObjectID.isValid(surveyid)){
             Staff.getSurveyDetail(surveyid,function(err,msg){
@@ -659,6 +684,264 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(errorMsg));
         }
     })
+
+    app.post("/investigator/survey/answer/add",acl.middleware(2),function(req,res){
+        var surveyid = req.body.surveyid;
+        var investigatorid = req.session.uid;
+        if(surveyid && ObjectID.isValid(surveyid) && investigatorid &&
+            ObjectID.isValid(investigatorid) && req.body.answerlist){
+            Staff.saveAnswers(req.body,investigatorid,function(err,msg){
+                logger.logger.log("info","staff send survey answer",{
+                    staffid:req.session.uid,
+                    surveyid:surveyid,
+                    answerid:msg
+                });
+                res.status(200);
+                successMsg.body = msg;
+
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/investigator/survey/answer/list/:pagesize/:pagenum",acl.middleware(2),function(req,res){
+        var pagesize = req.params.pagesize;
+        var pagenum = req.params.pagenum;
+        if(pagesize && pagenum){
+            var intPagesize = parseInt(pagesize);
+            var intPagenum = parseInt(pagenum);
+            if(!isNaN(intPagesize) && intPagesize>=0 && !isNaN(intPagenum) && intPagenum>=0){
+                Staff.getAnswerList(intPagesize,intPagenum,req.session.uid,function(err,msg){
+                    logger.logger.log("info","staff get survey answer list",{
+                        staffid:req.session.uid
+
+                    });
+                    res.status(200);
+                    successMsg.body = msg;
+
+                    res.send(JSON.stringify(successMsg));
+                });
+            }
+            else{
+                res.status(406);
+                errorMsg.code = "wrong";
+                res.send(JSON.stringify(errorMsg));
+            }
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/investigator/survey/answer/detail/:answerid",acl.middleware(2),function(req,res){
+        var answerid = req.params.answerid;
+
+        if(answerid && ObjectID.isValid(answerid)){
+            Staff.getAnswerDetail(answerid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "answer not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff get answer detail",{
+                        id:req.session.uid,
+                        answerid:answerid
+                    });
+                    res.status(200);
+                    successMsg.body = msg;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    var staffImageUploadHandle = imageupload.single("file");
+    app.post('/staff/upload/image',acl.middleware(2),function (req, res) {
+
+        staffImageUploadHandle(req, res, function (err) {
+            if (err) {
+                res.status(406);
+                console.log(err);
+                res.send("filename error")
+            }
+            else{
+
+                var newFname = req.file.path.split(".")[0]+"_small.jpg";
+
+
+                im.convert([req.file.path,"-quality","30",req.file.path],function(err,fout){
+
+                    successMsg.body = req.file.filename;
+
+                    res.send(JSON.stringify(successMsg));
+                })
+
+
+            }
+        });
+
+    });
+
+    var avuploadHandler = videoaudioupload.single("file");
+    app.post('/staff/upload/audio',acl.middleware(2),function (req, res) {
+
+        avuploadHandler(req, res, function (err) {
+            if (err) {
+                res.status(406);
+                console.log(err);
+                res.send("filename error")
+            }
+            else{
+
+                successMsg.body = req.file.filename;
+
+                res.send(JSON.stringify(successMsg));
+
+
+            }
+        });
+
+    });
+
+    app.post('/staff/upload/video',acl.middleware(2),function (req, res) {
+
+        avuploadHandler(req, res, function (err) {
+            if (err) {
+                res.status(406);
+                console.log(err);
+                res.send("filename error")
+            }
+            else{
+
+                successMsg.body = req.file.filename;
+
+                res.send(JSON.stringify(successMsg));
+
+
+            }
+        });
+
+    });
+
+    app.post("/investigator/feedback",acl.middleware(),function(req,res){
+        var staffid = req.session.uid;
+        var platform = req.body.platform;
+        var osversion = req.body.osversion;
+        var versionnum = req.body.versionnum;
+        var content = req.body.content;
+        var image = req.body.image;
+        var fdata = {
+            staffid:staffid,
+            platform:platform,
+            osversion:osversion,
+            versionnum:versionnum,
+            content:content,
+            image:image
+        };
+        Staff.addFeedback(fdata,function(err,msg){
+            logger.logger.log("info","staff add feedback",{
+                staffid:req.session.uid,
+                feedbackid:msg
+            });
+            res.status(200);
+            successMsg.body = msg;
+
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
+    app.post("/admin/version/add",acl.middleware(2),function(req,res){
+        var platform = req.body.platform;
+        var versionnum = req.body.versionnum;
+        var fileurl = req.body.fileurl;
+        if(platform && versionnum && fileurl){
+            Admin.addVersion(req.session.orgid,platform,versionnum,fileurl,function(err,msg){
+                logger.logger.log("info","admin add new version",{
+                    adminid:req.session.uid,
+                    versionid:msg
+                });
+                res.status(200);
+                successMsg.body = msg;
+
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+    app.get("/investigator/version/get/:platform",acl.middleware(2),function(req,res){
+        var platform = req.params.platform;
+        if(platform &&
+            (platform == dict.PLATFORMTYPE_ANDROID || platform == dict.PLATFORMTYPE_IOS || platform==dict.PLATFORMTYPE_WEB)){
+            Staff.getVersionInfo(req.session.orgid,platform,function(err,msg){
+                logger.logger.log("info","staff get version info",{
+                    staffid:req.session.uid,
+                });
+                res.status(200);
+                successMsg.body = msg;
+
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.post("/admin/ad/add",acl.middleware(2),function(req,res){
+        var title = req.body.title;
+        var image = req.body.image;
+        var link = req.body.link;
+        if(title && image && link){
+            Admin.addAd(req.session.orgid,title,image,link,function(err,msg){
+                logger.logger.log("info","admin add new ad",{
+                    adminid:req.session.uid,
+                    adid:msg
+                });
+                res.status(200);
+                successMsg.body = msg;
+
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/investigator/ad/get",acl.middleware(2),function(req,res){
+        Staff.getAdInfo(req.session.orgid,function(err,ads){
+            logger.logger.log("info","staff get ad info",{
+                staffid:req.session.uid
+            });
+            res.status(200);
+            successMsg.body = ads;
+
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
 });
 
 function checkSurveyData(data){

@@ -179,6 +179,24 @@ class TestEdtor(unittest.TestCase):
         asignReq = requests.put(asignUrl,data=asignData,cookies=salRequest.cookies)
         self.assertEqual(asignReq.status_code,200)
 
+        addVersionUrl = urlHeader + "/admin/version/add"
+        addVersionData = {
+            "platform":"android",
+            "versionnum":"231",
+            "fileurl":"test.apk"
+        }
+        versionReq = requests.post(addVersionUrl,data=addVersionData,cookies=salRequest.cookies);
+        self.assertEqual(versionReq.status_code,200)
+
+        addAdUrl = urlHeader + "/admin/ad/add"
+        addAdData = {
+            "title":"this is a ad",
+            "image":"test.jpg",
+            "link":"http://www.baidu.com"
+        }
+        adReq = requests.post(addAdUrl,data=addAdData,cookies=salRequest.cookies);
+        self.assertEqual(adReq.status_code,200)
+
 
 if __name__ == '__main__':
     unittest.main()

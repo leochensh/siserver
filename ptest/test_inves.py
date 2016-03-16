@@ -57,7 +57,42 @@ class TestInves(unittest.TestCase):
 
         sdeataiReq = requests.get(sdeataiUrl,cookies = eloginReq.cookies)
         self.assertEqual(sdeataiReq.status_code,200)
-        print sdeataiReq.content
+
+        answerUrl = urlHeader + "/investigator/survey/answer/add"
+        answerData = survey.Answer
+        answerData["surveyid"] = sList[0]["surveyid"]
+        answerReq = requests.post(answerUrl,json=answerData,cookies=eloginReq.cookies)
+        self.assertEqual(answerReq.status_code,200)
+
+        answerListUrl = urlHeader + "/investigator/survey/answer/list/5/0"
+        answerListReq = requests.get(answerListUrl,cookies = eloginReq.cookies)
+        self.assertEqual(answerListReq.status_code,200)
+
+
+        answerId = json.loads(answerListReq.content)["body"][0]["_id"]
+        answerDetailUrl = urlHeader + "/investigator/survey/answer/detail/" + answerId
+
+        answerDetailReq = requests.get(answerDetailUrl,cookies = eloginReq.cookies)
+        self.assertEqual(answerDetailReq.status_code,200)
+
+        uploadImageUrl = urlHeader + "/staff/upload/image"
+        uploadReqFiles = {'file':("image.png",open('ptest/figure_1.png','rb'),"image/png")}
+        uploadImageReq = requests.post(uploadImageUrl,files=uploadReqFiles,cookies=eloginReq.cookies)
+        self.assertEqual(uploadImageReq.status_code,200)
+
+        uploadAudioUrl = urlHeader + "/staff/upload/audio"
+        uploadReqFiles = {'file':open('ptest/test.amr','rb')}
+        uploadAudioReq = requests.post(uploadAudioUrl,files=uploadReqFiles,cookies=eloginReq.cookies)
+        self.assertEqual(uploadAudioReq.status_code,200)
+
+        getVersionUrl = urlHeader + "/investigator/version/get/android"
+        getVersionReq = requests.get(getVersionUrl,cookies = eloginReq.cookies)
+        self.assertEqual(getVersionReq.status_code,200)
+
+        getadUrl = urlHeader + "/investigator/ad/get"
+        getadReq = requests.get(getadUrl,cookies = eloginReq.cookies)
+        self.assertEqual(getadReq.status_code,200)
+        print getadReq.content
 
 if __name__ == '__main__':
     unittest.main()

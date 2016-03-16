@@ -29,13 +29,16 @@ mongoPool.acquire(function(err, db){
                 {resources:'/admin/staff/add',permissions:'post'},
                 {resources:'/admin/staff/resetpass',permissions:'put'},
                 {resources:'/admin/staff/delete',permissions:'delete'},
-                {resources:'/admin/survey',permissions:['put']}
+                {resources:'/admin/survey',permissions:['put']},
+                {resources:'/admin/version',permissions:['post']},
+                {resources:'/admin/ad',permissions:['post']}
             ]
         },
         {
             roles:[dict.STAFF_EDITOR,dict.STAFF_INVESTIGATOR],
             allows:[
-                {resources:'/staff/pass/change',permissions:'put'}
+                {resources:'/staff/pass/change',permissions:'put'},
+                {resources:'/staff/upload',permissions:"post"}
             ]
         },
         {
@@ -47,7 +50,10 @@ mongoPool.acquire(function(err, db){
         {
             roles:[dict.STAFF_INVESTIGATOR],
             allows:[
-                {resources:'/investigator/survey',permissions:['get']}
+                {resources:'/investigator/survey',permissions:['get','post']},
+                {resources:'/investigator/feedback',permissions:['post']},
+                {resources:'/investigator/version',permissions:['get']},
+                {resources:'/investigator/ad',permissions:['get']}
             ]
         }
     ]);

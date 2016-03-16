@@ -7,6 +7,21 @@ import survey
 
 urlHeader = "http://localhost:8080"
 
+superAdminPass = "123456"
+orgName = "neworg"
+adminName = "orgadmin"
+adminPass = "123456"
+adminNewPass = "654321"
+
+editorName = "myeditor"
+editorPassword = "123456"
+editorNewPassword = "654321"
+
+investigatorName = "myinvestigator"
+investigatorPassword = "123456"
+
+surveyName = "mysurvey"
+surveyType = "survey"
 
 def cleanDb():
     client = MongoClient()
@@ -16,6 +31,7 @@ def cleanDb():
     db.drop_collection("questions")
     db.drop_collection("staffs")
     db.drop_collection("surveys")
+    db.drop_collection("answers")
     
 def createSuperAdmin(password):
     csaUrl = urlHeader + "/createsuperadmin"
@@ -153,4 +169,25 @@ def assignSurvey(superAdminPass,orgName,adminName,adminPass,editorName,editorPas
     asignUrl = urlHeader + "/admin/survey/assign"
     asignData = {"surveyid":surveyId,"staffid":investigatorId}
     asignReq = requests.put(asignUrl,data=asignData,cookies=salRequest.cookies)
+
+    addVersionUrl = urlHeader + "/admin/version/add"
+    addVersionData = {
+        "platform":"android",
+        "versionnum":"231",
+        "fileurl":"test.apk"
+    }
+    versionReq = requests.post(addVersionUrl,data=addVersionData,cookies=salRequest.cookies);
+
+    addAdUrl = urlHeader + "/admin/ad/add"
+    addAdData = {
+        "title":"this is a ad",
+        "image":"test.jpg",
+        "link":"http://www.baidu.com"
+    }
+    adReq = requests.post(addAdUrl,data=addAdData,cookies=salRequest.cookies);
+
     return asignReq
+
+def simpleInit():
+    cleanDb()
+    assignSurvey(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType,investigatorName,investigatorPassword):

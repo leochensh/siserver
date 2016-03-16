@@ -424,3 +424,49 @@ Admin.assignSurvey = function(orgid,surveyid,staffid,callback){
         }
     });
 };
+
+Admin.addVersion = function(orgid,platform,versionnum,fileurl,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("versions",function(err,collection){
+                var newversion = {
+                    orgid:orgid,
+                    platform:platform,
+                    versionnum:versionnum,
+                    fileurl:fileurl,
+                    ctime:new Date()
+                };
+                collection.insertOne(newversion,function(err,insert){
+                    mongoPool.release(db);
+                    callback(err,insert.insertedId);
+                });
+            });
+        }
+    });
+};
+
+Admin.addAd = function(orgid,title,image,link,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("ads",function(err,collection){
+                var newad = {
+                    orgid:orgid,
+                    title:title,
+                    image:image,
+                    link:link,
+                    ctime:new Date()
+                };
+                collection.insertOne(newad,function(err,insert){
+                    mongoPool.release(db);
+                    callback(err,insert.insertedId);
+                });
+            });
+        }
+    });
+};
