@@ -190,4 +190,4 @@ def assignSurvey(superAdminPass,orgName,adminName,adminPass,editorName,editorPas
 
 def simpleInit():
     cleanDb()
-    assignSurvey(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType,investigatorName,investigatorPassword):
+    assignSurvey(superAdminPass,orgName,adminName,adminPass,editorName,editorPassword,surveyName,surveyType,investigatorName,investigatorPassword)
