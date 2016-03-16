@@ -632,7 +632,7 @@ aclHandler.registerWait(function(acl){
         })
     });
 
-    app.get("/investigator/survey/detail/:surveyid",acl.middleware(2),function(req,res){
+    app.get("/investigator/survey/detail/:surveyid",function(req,res){
         var surveyid = req.params.surveyid;
         if(surveyid && ObjectID.isValid(surveyid)){
             Staff.getSurveyDetail(surveyid,function(err,msg){
