@@ -13,7 +13,7 @@ Staff.login = function(uname,pass,callback){
 
         }
         else{
-            db.collection("staffs",function(err,collection){
+            db.collection("admins",function(err,collection){
 
                 collection.find({name:uname,passhash:pass}).limit(1).next(function(err,admin){
                     if(admin){
@@ -42,7 +42,7 @@ Staff.changeStaffPass = function(staffname,oldpass,newpass,callback){
 
         }
         else{
-            db.collection("staffs",function(err,collection){
+            db.collection("admins",function(err,collection){
 
                 collection.find({name:staffname}).limit(1).next(function(err,admin){
                     if(admin){
@@ -227,7 +227,7 @@ Staff.getStaffSurveyList = function(staffid,callback){
 
         }
         else{
-            db.collection("staffs",function(err,collection){
+            db.collection("admins",function(err,collection){
                 collection.find({_id:ObjectID(staffid)}).limit(1).next(function(err,staff){
                     if(staff){
 

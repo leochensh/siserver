@@ -61,6 +61,7 @@ var successMsg = {
 };
 
 app.use('/uploads',serveStatic(__dirname + '/uploads'));
+app.use('/public',serveStatic(__dirname + '/public'));
 //app.use(multer({dest:"./static/"}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -135,7 +136,9 @@ app.post("/admin/login",function(req,res){
             }
             else{
                 res.status(200);
-                successMsg.body = null;
+                successMsg.body = {
+                    role:msg.role
+                };
                 req.session.userId = msg.name;
                 if(msg.orgid){
                     req.session.orgid = msg.orgid;
@@ -169,7 +172,9 @@ app.post("/staff/login",function(req,res){
             }
             else{
                 res.status(200);
-                successMsg.body = null;
+                successMsg.body = {
+                    role:msg.role
+                };
                 req.session.userId = msg.name;
                 req.session.orgid = msg.orgid;
                 req.session.uid = msg._id;
@@ -227,7 +232,7 @@ aclHandler.registerWait(function(acl){
         var pass = req.body.password;
 
         if(orgid && name && pass){
-            Admin.createOrgAdmin(orgid,name,pass,function(err,msg,insertedid){
+            Admin.createOrgAdmin(orgid,name,pass,"admin",function(err,msg,insertedid){
                 if(msg == "nameduplicate"){
                     res.status(409);
                     errorMsg.code = "name duplicate";
@@ -252,6 +257,68 @@ aclHandler.registerWait(function(acl){
             errorMsg.code = "wrong";
             res.send(JSON.stringify(errorMsg));
         }
+    });
+
+    app.post("/sadmin/personal/add",acl.middleware(1),function(req,res){
+        var name = req.body.name;
+        var pass = req.body.password;
+
+        if(name && pass){
+            var orgname = "__personal"+name;
+            if(orgname){
+                Admin.createOrganization(orgname,function(err,msg,insertedid){
+                    if(msg == "duplicate"){
+                        res.status(409);
+                        errorMsg.code = "duplicate";
+                        res.send(JSON.stringify(errorMsg));
+                    }
+                    else{
+                        logger.logger.log("info","new organization created",{name:msg.name});
+                        var orgid = insertedid.toString();
+                        Admin.createOrgAdmin(orgid,name,pass,dict.STAFF_PERSONAL,function(err,msg,insertedid){
+                            if(msg == "nameduplicate"){
+                                res.status(409);
+                                errorMsg.code = "name duplicate";
+                                res.send(JSON.stringify(errorMsg));
+                            }
+                            else if(msg == "orgnotfound"){
+                                res.status(404);
+                                errorMsg.code = "organization not found";
+                                res.send(JSON.stringify(errorMsg));
+                            }
+                            else{
+                                logger.logger.log("info","new organization admin created",{name:msg.name});
+                                res.status(200);
+                                acl.addUserRoles(msg.name, dict.STAFF_PERSONAL);
+                                successMsg.body = insertedid;
+                                res.send(JSON.stringify(successMsg));
+                            }
+                        })
+                    }
+                })
+            }
+            else{
+                res.status(406);
+                errorMsg.code = "wrong";
+                res.send(JSON.stringify(errorMsg));
+            }
+
+
+
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/personal/list",acl.middleware(1),function(req,res){
+        Admin.getPersonalList(function(err,msg){
+            res.status(200);
+            successMsg.body = msg;
+            res.send(JSON.stringify(successMsg));
+        })
     });
 
     app.put("/sadmin/org/admin/resetpass",acl.middleware(1),function(req,res){

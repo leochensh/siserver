@@ -29,7 +29,8 @@ Admin.createSuperAdmin = function(passhash,callback){
                             name:"superadmin",
                             passhash:hash.digest('hex'),
                             ctime:new Date(),
-                            disable:false
+                            disable:false,
+                            role:"sadmin"
                         };
                         collection.insertOne(superadmin,function(err,admin){
                             mongoPool.release(db);
@@ -43,16 +44,12 @@ Admin.createSuperAdmin = function(passhash,callback){
 };
 
 Admin.login = function(uname,pass,callback){
-    console.log(uname)
-    console.log(pass)
     mongoPool.acquire(function(err,db){
         if(err){
 
         }
         else{
             db.collection("admins",function(err,collection){
-                console.log(uname)
-                console.log(pass)
                 collection.find({name:uname,passhash:pass}).limit(1).next(function(err,admin){
                     console.log(admin)
                     if(admin){
@@ -105,7 +102,7 @@ Admin.createOrganization = function(orgname,callback){
     });
 };
 
-Admin.createOrgAdmin = function(orgid,name,pass,callback){
+Admin.createOrgAdmin = function(orgid,name,pass,role,callback){
     mongoPool.acquire(function(err,db){
         if(err){
 
@@ -128,7 +125,8 @@ Admin.createOrgAdmin = function(orgid,name,pass,callback){
                                         passhash:pass,
                                         orgid:orgid,
                                         ctime:new Date(),
-                                        disable:false
+                                        disable:false,
+                                        role:role
                                     };
                                     adcollection.insertOne(newadmin,function(err,result){
                                         mongoPool.release(db);
@@ -172,6 +170,29 @@ Admin.sadminResetAdminPass = function(adminid,pass,callback){
         }
     });
 };
+
+Admin.getPersonalList = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,collection){
+
+                collection.find({role:dict.STAFF_PERSONAL}).sort({ctime:-1}).toArray(function(err,admins){
+                    if(admins){
+                        mongoPool.release(db);
+                        callback(err,admins);
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,[]);
+                    }
+                });
+            });
+        }
+    });
+}
 
 Admin.sadminDisableAdmin = function(adminid,callback){
     mongoPool.acquire(function(err,db){
@@ -240,7 +261,7 @@ Admin.addStaff = function(orgid,name,role,pass,callback){
 
                 collection.find({_id:ObjectID(orgid)}).limit(1).next(function(err,org){
                     if(org){
-                        db.collection("staffs",function(err,adcollection){
+                        db.collection("admins",function(err,adcollection){
                             adcollection.find({name:name}).limit(1).next(function(err,admin){
                                 if(admin){
                                     mongoPool.release(db);
@@ -280,7 +301,7 @@ Admin.resetStaffPass = function(orgid,staffid,pass,callback){
 
         }
         else{
-            db.collection("staffs",function(err,collection){
+            db.collection("admins",function(err,collection){
 
                 collection.find({_id:ObjectID(staffid)}).limit(1).next(function(err,admin){
                     if(admin && admin.orgid == orgid){
@@ -305,7 +326,7 @@ Admin.adminDisableStaff = function(orgid,staffid,callback){
 
         }
         else{
-            db.collection("staffs",function(err,collection){
+            db.collection("admins",function(err,collection){
 
                 collection.find({_id:ObjectID(staffid)}).limit(1).next(function(err,admin){
                     if(admin && admin.orgid == orgid){
@@ -370,22 +391,22 @@ Admin.assignSurvey = function(orgid,surveyid,staffid,callback){
                             mongoPool.release(db);
                         }
                         else{
-                            db.collection("staffs",function(err,staffcollection){
+                            db.collection("admins",function(err,staffcollection){
                                 staffcollection.find({_id:ObjectID(staffid)}).limit(1)
                                     .next(function(err,staff){
                                         if(staff){
                                             if(staff.orgid != orgid){
-                                                console.log("++++++++++")
+                                                console.log("++++++++++");
                                                 callback(err,"forbidden");
                                                 mongoPool.release(db);
                                             }
                                             else if(survey.status!=dict.SURVEYSTATUS_NORMAL){
-                                                console.log("---------------")
+                                                console.log("---------------");
                                                 callback(err,"forbidden");
                                                 mongoPool.release(db);
                                             }
                                             else if(staff.role!=dict.STAFF_INVESTIGATOR){
-                                                console.log("!!!!!!!!!!!!!!!!")
+                                                console.log("!!!!!!!!!!!!!!!!");
                                                 callback(err,"forbidden");
                                                 mongoPool.release(db);
                                             }

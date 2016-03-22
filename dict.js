@@ -1,6 +1,7 @@
 module.exports = {
     STAFF_EDITOR:"editor",
     STAFF_INVESTIGATOR:"investigator",
+    STAFF_PERSONAL:"personal",
 
     TYPE_SURVEY:"survey",
     TYPE_TEMPLATE:"template",

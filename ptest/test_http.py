@@ -15,6 +15,9 @@ adminName = "orgadmin"
 adminPass = "123456"
 adminNewPass = "654321"
 
+personalName = "leo"
+personalPass = "123456"
+
 
 class TestSuperAdmin(unittest.TestCase):
     
@@ -70,7 +73,24 @@ class TestSuperAdmin(unittest.TestCase):
         self.coaData = {"orgid":self.orgId,"name":adminName,"password":self.hash.hexdigest()}
         self.coaRequest = requests.post(self.coaUrl,data=self.coaData,cookies=self.coRequest["sadmin"].cookies)
         self.assertEqual(self.coaRequest.status_code,200)
-    
+
+    def test_createpersonal(self):
+        self.sloginRequest = helpfunc.sadminLogin(superAdminPass)
+        self.coUrl = urlHeader + "/sadmin/personal/add"
+        self.hash = hashlib.md5()
+        self.hash.update(personalPass)
+        self.coData = {"name":personalName,"password":self.hash.hexdigest()}
+        self.coRequest = requests.post(self.coUrl,data=self.coData,cookies=self.sloginRequest.cookies)
+        self.assertEqual(self.coRequest.status_code,200)
+
+        getListUrl = urlHeader+"/sadmin/personal/list"
+        getListReq = requests.get(getListUrl,cookies=self.sloginRequest.cookies)
+        self.assertEqual(getListReq.status_code,200)
+        data = json.loads(getListReq.content)
+        self.assertEqual(len(data["body"]),1)
+        self.assertEqual(data["body"][0]["name"],personalName)
+
+
     def test_resetAdminPass(self):
         
         self.newhash = hashlib.md5()
