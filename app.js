@@ -4,9 +4,11 @@ var ObjectID=require('mongodb').ObjectID;
 var _ = require("underscore");
 var spawn = require('child_process').spawn;
 var im = require('imagemagick');
-
+var parse = require('csv-parse');
+var fs = require('fs');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
+
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -965,6 +967,52 @@ aclHandler.registerWait(function(acl){
             }
         });
 
+    });
+
+    app.post('/parsexlsx',function(req,res){
+        var file = req.body.file;
+        var typemap = {
+            "0":dict.QTYPE_SINGLESELECT,
+            "1":dict.QTYPE_MULTISELECT,
+            "2":dict.QTYPE_DESCRIPTION,
+            "3":dict.QTYPE_SEQUENCE,
+            "4":dict.QTYPE_SCORE
+        }
+        if(file){
+            fs.readFile("./uploads/"+file,function(err,data){
+                parse(data,function(err,output){
+                    var qlist = [];
+                    for(var i in output){
+                        var q = {}
+                        if(i>=1){
+                            if(output[i][1]){
+                                q.title = output[i][1].trim();
+                            }
+                            if(output[i][2]){
+                                q.type = typemap[output[i][2].trim()]
+                            }
+                            q.selectlist = [];
+                            var start = 3;
+                            while(output[i][start]){
+                                q.selectlist.push({
+                                    type:"textselect",
+                                    title:output[i][start].trim()
+                                });
+                                start+=1;
+                            }
+                            qlist.push(q)
+                        }
+                    }
+                    successMsg.body = qlist;
+                    res.send(JSON.stringify(successMsg));
+                })
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
     });
 
     app.post("/investigator/feedback",acl.middleware(),function(req,res){

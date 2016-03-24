@@ -4,6 +4,7 @@ import {SisDispatcher} from "../dispatcher";
 import {Question} from "./question"
 import _ from "underscore"
 import crypto from "crypto"
+var Dropzone = require('react-dropzone');
 
 export var Newsurvey = React.createClass({
     getInitialState(){
@@ -257,6 +258,58 @@ export var Newsurvey = React.createClass({
         };
         return dhandler;
     },
+    onDrop(files){
+        if(this.checkIfSurveySaved()){
+            var data = new FormData();
+            data.append("name",files[0].name);
+            data.append("file",files[0]);
+            $("#ajaxloading").show();
+
+            $.ajax({
+                url: Constant.BASE_URL+"staff/upload/video",
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'POST',
+                success: function(data){
+                    //alert(data);
+                    var file = JSON.parse(data).body
+                    $.ajax({
+                        url: Constant.BASE_URL+"parsexlsx",
+                        data: $.param({
+                            file:file
+                        }),
+                        type: 'POST',
+                        contentType: 'application/x-www-form-urlencoded',
+                        success: function (data) {
+                            $("#ajaxloading").hide();
+                            var msg = JSON.parse(data);
+
+                        },
+                        error:function(jxr,scode){
+                            $("#ajaxloading").hide();
+                        },
+                        statusCode:{
+                            406:function(){
+
+                            },
+                            500:function(){
+                                that.context.router.push("/login");
+                            },
+                            409:function(){
+
+                            }
+                        }
+                    });
+                },
+                error:function(jxr,scode){
+                    $("#ajaxloading").hide();
+                }
+            });
+        }
+        
+    },
     render(){
         var emptystyle = {display:"none"};
         if(this.state.ifSurveyNameEmpty){
@@ -321,6 +374,9 @@ export var Newsurvey = React.createClass({
                             </a>
 
                         </div>
+                        <Dropzone onDrop={this.onDrop} accept=" text/csv">
+                            <div>Drop xlsx file here or click.</div>
+                        </Dropzone>
                     </div>
 
                     <div id="scrollright" className="col-md-9 right_list_media">

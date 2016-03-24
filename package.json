@@ -58,6 +58,7 @@
     "babelify": "^7.2.0",
     "browserify": "^13.0.0",
     "browserify-shim": "^3.8.12",
+    "csv": "^0.4.6",
     "flux": "^2.1.1",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
