@@ -3,6 +3,10 @@ export var Constant = {
     LOGINSUCCESS:"loginsuccess",
     GETPERSONAL_LIST:"getpersonallist",
     ADDNEWPERSON:"addnewperson",
+    SURVEYVALUECHANGE:"surveyvaluechange",
+    CLEANSURVEYDATA:"cleansurveydata",
+    SURVEYDATABATCHCHANGE:"surveydatabatchchange",
+    LOADCSV:"loadcsv",
 
     QTYPE_SINGLESELECT:"singleselect",
     QTYPE_MULTISELECT:"multiselect",
@@ -32,6 +36,6 @@ export var Constant = {
     //BASE_URL:"http://121.40.94.201:3005/",
     //BASE_URL:"/tracker/"
     //BASE_URL:"http://121.40.94.201/mmn/",
-    BASE_URL:"/",
+    BASE_URL:"/si/",
     BASE_IMAGEURL:"/uploads/"
 };

@@ -15,7 +15,7 @@ export var Question = React.createClass({
         };
     },
     addselection(){
-        var ls = this.state.selectlist;
+        var ls = this.props.qdata.selectlist;
         ls.push({
             title:"selection",
             type:Constant.SELECTTYPE_TEXT
@@ -51,9 +51,9 @@ export var Question = React.createClass({
                 type: 'POST',
                 success: function(data){
                     $("#ajaxloading").hide();
-                    that.state.selectlist[index].img = JSON.parse(data).body;
+                    that.props.qdata.selectlist[index].img = JSON.parse(data).body;
                     that.informChange({
-                        selectlist:that.state.selectlist
+                        selectlist:that.props.qdata.selectlist
                     })
                 },
                 error:function(jxr,scode){
@@ -66,7 +66,7 @@ export var Question = React.createClass({
     stypechange(index){
         var that = this;
         function handleStype(event){
-            var slist = that.state.selectlist;
+            var slist = that.props.qdata.selectlist;
             slist[index].type = event.target.value;
             that.informChange({
                 selectlist:slist
@@ -77,7 +77,7 @@ export var Question = React.createClass({
     selectTitleChange(index){
         var that = this;
         function handleTC(event){
-            var slist = that.state.selectlist;
+            var slist = that.props.qdata.selectlist;
             slist[index].title = event.target.value;
             that.informChange({
                 selectlist:slist
@@ -89,19 +89,20 @@ export var Question = React.createClass({
         if(!obj.ifSaved){
             obj.ifSaved = false;
         }
-        this.setState(obj);
-        var that = this;
-        setTimeout(
-            function(){
-                that.props.qhandle(that.state);
-            },50
-        );
+        this.props.qhandle(obj);
+        //this.setState(obj);
+        //var that = this;
+        //setTimeout(
+        //    function(){
+        //        that.props.qhandle(that.state);
+        //    },50
+        //);
 
     },
     deleteselection(index){
         var that = this;
         var dfunc = function(){
-            var slist = that.state.selectlist;
+            var slist = that.props.qdata.selectlist;
             slist.splice(index,1);
             that.informChange({
                 selectlist:slist
@@ -110,18 +111,19 @@ export var Question = React.createClass({
         return dfunc;
     },
     savequestion(){
-        if(this.state.title &&
-            (this.state.selectlist.length>0 || this.props.qdata.qtype == Constant.QTYPE_DESCRIPTION)){
+        if(this.props.qdata.title &&
+            (this.props.qdata.selectlist.length>0 || this.props.qdata.type == Constant.QTYPE_DESCRIPTION)){
             var q = {
-                title:this.state.title,
+                title:this.props.qdata.title,
                 surveyid:this.props.qdata.surveyid,
-                type:this.props.qdata.qtype,
-                selectlist:this.state.selectlist
+                type:this.props.qdata.type,
+                selectlist:this.props.qdata.selectlist
             };
+            //alert(JSON.stringify(this.props.qdata));
             $("#ajaxloading").show();
             var that = this;
-            if(this.state.ifSaved){
-                q.questionid = this.state.id;
+            if(this.props.qdata.id){
+                q.questionid = this.props.qdata.id;
                 $.ajax({
                     url: Constant.BASE_URL+"editor/survey/question/edit",
                     data: JSON.stringify(q),
@@ -163,13 +165,13 @@ export var Question = React.createClass({
         }
     },
     deletequestion(){
-        if(this.state.id){
+        if(this.props.qdata.id){
             $("#ajaxloading").show();
             var that = this;
             $.ajax({
                 url: Constant.BASE_URL+"editor/survey/question/delete",
                 data: $.param({
-                    questionid:that.state.id
+                    questionid:that.props.qdata.id
                 }),
                 type: 'DELETE',
                 contentType: 'application/x-www-form-urlencoded',
@@ -195,12 +197,13 @@ export var Question = React.createClass({
 
     },
     render(){
-        var colorClass = this.state.ifSaved?"blue":"red";
+        //alert(JSON.stringify(this.props))
+        var colorClass = this.props.qdata.ifSaved?"blue":"red";
         var qid = "questionname"+this.props.index;
-        var typestr = Constant.QTYPE_NAME_MAP[this.props.qdata.qtype];
+        var typestr = Constant.QTYPE_NAME_MAP[this.props.qdata.type];
         var slist = [];
-        for(var i in this.state.selectlist){
-            var s = this.state.selectlist[i];
+        for(var i in this.props.qdata.selectlist){
+            var s = this.props.qdata.selectlist[i];
             var sid = "selection"+i;
             var img = "";
             var s2id = "selection2"+i;
@@ -287,7 +290,7 @@ export var Question = React.createClass({
                                 <textarea type="text"
                                           className="form-control"
                                           id={qid}
-                                          value={this.state.title}
+                                          value={this.props.qdata.title}
                                           onChange={this.handleChange.bind(this,"title")}>
                                 </textarea>
                             </div>

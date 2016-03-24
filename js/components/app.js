@@ -1,6 +1,7 @@
 import React from 'react';
 import {loginStore} from '../store/loginstore';
 import {personalStore} from '../store/personalstore'
+import {newsurveyStore} from '../store/newsurveystore'
 import {Link} from 'react-router'
 
 export var App = React.createClass({
@@ -10,10 +11,12 @@ export var App = React.createClass({
     componentDidMount(){
         this.token=loginStore.addListener(this._onChange);
         this.ptoken = personalStore.addListener(this._onChange);
+        this.newstoken = newsurveyStore.addListener(this._onChange);
     },
     componentWillUnmount(){
         loginStore.remove(this.token);
         personalStore.remove(this.ptoken);
+        newsurveyStore.remove(this.newstoken);
     },
     homeclick(){
         var cpath = this.props.routes[this.props.routes.length-1]['path']
@@ -53,6 +56,7 @@ export var App = React.createClass({
                 {
                     this.props.children && React.cloneElement(this.props.children,
                         {loginInfo:loginStore.getLoginInfo(),
+                            newsurvey:newsurveyStore.getAll(),
                             personalList:personalStore.getAll()})
                 }
             </div>

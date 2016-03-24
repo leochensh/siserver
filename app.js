@@ -985,22 +985,22 @@ aclHandler.registerWait(function(acl){
                     for(var i in output){
                         var q = {}
                         if(i>=1){
-                            if(output[i][1]){
+                            if(output[i][1] && output[i][2]){
                                 q.title = output[i][1].trim();
-                            }
-                            if(output[i][2]){
                                 q.type = typemap[output[i][2].trim()]
+                                q.selectlist = [];
+                                var start = 3;
+                                while(output[i][start]){
+                                    q.selectlist.push({
+                                        type:"textselect",
+                                        title:output[i][start].trim()
+                                    });
+                                    start+=1;
+                                }
+                                qlist.push(q)
                             }
-                            q.selectlist = [];
-                            var start = 3;
-                            while(output[i][start]){
-                                q.selectlist.push({
-                                    type:"textselect",
-                                    title:output[i][start].trim()
-                                });
-                                start+=1;
-                            }
-                            qlist.push(q)
+
+
                         }
                     }
                     successMsg.body = qlist;

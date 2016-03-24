@@ -17,26 +17,34 @@ export var Newsurvey = React.createClass({
         }
     },
     handleChange(name,event){
-        var newstate = {};
-        newstate[name] = event.target.value;
-        newstate.ifSurveyNameEmpty = false;
-        this.setState(newstate);
+        //var newstate = {};
+        //newstate[name] = event.target.value;
+        //newstate.ifSurveyNameEmpty = false;
+        //this.setState(newstate);
+        SisDispatcher.dispatch({
+            actionType: Constant.SURVEYVALUECHANGE,
+            name:name,
+            value:event.target.value
+        });
     },
     cleanall(){
         $("#cleanall").modal("show");
     },
     confirmclean(){
-        this.setState({
-            surveyname:"new survey",
-            ifSaved:false,
-            surveyid:null,
-            ifSurveyNameEmpty:false,
-            qlist:[]
+        //this.setState({
+        //    surveyname:"new survey",
+        //    ifSaved:false,
+        //    surveyid:null,
+        //    ifSurveyNameEmpty:false,
+        //    qlist:[]
+        //});
+        SisDispatcher.dispatch({
+            actionType: Constant.CLEANSURVEYDATA
         });
         $("#cleanall").modal("hide");
     },
     publishsurvey(){
-        if(this.state.surveyid){
+        if(this.props.newsurvey.surveyid){
             $("#publishsurvey").modal("show");
         }
 
@@ -44,12 +52,12 @@ export var Newsurvey = React.createClass({
     confirmpublish(){
 
         var that = this;
-        if(this.state.surveyid){
+        if(this.props.newsurvey.surveyid){
             $("#ajaxloading").show();
             $.ajax({
                 url: Constant.BASE_URL+"editor/survey/rfp",
                 data: $.param({
-                    surveyid:that.state.surveyid
+                    surveyid:that.props.newsurvey.surveyid
                 }),
                 type: 'PUT',
                 contentType: 'application/x-www-form-urlencoded',
@@ -58,7 +66,7 @@ export var Newsurvey = React.createClass({
                     $.ajax({
                         url: Constant.BASE_URL+"admin/survey/audit",
                         data: $.param({
-                            surveyid:that.state.surveyid,
+                            surveyid:that.props.newsurvey.surveyid,
                             status:"surveynormal"
                         }),
                         type: 'PUT',
@@ -67,7 +75,7 @@ export var Newsurvey = React.createClass({
                             $.ajax({
                                 url: Constant.BASE_URL+"admin/survey/assign",
                                 data: $.param({
-                                    surveyid:that.state.surveyid,
+                                    surveyid:that.props.newsurvey.surveyid,
                                     staffid:that.props.loginInfo.id
                                 }),
                                 type: 'PUT',
@@ -120,21 +128,57 @@ export var Newsurvey = React.createClass({
         }
 
     },
+    createNewSurvey(callback){
+        var that =this;
+        $.ajax({
+            url: Constant.BASE_URL+"editor/survey/create",
+            data: $.param({
+                name:that.props.newsurvey.surveyname,
+                type:"survey"
+            }),
+            type: 'POST',
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (data) {
+                $("#ajaxloading").hide();
+                callback(data);
+
+                $("#notsavealert").hide();
+            },
+            error:function(jxr,scode){
+                $("#ajaxloading").hide();
+            },
+            statusCode:{
+                406:function(){
+
+                },
+                500:function(){
+                    that.context.router.push("/login");
+                },
+                409:function(){
+
+                }
+            }
+        });
+    },
     savesurvey(){
 
-        if(!this.state.surveyname){
-            this.setState({ifSurveyNameEmpty:true});
+        if(!this.props.newsurvey.surveyname){
+            SisDispatcher.dispatch({
+                actionType: Constant.SURVEYVALUECHANGE,
+                name:"ifSurveyNameEmpty",
+                value:true
+            });
         }
         else{
 
             $("#ajaxloading").show();
             var that = this;
-            if(this.state.ifSaved){
+            if(this.props.newsurvey.ifSaved){
                 $.ajax({
                     url: Constant.BASE_URL+"editor/survey/edit",
                     data: $.param({
-                        name:that.state.surveyname,
-                        id:that.state.surveyid
+                        name:that.props.newsurvey.surveyname,
+                        id:that.props.newsurvey.surveyid
                     }),
                     type: 'PUT',
                     contentType: 'application/x-www-form-urlencoded',
@@ -160,44 +204,23 @@ export var Newsurvey = React.createClass({
                 });
             }
             else{
-                $.ajax({
-                    url: Constant.BASE_URL+"editor/survey/create",
-                    data: $.param({
-                        name:that.state.surveyname,
-                        type:"survey"
-                    }),
-                    type: 'POST',
-                    contentType: 'application/x-www-form-urlencoded',
-                    success: function (data) {
-                        $("#ajaxloading").hide();
-                        var msg = JSON.parse(data);
-                        that.setState({
+                this.createNewSurvey(function(data){
+                    var msg = JSON.parse(data);
+                    SisDispatcher.dispatch({
+                        actionType: Constant.SURVEYDATABATCHCHANGE,
+                        value:{
                             ifSaved:true,
                             surveyid:msg.body
-                        })
-                        $("#notsavealert").hide();
-                    },
-                    error:function(jxr,scode){
-                        $("#ajaxloading").hide();
-                    },
-                    statusCode:{
-                        406:function(){
-
-                        },
-                        500:function(){
-                            that.context.router.push("/login");
-                        },
-                        409:function(){
-
                         }
-                    }
+                    });
                 });
+
             }
 
         }
     },
     checkIfSurveySaved(){
-        if(!this.state.ifSaved){
+        if(!this.props.newsurvey.ifSaved){
             $("#notsavealert").show();
             return false;
         }
@@ -208,13 +231,20 @@ export var Newsurvey = React.createClass({
     addNewQuestion(qtype){
         if(this.checkIfSurveySaved()){
             var newQ = {
-                surveyid:this.state.surveyid,
-                qtype:qtype
+                surveyid:this.props.newsurvey.surveyid,
+                type:qtype,
+                title:"newquestion",
+                ifSaved:false,
+                selectlist:[],
+                id:null
             };
-            var cqlist = this.state.qlist;
+            var cqlist = this.props.newsurvey.qlist;
             cqlist.push(newQ);
-
-            this.setState({qlist:cqlist});
+            SisDispatcher.dispatch({
+                actionType: Constant.SURVEYVALUECHANGE,
+                name:"qlist",
+                value:cqlist
+            });
             setTimeout(function(){
                 var objDiv = document.getElementById("scrollright");
                 objDiv.scrollTop = objDiv.scrollHeight;
@@ -239,32 +269,67 @@ export var Newsurvey = React.createClass({
     questionchange(index){
         var that =this;
         var qhanle = function(qdata){
-            var cq = that.state.qlist[index];
+            var cq = that.props.newsurvey.qlist[index];
             for(var i in _.keys(qdata)){
                 var key = _.keys(qdata)[i];
                 cq[key] = qdata[key];
             }
+            SisDispatcher.dispatch({
+                actionType: Constant.SURVEYVALUECHANGE,
+                name:"qlist",
+                value:that.props.newsurvey.qlist
+            });
+
         }
         return qhanle;
     },
     questiondeleteinform(index){
         var that = this;
         var dhandler = function(){
-            var qlist = that.state.qlist;
+            var qlist = that.props.newsurvey.qlist;
             qlist.splice(index,1);
-            that.setState({
-                qlist:qlist
-            })
+            SisDispatcher.dispatch({
+                actionType: Constant.SURVEYVALUECHANGE,
+                name:"qlist",
+                value:qlist
+            });
+
         };
         return dhandler;
     },
+    confirmnewfromfile(){
+        $("#createsurveyfromfile").modal("hide");
+        var that = this;
+        if(this.props.newsurvey.surveyname){
+            this.createNewSurvey(function(data){
+                var msg = JSON.parse(data);
+
+                for(var i in that.state.tmsg){
+                    var q = that.state.tmsg[i];
+                    q.surveyid = that.props.newsurvey.surveyid;
+                    q.ifSaved = false;
+                    q.id = null;
+                }
+                //alert(JSON.stringify(that.state.tmsg))
+                SisDispatcher.dispatch({
+
+                    actionType: Constant.SURVEYDATABATCHCHANGE,
+                    value:{
+                        ifSaved:true,
+                        surveyid:msg.body,
+                        qlist:that.state.tmsg
+                    }
+                });
+            })
+        }
+    },
     onDrop(files){
-        if(this.checkIfSurveySaved()){
+        if(true){
             var data = new FormData();
             data.append("name",files[0].name);
             data.append("file",files[0]);
             $("#ajaxloading").show();
-
+            var that = this;
             $.ajax({
                 url: Constant.BASE_URL+"staff/upload/video",
                 data: data,
@@ -284,7 +349,9 @@ export var Newsurvey = React.createClass({
                         contentType: 'application/x-www-form-urlencoded',
                         success: function (data) {
                             $("#ajaxloading").hide();
-                            var msg = JSON.parse(data);
+                            var msg = JSON.parse(data).body;
+                            that.state.tmsg = msg;
+                            $("#createsurveyfromfile").modal("show");
 
                         },
                         error:function(jxr,scode){
@@ -308,16 +375,16 @@ export var Newsurvey = React.createClass({
                 }
             });
         }
-        
+
     },
     render(){
         var emptystyle = {display:"none"};
-        if(this.state.ifSurveyNameEmpty){
+        if(this.props.newsurvey.ifSurveyNameEmpty){
             emptystyle = {}
         }
         var questionList = [];
-        for(var i in this.state.qlist){
-            var q = this.state.qlist[i];
+        for(var i in this.props.newsurvey.qlist){
+            var q = this.props.newsurvey.qlist[i];
             questionList.push(<Question
                 index = {i}
                 qdata={q}
@@ -374,14 +441,14 @@ export var Newsurvey = React.createClass({
                             </a>
 
                         </div>
-                        <Dropzone onDrop={this.onDrop} accept=" text/csv">
+                        <Dropzone onDrop={this.onDrop} accept="text/csv">
                             <div>Drop xlsx file here or click.</div>
                         </Dropzone>
                     </div>
 
                     <div id="scrollright" className="col-md-9 right_list_media">
                         <div className="page-header">
-                            <h3> {this.state.surveyname}&nbsp;&nbsp;&nbsp;&nbsp;
+                            <h3> {this.props.newsurvey.surveyname}&nbsp;&nbsp;&nbsp;&nbsp;
                                 <button type="button"
                                         onClick={this.publishsurvey}
                                         className="btn btn-primary">
@@ -404,7 +471,7 @@ export var Newsurvey = React.createClass({
                                     <input type="text"
                                            className="form-control"
                                            id="inputEmail3"
-                                           value={this.state.surveyname}
+                                           value={this.props.newsurvey.surveyname}
                                            onChange={this.handleChange.bind(this,"surveyname")}
                                            placeholder="Survey Name"/>
                                 </div>
@@ -466,6 +533,40 @@ export var Newsurvey = React.createClass({
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
                                 <button type="button" className="btn btn-primary" onClick={this.confirmclean}>Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="createsurveyfromfile" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Clean All Data</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    This operation will create a new survey.Please input survey's name.
+                                </h3>
+                                    <div className="form-group form-group-lg">
+                                        <label htmlFor="surveynewform" className="col-sm-2 control-label">Survey Name</label>
+                                        <div className="col-sm-10">
+                                            <input type="text"
+                                                   className="form-control"
+                                                   id="inputPasswordxxx"
+                                                   placeholder=""
+                                                   value={this.props.newsurvey.surveyname}
+                                                   onChange={this.handleChange.bind(this,"surveyname")}
+                                            />
+                                        </div>
+                                    </div>
+
+
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
+                                <button type="button" className="btn btn-primary" onClick={this.confirmnewfromfile}>Confirm</button>
                             </div>
                         </div>
                     </div>
