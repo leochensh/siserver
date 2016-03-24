@@ -4,7 +4,8 @@ import {Constant} from "../constant"
 
 var loginInfo = {
     ifLogin:false,
-    role:null
+    role:null,
+    id:null
 };
 
 class LoginStore extends Store{
@@ -16,6 +17,7 @@ class LoginStore extends Store{
         if(payload.actionType == Constant.LOGINSUCCESS){
             loginInfo.ifLogin = true;
             loginInfo.role = payload.role;
+            loginInfo.id = payload.id;
             this.__emitChange();
         }
     }

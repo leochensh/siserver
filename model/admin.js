@@ -405,11 +405,7 @@ Admin.assignSurvey = function(orgid,surveyid,staffid,callback){
                                                 callback(err,"forbidden");
                                                 mongoPool.release(db);
                                             }
-                                            else if(staff.role!=dict.STAFF_INVESTIGATOR){
-                                                console.log("!!!!!!!!!!!!!!!!");
-                                                callback(err,"forbidden");
-                                                mongoPool.release(db);
-                                            }
+
                                             else{
                                                 if(!staff.surveyList){
                                                     staff.surveyList = []

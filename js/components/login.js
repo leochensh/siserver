@@ -44,7 +44,8 @@ export var Login = React.createClass({
 
                     SisDispatcher.dispatch({
                         actionType: Constant.LOGINSUCCESS,
-                        role:msg.body.role
+                        role:msg.body.role,
+                        id:msg.body.id
                     });
                     that.context.router.push("/home");
                 },

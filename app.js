@@ -137,7 +137,8 @@ app.post("/admin/login",function(req,res){
             else{
                 res.status(200);
                 successMsg.body = {
-                    role:msg.role
+                    role:msg.role,
+                    id:msg._id
                 };
                 req.session.userId = msg.name;
                 if(msg.orgid){
@@ -173,7 +174,8 @@ app.post("/staff/login",function(req,res){
             else{
                 res.status(200);
                 successMsg.body = {
-                    role:msg.role
+                    role:msg.role,
+                    id:msg._id
                 };
                 req.session.userId = msg.name;
                 req.session.orgid = msg.orgid;
@@ -541,6 +543,34 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+    app.put("/editor/survey/edit",acl.middleware(2),function(req,res){
+        var name = req.body.name;
+        var surveyid = req.body.id;
+
+        if(name && ObjectID.isValid(surveyid)){
+            Staff.editSurvey(name,surveyid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff edit survey name",{
+                        id:surveyid,
+                        editorid:req.session.uid});
+                    res.status(200);
+                    successMsg.body = null;
+                    res.send(JSON.stringify(successMsg));
+                }
+            });
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
     app.post("/editor/survey/question/add",acl.middleware(2),function(req,res){
         var surveydata = req.body;
         if(checkSurveyData(surveydata)){
@@ -561,6 +591,39 @@ aclHandler.registerWait(function(acl){
                         editorid:req.session.uid});
                     res.status(200);
                     successMsg.body = msg;
+                    console.log(JSON.stringify(successMsg));
+                    res.send(JSON.stringify(successMsg));
+                }
+            });
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.put("/editor/survey/question/edit",acl.middleware(2),function(req,res){
+        var surveydata = req.body;
+        console.log(JSON.stringify(surveydata));
+        if(checkSurveyData(surveydata) && ObjectID.isValid(surveydata.questionid)){
+            Staff.editQuestion(req.session.orgid,surveydata,function(err,msg){
+                if(msg == "forbidden"){
+                    res.status(403);
+                    errorMsg.code = "can not operate";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff edit question",{
+                        id:surveydata.questionid,
+                        editorid:req.session.uid});
+                    res.status(200);
+                    successMsg.body = null;
                     console.log(JSON.stringify(successMsg));
                     res.send(JSON.stringify(successMsg));
                 }

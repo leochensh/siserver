@@ -9,22 +9,10 @@ import {App} from "./components/app"
 import {Login} from "./components/login"
 import {Home} from "./components/home"
 import {Personal} from "./components/personal"
-var main = document.getElementsByTagName('main')[0];
-var wrapHome = function(){
-    return(React.createClass({
-        render(){
-            return(<Home loginInfo={loginStore.getLoginInfo()}/>);
-        }
-    }));
-};
+import {Newsurvey} from "./components/newsurvey"
 
-var wrapPersonal = function(){
-    return(React.createClass({
-        render(){
-            return(<Personal personalList={personalStore.getAll()}/>);
-        }
-    }));
-};
+var main = document.getElementsByTagName('main')[0];
+
 
 ReactDom.render(
     <Router history={hashHistory}>
@@ -33,6 +21,7 @@ ReactDom.render(
             <Route path="login" component={Login} />
             <Route path="home" component={Home} />
             <Route path="personal" component={Personal} />
+            <Route path="newsurvey" component={Newsurvey} />
         </Route>
     </Router>,
     main

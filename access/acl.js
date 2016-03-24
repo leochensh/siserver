@@ -23,7 +23,7 @@ mongoPool.acquire(function(err, db){
             ]
         },
         {
-            roles:['admin'],
+            roles:['admin',dict.STAFF_PERSONAL],
             allows:[
                 {resources:'/admin/pass/change', permissions:'put'},
                 {resources:'/admin/staff/add',permissions:'post'},
@@ -35,20 +35,20 @@ mongoPool.acquire(function(err, db){
             ]
         },
         {
-            roles:[dict.STAFF_EDITOR,dict.STAFF_INVESTIGATOR],
+            roles:[dict.STAFF_EDITOR,dict.STAFF_INVESTIGATOR,dict.STAFF_PERSONAL],
             allows:[
                 {resources:'/staff/pass/change',permissions:'put'},
                 {resources:'/staff/upload',permissions:"post"}
             ]
         },
         {
-            roles:[dict.STAFF_EDITOR],
+            roles:[dict.STAFF_EDITOR,dict.STAFF_PERSONAL],
             allows:[
                 {resources:'/editor/survey',permissions:['post','delete','put']}
             ]
         },
         {
-            roles:[dict.STAFF_INVESTIGATOR],
+            roles:[dict.STAFF_INVESTIGATOR,dict.STAFF_PERSONAL],
             allows:[
                 {resources:'/investigator/survey',permissions:['get','post']},
                 {resources:'/investigator/feedback',permissions:['post']},

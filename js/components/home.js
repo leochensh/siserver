@@ -7,6 +7,9 @@ export var Home = React.createClass({
     personClick(event){
         this.context.router.push("/personal");
     },
+    newsurvey(event){
+        this.context.router.push("/newsurvey");
+    },
 
     render() {
         var style = {
@@ -22,6 +25,9 @@ export var Home = React.createClass({
         if(loginInfo.role == "sadmin"){
             orgDisable = "";
             personalDisable = "";
+        }
+        else if(loginInfo.role == "personal"){
+            newsurveyDisable = "";
         }
         return (
             <div>
@@ -44,7 +50,7 @@ export var Home = React.createClass({
                     <button className="col-md-3 btn btn-default"
                         disabled={personalDisable}
                         onClick={this.personClick}
-                    >
+                        >
 
                         <div className="fixed-size-square">
                             <div>
@@ -60,7 +66,7 @@ export var Home = React.createClass({
                 </div>
                 <div className="row">
                     <button className="col-md-3 col-md-offset-3 btn btn-default"
-                    disabled={newsurveyDisable}>
+                    disabled={newsurveyDisable} onClick={this.newsurvey}>
 
                         <div className="fixed-size-square">
                             <div>

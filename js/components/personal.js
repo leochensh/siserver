@@ -123,7 +123,7 @@ export var Personal = React.createClass({
                 hash.update(this.state.password1st);
 
                 $("#ajaxloading").show();
-                alert(this.state.resetid)
+                //alert(this.state.resetid)
                 var that = this;
                 $.ajax({
                     url: Constant.BASE_URL+"sadmin/org/admin/resetpass",

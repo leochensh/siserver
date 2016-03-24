@@ -92,6 +92,31 @@ Staff.createSurvey = function(orgid,uid,name,type,callback){
     });
 };
 
+Staff.editSurvey = function(name,surveyid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+                collection.find({_id:ObjectID(surveyid)}).limit(1).next(function(err,survey){
+                    if(!survey){
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                    else{
+                        collection.updateOne({_id:ObjectID(surveyid)},{$set:{name:name}},function(err,result){
+                            mongoPool.release(db);
+                            callback(err,result);
+                        });
+                    }
+                });
+
+            });
+        }
+    });
+};
+
 Staff.createQuestion = function(orgid,questiondata,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -126,6 +151,58 @@ Staff.createQuestion = function(orgid,questiondata,callback){
 
                     }
                     else{
+                        mongoPool.release(db);
+                        callback(err,"notfound")
+                    }
+                })
+
+            });
+        }
+    });
+};
+
+Staff.editQuestion = function(orgid,questiondata,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,surveycollection){
+
+                surveycollection.find({_id:ObjectID(questiondata.surveyid)}).limit(1).next(function(err,survey){
+                    if(survey){
+                        if(survey.orgid != orgid){
+                            mongoPool.release(db);f
+                            callback(err,"forbidden");
+
+                        }
+                        else{
+                            db.collection("questions",function(err,questioncollection){
+                                questioncollection.find({_id:ObjectID(questiondata.questionid)}).limit(1).next(function(err,question){
+                                    if(question){
+                                        questioncollection.updateOne({_id:ObjectID(questiondata.questionid)},
+                                            {$set:{title:questiondata.title,selectlist:questiondata.selectlist}},
+
+                                            function(err,insertresult){
+                                                console.log(err);
+                                                mongoPool.release(db);
+                                                callback(err,insertresult);
+                                            });
+                                    }
+                                    else{
+                                        console.log("not find question"+questiondata.questionid);
+                                        mongoPool.release(db);
+                                        callback(err,"notfound")
+                                    }
+                                });
+
+
+                            });
+                        }
+
+                    }
+                    else{
+                        console.log("not find survey"+questiondata.surveyid);
                         mongoPool.release(db);
                         callback(err,"notfound")
                     }
@@ -317,11 +394,11 @@ var processAnswers = function(answers,db,callback){
             db.collection("surveys",function(error,surveycollection){
                 surveycollection.find({_id:ObjectID(answer.surveyid)},{name:1})
                     .limit(1).next(function(err,survey){
-                        if(survey){
-                            answer.surveyname = survey.name;
-                        }
-                        cb();
-                    })
+                    if(survey){
+                        answer.surveyname = survey.name;
+                    }
+                    cb();
+                })
             });
         }
         else{
@@ -350,8 +427,8 @@ Staff.getAnswerList = function(pagesize,pagenum,staffid,callback){
                 else{
                     collection.find({investigatorid:staffid},{_id:1,surveyid:1,ctime:1})
                         .skip(pagenum*pagesize).limit(pagesize).toArray(function(err,answers){
-                            processAnswers(answers,db,callback)
-                        });
+                        processAnswers(answers,db,callback)
+                    });
                 }
 
             });
@@ -368,14 +445,14 @@ Staff.getAnswerDetail = function(answerid,callback){
             db.collection("answers",function(err,collection){
                 collection.find({_id:ObjectID(answerid)})
                     .limit(1).next(function(err,answer){
-                        mongoPool.release(db);
-                        if(answer){
-                            callback(err,answer);
-                        }
-                        else{
-                            callback(err,"notfound");
-                        }
-                    });
+                    mongoPool.release(db);
+                    if(answer){
+                        callback(err,answer);
+                    }
+                    else{
+                        callback(err,"notfound");
+                    }
+                });
             });
         }
     });
@@ -407,9 +484,9 @@ Staff.getVersionInfo = function(orgid,platform,callback){
             db.collection("versions",function(err,collection){
                 collection.find({orgid:orgid,platform:platform},{_id:0,orgid:0}).sort({ctime:-1})
                     .limit(1).next(function(err,ver){
-                        mongoPool.release(db);
-                        callback(err,ver);
-                    })
+                    mongoPool.release(db);
+                    callback(err,ver);
+                })
             });
         }
     });
