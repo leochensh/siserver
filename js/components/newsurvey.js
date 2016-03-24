@@ -306,7 +306,7 @@ export var Newsurvey = React.createClass({
 
                 for(var i in that.state.tmsg){
                     var q = that.state.tmsg[i];
-                    q.surveyid = that.props.newsurvey.surveyid;
+                    q.surveyid = msg.body;
                     q.ifSaved = false;
                     q.id = null;
                 }
