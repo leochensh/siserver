@@ -472,9 +472,14 @@ Admin.removeAssginRepeat = function(callback){
                                 slist.push(survey)
                             }
                         }
+                        collection.updateOne({_id:admin._id},
+                            {$set:{surveyList:slist}},
+                            function(err,ures){
+                                callback(err,ures);
+                                mongoPool.release(db);
+                            });
                     }
-                    mongoPool.release(db);
-                    callback(err,"ok");
+                    
                 });
             });
         }
