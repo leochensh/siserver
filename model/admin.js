@@ -410,10 +410,20 @@ Admin.assignSurvey = function(orgid,surveyid,staffid,callback){
                                                 if(!staff.surveyList){
                                                     staff.surveyList = []
                                                 }
-                                                staff.surveyList.push({
-                                                    surveyid:surveyid,
-                                                    name:survey.name
-                                                });
+                                                var ifExist = false;
+                                                for(var i in staff.surveyList){
+                                                    if(staff.surveyList[i].surveyid == surveyid){
+                                                        ifExist = true;
+                                                        break;
+                                                    }
+                                                }
+                                                if(!ifExist){
+                                                    staff.surveyList.push({
+                                                        surveyid:surveyid,
+                                                        name:survey.name
+                                                    });
+                                                }
+
                                                 staffcollection.updateOne({_id:ObjectID(staffid)},
                                                     {$set:{surveyList:staff.surveyList}},
                                                     function(err,ures){
@@ -437,6 +447,35 @@ Admin.assignSurvey = function(orgid,surveyid,staffid,callback){
                         callback(err,"notfound")
                     }
                 })
+            });
+        }
+    });
+};
+
+Admin.removeAssginRepeat = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,collection){
+                collection.find().toArray(function(err,admins){
+                    for(var index in admins){
+                        var admin = admins[index];
+                        var slist = []
+                        for(var sindex in admin.surveyList){
+                            var survey = admin.surveyList[sindex];
+                            var fvalue = slist.find(function(v,i,a){
+                                v.surveyid = survey.surveyid;
+                            })
+                            if(!fvalue){
+                                slist.push(survey)
+                            }
+                        }
+                    }
+                    mongoPool.release(db);
+                    callback(err,"ok");
+                });
             });
         }
     });

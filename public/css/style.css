@@ -1,4 +1,7 @@
 @import url(../bower_components/bootstrap/dist/css/bootstrap.min.css);
+body {
+  padding-bottom: 70px; }
+
 .divLogin {
   border: 1px solid;
   padding-top: 30px;

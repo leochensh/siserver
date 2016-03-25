@@ -83,6 +83,13 @@ export var Newsurvey = React.createClass({
                                 success: function (data) {
                                     $("#ajaxloading").hide();
                                     $("#publishsurvey").modal("hide");
+
+                                    SisDispatcher.dispatch({
+                                        actionType: Constant.SURVEYVALUECHANGE,
+                                        name:"surveystatus",
+                                        value:Constant.SURVEYSTATUS_NORMAL
+                                    });
+
                                 },
                                 error:function(jxr,scode){
                                     $("#ajaxloading").hide();
@@ -391,6 +398,18 @@ export var Newsurvey = React.createClass({
                 dhandle={this.questiondeleteinform(i)}
                 qhandle={this.questionchange(i)}></Question>);
         }
+        var surveyStatusTxt = "Not Published";
+        var surveyStatusClassStyle = {
+            color:"red",
+            fontSize:"10px"
+        };
+        if(this.props.newsurvey.surveystatus==Constant.SURVEYSTATUS_NORMAL){
+            surveyStatusTxt = "Published"
+            surveyStatusClassStyle = {
+                color:"blue",
+                fontSize:"10px"
+            };
+        }
         return(
             <div>
                 <div className="row" >
@@ -447,23 +466,29 @@ export var Newsurvey = React.createClass({
                     </div>
 
                     <div id="scrollright" className="col-md-9 right_list_media">
-                        <div className="page-header">
-                            <h3> {this.props.newsurvey.surveyname}&nbsp;&nbsp;&nbsp;&nbsp;
-                                <button type="button"
-                                        onClick={this.publishsurvey}
-                                        className="btn btn-primary">
-                                    <span className="glyphicon glyphicon-check" aria-hidden="true"></span>
-                                    <span>&nbsp;&nbsp;Publish it</span>
-                                </button>
-                                &nbsp;&nbsp;
-                                <button type="button"
-                                        onClick={this.cleanall}
-                                        className="btn btn-warning">
-                                    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                                    <span>&nbsp;&nbsp;Clean all data</span>
-                                </button>
-                            </h3>
-                        </div>
+                        <nav className="navbar navbar-default navbar-fixed-bottom">
+                            <div className="container">
+                                    <h3> {this.props.newsurvey.surveyname}
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span style={surveyStatusClassStyle}>{surveyStatusTxt}</span>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <button type="button"
+                                                onClick={this.publishsurvey}
+                                                className="btn btn-primary">
+                                            <span className="glyphicon glyphicon-check" aria-hidden="true"></span>
+                                            <span>&nbsp;&nbsp;Publish it</span>
+                                        </button>
+                                        &nbsp;&nbsp;
+                                        <button type="button"
+                                                onClick={this.cleanall}
+                                                className="btn btn-warning">
+                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                            <span>&nbsp;&nbsp;Clean all data</span>
+                                        </button>
+                                    </h3>
+                            </div>
+                        </nav>
+
                         <form className="form-horizontal">
                             <div className="form-group">
                                 <label htmlFor="inputEmail3" className="col-sm-2 control-label">Survey Name</label>

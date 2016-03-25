@@ -8,6 +8,7 @@ var surveyData = {
     ifSaved:false,
     surveyid:null,
     ifSurveyNameEmpty:false,
+    surveystatus:Constant.SURVEYSTATUS_EDIT,
     qlist:[]
 }
 

@@ -768,8 +768,14 @@ aclHandler.registerWait(function(acl){
             errorMsg.code = "wrong";
             res.send(JSON.stringify(errorMsg));
         }
-    })
+    });
 
+    app.get("/removerepeatassign",function(req,res){ //临时接口，用于去除问卷分配的重复
+        Admin.removeAssginRepeat(function(err,msg){
+            successMsg.body = null;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
     app.get('/investigator/survey/list',acl.middleware(2),function(req,res){
         Staff.getStaffSurveyList(req.session.uid,function(err,msg){
             if(msg == "notfound"){

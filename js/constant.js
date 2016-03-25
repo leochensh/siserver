@@ -32,10 +32,18 @@ export var Constant = {
         "imageselect":"image",
         "descriptionselect":"subjective"
     },
+
+    SURVEYSTATUS_EDIT:"surveyedit",
+    SURVEYSTATUS_PROPOSE:"surveypropose",
+    SURVEYSTATUS_REJECT:"surveyreject",
+    SURVEYSTATUS_NORMAL:"surveynormal",
+
     //BASE_URL:"http://localhost:3000/",
     //BASE_URL:"http://121.40.94.201:3005/",
     //BASE_URL:"/tracker/"
     //BASE_URL:"http://121.40.94.201/mmn/",
     BASE_URL:"/si/",
     BASE_IMAGEURL:"/si/uploads/"
+    //BASE_URL:"/",
+    //BASE_IMAGEURL:"/uploads/"
 };
