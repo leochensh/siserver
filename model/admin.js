@@ -479,7 +479,7 @@ Admin.removeAssginRepeat = function(callback){
                                 mongoPool.release(db);
                             });
                     }
-                    
+
                 });
             });
         }
