@@ -776,6 +776,7 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(successMsg));
         })
     });
+
     app.get('/investigator/survey/list',acl.middleware(2),function(req,res){
         Staff.getStaffSurveyList(req.session.uid,function(err,msg){
             if(msg == "notfound"){

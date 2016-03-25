@@ -1,7 +1,7 @@
 var mongoPool = require("../db");
 var dict = require("../dict")
 var Admin = {};
-
+var async = require("async")
 var ObjectID=require('mongodb').ObjectID;
 
 module.exports = Admin;
@@ -460,13 +460,12 @@ Admin.removeAssginRepeat = function(callback){
         else{
             db.collection("admins",function(err,collection){
                 collection.find().toArray(function(err,admins){
-                    for(var index in admins){
-                        var admin = admins[index];
-                        var slist = []
+                    async.each(admins,function(admin,cb){
+                        var slist = [];
                         for(var sindex in admin.surveyList){
                             var survey = admin.surveyList[sindex];
                             var fvalue = slist.find(function(v,i,a){
-                                v.surveyid = survey.surveyid;
+                                return (v.surveyid == survey.surveyid);
                             })
                             if(!fvalue){
                                 slist.push(survey)
@@ -475,10 +474,13 @@ Admin.removeAssginRepeat = function(callback){
                         collection.updateOne({_id:admin._id},
                             {$set:{surveyList:slist}},
                             function(err,ures){
-                                callback(err,ures);
-                                mongoPool.release(db);
+                                cb();
                             });
-                    }
+                    },function(err){
+                        mongoPool.release(db);
+                        callback(err,"ok");
+                    });
+
 
                 });
             });
