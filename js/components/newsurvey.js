@@ -253,8 +253,9 @@ export var Newsurvey = React.createClass({
                 value:cqlist
             });
             setTimeout(function(){
-                var objDiv = document.getElementById("scrollright");
-                objDiv.scrollTop = objDiv.scrollHeight;
+                //var objDiv = document.getElementById("scrollright");
+                //objDiv.scrollTop = objDiv.scrollHeight;
+                $(window).scrollTop($(document).height());
             },100);
         }
     },
@@ -411,115 +412,124 @@ export var Newsurvey = React.createClass({
             };
         }
         return(
-            <div>
-                <div className="row" >
-                    <div className="col-md-3 left_list_media" style={{borderRight:"1px solid" }}>
-                        <div className="page-header">
-                            <h3>Question Types </h3>
-                        </div>
+            <div id="wrapper">
+                <div id="sidebar-wrapper">
+
+                    <ul className="sidebar-nav">
                         <div id="notsavealert" className="alert alert-danger alert-dismissible fade in" role="alert" style={{display:"none"}}>
                             <button className="close" aria-label="Close" data-dismiss="alert" type="button"></button>
                             <h4>You should save survey name first.</h4>
                         </div>
-
-                        <div className="list-group" style={{marginRight:"0!important",paddingRight:"0!important"}}>
-                            <a className="list-group-item" onClick={this.singleselect}>
-                                <h3>
+                        <li className="sidebar-brand">
+                            <a >
+                                Question Types
+                            </a>
+                        </li>
+                        <li>
+                            <a onClick={this.singleselect}>
                                     <span className="glyphicon glyphicon-minus" aria-hidden="true"></span>
                                     &nbsp;&nbsp;Single Selection
-                                </h3>
 
                             </a>
-                            <a className="list-group-item" onClick={this.multiselect}>
-                                <h3>
+                        </li>
+                        <li>
+                            <a  onClick={this.multiselect}>
                                     <span className="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                                     &nbsp;&nbsp;Multiple Selection
-                                </h3>
-
                             </a>
-                            <a className="list-group-item" onClick={this.description}>
-                                <h3>
+                        </li>
+                        <li>
+                            <a  onClick={this.description}>
                                     <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                                     &nbsp;&nbsp;Subjective Item
-                                </h3>
-
                             </a>
-                            <a className="list-group-item" onClick={this.sorttype}>
-                                <h3>
+                        </li>
+                        <li>
+                            <a  onClick={this.sorttype}>
                                     <span className="glyphicon glyphicon-signal" aria-hidden="true"></span>
                                     &nbsp;&nbsp;Sort
-                                </h3>
-
                             </a>
-                            <a className="list-group-item" onClick={this.scoretype}>
-                                <h3>
+                        </li>
+                        <li>
+                            <a  onClick={this.scoretype}>
                                     <span className="glyphicon glyphicon-sort-by-order" aria-hidden="true"></span>
                                     &nbsp;&nbsp;Score
-                                </h3>
-
                             </a>
+                        </li>
+                        <li>
+                                <Dropzone onDrop={this.onDrop} accept="text/csv">
+                                    <div>Drop xlsx file here or click.</div>
+                                </Dropzone>
+                        </li>
 
-                        </div>
-                        <Dropzone onDrop={this.onDrop} accept="text/csv">
-                            <div>Drop xlsx file here or click.</div>
-                        </Dropzone>
-                    </div>
+                    </ul>
 
-                    <div id="scrollright" className="col-md-9 right_list_media">
-                        <nav className="navbar navbar-default navbar-fixed-bottom">
-                            <div className="container">
-                                    <h3> {this.props.newsurvey.surveyname}
-                                        &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <span style={surveyStatusClassStyle}>{surveyStatusTxt}</span>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <button type="button"
-                                                onClick={this.publishsurvey}
-                                                className="btn btn-primary">
-                                            <span className="glyphicon glyphicon-check" aria-hidden="true"></span>
-                                            <span>&nbsp;&nbsp;Publish it</span>
-                                        </button>
-                                        &nbsp;&nbsp;
-                                        <button type="button"
-                                                onClick={this.cleanall}
-                                                className="btn btn-warning">
-                                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                                            <span>&nbsp;&nbsp;Clean all data</span>
-                                        </button>
-                                    </h3>
-                            </div>
-                        </nav>
 
-                        <form className="form-horizontal">
-                            <div className="form-group">
-                                <label htmlFor="inputEmail3" className="col-sm-2 control-label">Survey Name</label>
-                                <div className="col-sm-10">
-                                    <input type="text"
-                                           className="form-control"
-                                           id="inputEmail3"
-                                           value={this.props.newsurvey.surveyname}
-                                           onChange={this.handleChange.bind(this,"surveyname")}
-                                           placeholder="Survey Name"/>
+                </div>
+
+                <div id="page-content-wrapper">
+                    <div class="container-fluid">
+                        <div class="row">
+
+
+                            <div id="scrollright" className="col-md-12" style={{paddingBottom:"70px"}}>
+                                <nav className="navbar navbar-default navbar-fixed-bottom">
+                                    <div className="container">
+                                        <h3> {this.props.newsurvey.surveyname}
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <span style={surveyStatusClassStyle}>{surveyStatusTxt}</span>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <button type="button"
+                                                    onClick={this.publishsurvey}
+                                                    className="btn btn-primary">
+                                                <span className="glyphicon glyphicon-check" aria-hidden="true"></span>
+                                                <span>&nbsp;&nbsp;Publish it</span>
+                                            </button>
+                                            &nbsp;&nbsp;
+                                            <button type="button"
+                                                    onClick={this.cleanall}
+                                                    className="btn btn-warning">
+                                                <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                                <span>&nbsp;&nbsp;Clean all data</span>
+                                            </button>
+                                        </h3>
+                                    </div>
+                                </nav>
+
+                                <form className="form-horizontal">
+                                    <div className="form-group">
+                                        <label htmlFor="inputEmail3" className="col-sm-2 control-label">Survey Name</label>
+                                        <div className="col-sm-10">
+                                            <input type="text"
+                                                   className="form-control"
+                                                   id="inputEmail3"
+                                                   value={this.props.newsurvey.surveyname}
+                                                   onChange={this.handleChange.bind(this,"surveyname")}
+                                                   placeholder="Survey Name"/>
+                                        </div>
+
+                                    </div>
+
+                                    <div className="form-group">
+                                        <div className="col-sm-offset-2 col-sm-10">
+                                            <button className="btn btn-primary"
+                                                    onClick={this.savesurvey}>
+                                                Save
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div className="alert alert-danger col-md-12" role="alert" style={emptystyle}>
+                                    Survey name can not be empty.
                                 </div>
+                                <hr/>
+                                {questionList}
 
                             </div>
-
-                            <div className="form-group">
-                                <div className="col-sm-offset-2 col-sm-10">
-                                    <button className="btn btn-primary"
-                                            onClick={this.savesurvey}>
-                                        Save
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                        <div className="alert alert-danger col-md-12" role="alert" style={emptystyle}>
-                            Survey name can not be empty.
                         </div>
-                        <hr/>
-                        {questionList}
-
                     </div>
                 </div>
+
 
                 <div className="modal fade" id="publishsurvey" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div className="modal-dialog">
@@ -574,18 +584,18 @@ export var Newsurvey = React.createClass({
                                 <h3>
                                     This operation will create a new survey.Please input survey's name.
                                 </h3>
-                                    <div className="form-group form-group-lg">
-                                        <label htmlFor="surveynewform" className="col-sm-2 control-label">Survey Name</label>
-                                        <div className="col-sm-10">
-                                            <input type="text"
-                                                   className="form-control"
-                                                   id="inputPasswordxxx"
-                                                   placeholder=""
-                                                   value={this.props.newsurvey.surveyname}
-                                                   onChange={this.handleChange.bind(this,"surveyname")}
-                                            />
-                                        </div>
+                                <div className="form-group form-group-lg">
+                                    <label htmlFor="surveynewform" className="col-sm-2 control-label">Survey Name</label>
+                                    <div className="col-sm-10">
+                                        <input type="text"
+                                               className="form-control"
+                                               id="inputPasswordxxx"
+                                               placeholder=""
+                                               value={this.props.newsurvey.surveyname}
+                                               onChange={this.handleChange.bind(this,"surveyname")}
+                                        />
                                     </div>
+                                </div>
 
 
                             </div>

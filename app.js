@@ -822,7 +822,7 @@ aclHandler.registerWait(function(acl){
             errorMsg.code = "wrong";
             res.send(JSON.stringify(errorMsg));
         }
-    })
+    });
 
     app.post("/investigator/survey/answer/add",acl.middleware(2),function(req,res){
         var surveyid = req.body.surveyid;

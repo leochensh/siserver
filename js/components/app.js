@@ -39,7 +39,7 @@ export var App = React.createClass({
     render() {
         return (
             <div>
-                <nav className="navbar navbar-default">
+                <nav className="navbar navbar-default navbar-fixed-top">
                     <div className="container-fluid">
                         <div className="navbar-header">
                             <a className="navbar-brand">Smartinsight Survey Management System</a>

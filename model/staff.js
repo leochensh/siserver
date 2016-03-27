@@ -332,7 +332,7 @@ Staff.getSurveyDetail = function(surveyid,callback){
         }
         else{
             db.collection("surveys",function(err,surveycollection){
-                surveycollection.find({_id:ObjectID(surveyid)},{name:1,questionlist:1})
+                surveycollection.find({_id:ObjectID(surveyid)},{name:1,questionlist:1,status:1})
                     .limit(1).next(function(err,survey){
                         if(survey){
                             var qList = [];
@@ -342,9 +342,13 @@ Staff.getSurveyDetail = function(surveyid,callback){
 
                             }
                             db.collection("questions",function(err,questioncollection){
-                                async.each(qList,function(q,cb){
+                                async.forEachOfSeries(qList,function(q,index,cb){
                                     questioncollection.find({_id:q},{surveyid:0,ctime:0}).limit(1).next(function(qerr,question){
                                         if(question){
+                                            question.index = index;
+                                            for(var si in question.selectlist){
+                                                question.selectlist[si].index = si;
+                                            }
                                             qDetailList.push(question);
                                         }
                                         cb()

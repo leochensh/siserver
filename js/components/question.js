@@ -215,6 +215,12 @@ export var Question = React.createClass({
                     style={{maxHeight:"100px"}}
                     alt="Responsive image"/>
             }
+            var ifDropShow = {
+                display:"none"
+            };
+            if(s.type == Constant.SELECTTYPE_IMAGE){
+                ifDropShow = {};
+            }
             slist.push(
                 <div className="panel panel-info">
                     <div className="panel-heading">
@@ -241,10 +247,10 @@ export var Question = React.createClass({
                                 </textarea>
                             </div>
 
-                            <label htmlFor={s2id} className="col-sm-2 control-label">
+                            <label htmlFor={s2id} className="col-sm-2 control-label" style={ifDropShow}>
                                 Selection Image
                             </label>
-                            <div className="col-sm-10">
+                            <div className="col-sm-10" style={ifDropShow}>
                                 {img}
                                 <Dropzone onDrop={this.onDrop(parseInt(i))} accept="image/*">
                                     <div>Drop file here or click.</div>
