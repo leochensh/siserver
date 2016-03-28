@@ -8,6 +8,7 @@ var parse = require('csv-parse');
 var fs = require('fs');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
+var XLSX = require('xlsx');
 
 
 var storage = multer.diskStorage({
@@ -978,42 +979,44 @@ aclHandler.registerWait(function(acl){
 
     app.post('/parsexlsx',function(req,res){
         var file = req.body.file;
-        var typemap = {
-            "0":dict.QTYPE_SINGLESELECT,
-            "1":dict.QTYPE_MULTISELECT,
-            "2":dict.QTYPE_DESCRIPTION,
-            "3":dict.QTYPE_SEQUENCE,
-            "4":dict.QTYPE_SCORE
-        }
+
         if(file){
-            fs.readFile("./uploads/"+file,function(err,data){
-                parse(data,function(err,output){
-                    var qlist = [];
-                    for(var i in output){
-                        var q = {}
-                        if(i>=1){
-                            if(output[i][1] && output[i][2]){
-                                q.title = output[i][1].trim();
-                                q.type = typemap[output[i][2].trim()]
-                                q.selectlist = [];
-                                var start = 3;
-                                while(output[i][start]){
-                                    q.selectlist.push({
-                                        type:"textselect",
-                                        title:output[i][start].trim()
-                                    });
-                                    start+=1;
-                                }
-                                qlist.push(q)
-                            }
+            var fextenstionarray = file.split(".");
+            var fextenstion = fextenstionarray[fextenstionarray.length-1];
+            if(fextenstion == "csv"){
+
+                fs.readFile("./uploads/"+file,function(err,data){
+                    parseV1file(data,function(qlist){
+                        successMsg.body = qlist;
+                        res.send(JSON.stringify(successMsg));
+                    })
 
 
-                        }
-                    }
+                })
+            }
+            else if(fextenstion == "xlsx"){
+                var workbook = XLSX.readFile("./uploads/"+file);
+                var sheet_name_list = workbook.SheetNames;
+                var result = ""
+                sheet_name_list.forEach(function(y) { /* iterate through sheets */
+                    var worksheet = workbook.Sheets[y];
+                    //for (z in worksheet) {
+                    //    /* all keys that do not begin with "!" correspond to cell addresses */
+                    //    if(z[0] === '!') continue;
+                    //    console.log(y + "!" + z + "=" + JSON.stringify(worksheet[z].v));
+                    //}
+                    var csv = XLSX.utils.sheet_to_csv(worksheet);
+                    result+=csv;
+                });
+                var data = result;
+                parseV1file(data,function(qlist){
                     successMsg.body = qlist;
                     res.send(JSON.stringify(successMsg));
                 })
-            })
+
+
+            }
+
         }
         else{
             res.status(406);
@@ -1178,7 +1181,42 @@ function checkSurveyData(data){
 
 
 }
+var typemap = {
+    "0":dict.QTYPE_SINGLESELECT,
+    "1":dict.QTYPE_MULTISELECT,
+    "2":dict.QTYPE_DESCRIPTION,
+    "3":dict.QTYPE_SEQUENCE,
+    "4":dict.QTYPE_SCORE
+}
+function parseV1file(data,aftercall){
+    parse(data,function(err,output){
 
+        //output = output[0]
+        var qlist = [];
+        for(var i in output){
+            var q = {}
+            if(i>=1){
+                if(output[i][1] && output[i][2]){
+                    q.title = output[i][1].trim();
+                    q.type = typemap[output[i][2].trim()]
+                    q.selectlist = [];
+                    var start = 3;
+                    while(output[i][start]){
+                        q.selectlist.push({
+                            type:"textselect",
+                            title:output[i][start].trim()
+                        });
+                        start+=1;
+                    }
+                    qlist.push(q)
+                }
+
+
+            }
+        }
+        aftercall(qlist);
+    })
+}
 var server = app.listen(8080, function () {
 
     var host = server.address().address;
