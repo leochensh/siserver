@@ -980,15 +980,33 @@ aclHandler.registerWait(function(acl){
     app.post('/parsexlsx',function(req,res){
         var file = req.body.file;
 
+        var letterMap = ["A","B","C","D","E",
+            "F","G","H","I","J",
+            "K","L","M","N","O",
+            "P","Q","R","S","T",
+            "U","V","W","X","Y","Z"];
+
         if(file){
             var fextenstionarray = file.split(".");
             var fextenstion = fextenstionarray[fextenstionarray.length-1];
             if(fextenstion == "csv"){
 
                 fs.readFile("./uploads/"+file,function(err,data){
-                    parseV1file(data,function(qlist){
-                        successMsg.body = qlist;
-                        res.send(JSON.stringify(successMsg));
+
+                    parse(data,function(err,output){
+
+                        //output = output[0]
+                        if(output[0][0] == "2"){
+                            var qlist = parseV2List(output);
+                            successMsg.body = qlist;
+                            res.send(JSON.stringify(successMsg));
+                        }
+                        else{
+                            var qlist = parseV1List(output);
+                            successMsg.body = qlist;
+                            res.send(JSON.stringify(successMsg));
+                        }
+
                     })
 
 
@@ -997,24 +1015,42 @@ aclHandler.registerWait(function(acl){
             else if(fextenstion == "xlsx"){
                 var workbook = XLSX.readFile("./uploads/"+file);
                 var sheet_name_list = workbook.SheetNames;
+                console.log(sheet_name_list)
                 var result = ""
-                sheet_name_list.forEach(function(y) { /* iterate through sheets */
-                    var worksheet = workbook.Sheets[y];
-                    //for (z in worksheet) {
-                    //    /* all keys that do not begin with "!" correspond to cell addresses */
-                    //    if(z[0] === '!') continue;
-                    //    console.log(y + "!" + z + "=" + JSON.stringify(worksheet[z].v));
-                    //}
-                    var csv = XLSX.utils.sheet_to_csv(worksheet);
-                    result+=csv;
-                });
-                var data = result;
-                parseV1file(data,function(qlist){
-                    successMsg.body = qlist;
-                    res.send(JSON.stringify(successMsg));
-                })
 
 
+                var firstSheet = workbook.Sheets[sheet_name_list[0]];
+                var resultList = [];
+                var currentRow = 1;
+
+
+                while(firstSheet["A"+currentRow]){
+                    var row = []
+                    var start = 0;
+                    while(firstSheet[letterMap[start]+currentRow]){
+                        var v = firstSheet[letterMap[start]+currentRow].v;
+                        var vt = JSON.stringify(v).trim();
+                        if(vt[0] && vt[0] == "\""){
+                            var vlength = vt.length;
+                            vt = vt.substring(1,vlength-1).trim();
+                        }
+                        row.push(vt);
+                        start+=1;
+                    }
+                    resultList.push(row);
+                    currentRow+=1;
+                }
+
+                console.log(resultList);
+                if(resultList[0][0] == "2"){
+                    var qlist = parseV2List(resultList);
+                }
+                else{
+                    var qlist = parseV1List(resultList);
+                }
+
+                successMsg.body = qlist;
+                res.send(JSON.stringify(successMsg));
             }
 
         }
@@ -1181,42 +1217,95 @@ function checkSurveyData(data){
 
 
 }
-var typemap = {
-    "0":dict.QTYPE_SINGLESELECT,
-    "1":dict.QTYPE_MULTISELECT,
-    "2":dict.QTYPE_DESCRIPTION,
-    "3":dict.QTYPE_SEQUENCE,
-    "4":dict.QTYPE_SCORE
-}
-function parseV1file(data,aftercall){
-    parse(data,function(err,output){
 
-        //output = output[0]
-        var qlist = [];
-        for(var i in output){
-            var q = {}
-            if(i>=1){
-                if(output[i][1] && output[i][2]){
-                    q.title = output[i][1].trim();
-                    q.type = typemap[output[i][2].trim()]
-                    q.selectlist = [];
-                    var start = 3;
-                    while(output[i][start]){
-                        q.selectlist.push({
-                            type:"textselect",
-                            title:output[i][start].trim()
-                        });
-                        start+=1;
-                    }
-                    qlist.push(q)
+function parseV1List(input){
+    var qlist = [];
+    var typemap = {
+        "0":dict.QTYPE_SINGLESELECT,
+        "1":dict.QTYPE_MULTISELECT,
+        "2":dict.QTYPE_DESCRIPTION,
+        "3":dict.QTYPE_SEQUENCE,
+        "4":dict.QTYPE_SCORE
+    }
+
+    for(var i in input){
+
+        var q = {}
+        if(i>=1){
+            if(input[i][1] && input[i][2]){
+                q.title = input[i][1].trim();
+                q.type = typemap[input[i][2].trim()]
+                q.selectlist = [];
+                var start = 3;
+                while(input[i][start]){
+                    q.selectlist.push({
+                        type:"textselect",
+                        title:input[i][start].trim()
+                    });
+                    start+=1;
                 }
-
-
+                qlist.push(q)
             }
+
+
         }
-        aftercall(qlist);
-    })
+    }
+    return qlist;
 }
+
+function parseV2List(input){
+    var qlist = [];
+    var typemap = {
+        "单选题":dict.QTYPE_SINGLESELECT,
+        "多选题":dict.QTYPE_MULTISELECT,
+        "描述题":dict.QTYPE_DESCRIPTION,
+        "选项排序题":dict.QTYPE_SEQUENCE,
+        "选项打分题":dict.QTYPE_SCORE
+    };
+
+
+    for(var i in input){
+
+        var q = {}
+        if(i>=2){
+            if(input[i][1] && input[i][2]){
+                var tindex = input[i][1].trim().split(",")[0]
+                q.title = input[i][2].trim();
+                q.type = typemap[tindex]
+                q.selectlist = [];
+                var start = 3;
+                while(input[i][start]){
+                    var stype = dict.SELECTTYPE_TEXT;
+                    var vtrim = input[i][start].trim();
+
+                    if(vtrim == "图形"){
+                        stype = dict.SELECTTYPE_IMAGE;
+                        vtrim = ""
+                    }
+                    else if(vtrim == "视频"){
+                        stype = dict.SELECTTYPE_VIDEO;
+                        vtrim = ""
+                    }
+                    else if(vtrim.indexOf("others")>=0 || vtrim.indexOf("Others")>=0){
+                        stype = dict.SELECTTYPE_DESCRIPTION;
+                    }
+
+                    q.selectlist.push({
+                        type:stype,
+                        title:vtrim
+                    });
+                    start+=1;
+                }
+                qlist.push(q)
+            }
+
+
+        }
+    }
+    return qlist;
+}
+
+
 var server = app.listen(8080, function () {
 
     var host = server.address().address;
