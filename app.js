@@ -1034,6 +1034,7 @@ aclHandler.registerWait(function(acl){
                             var vlength = vt.length;
                             vt = vt.substring(1,vlength-1).trim();
                         }
+                        vt = vt.replace("\\r\\n","\r\n");
                         row.push(vt);
                         start+=1;
                     }
@@ -1269,7 +1270,20 @@ function parseV2List(input){
         var q = {}
         if(i>=2){
             if(input[i][1] && input[i][2]){
-                var tindex = input[i][1].trim().split(",")[0]
+                var titleSplit = input[i][1].trim().split(",");
+                var tindex = titleSplit[0]
+                if(titleSplit.length==3){
+                    var preindex = parseInt(titleSplit[1]);
+                    var selectindex = parseInt(titleSplit[2]);
+                    q.ifhasprecedent = true;
+                    q.precedentindex = preindex-1;
+                    q.precedentselectindex = selectindex-1;
+                }
+                else{
+                    q.ifhasprecedent = false;
+                    q.precedentindex = -1;
+                    q.precedentselectindex = -1;
+                }
                 q.title = input[i][2].trim();
                 q.type = typemap[tindex]
                 q.selectlist = [];

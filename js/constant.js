@@ -7,6 +7,8 @@ export var Constant = {
     CLEANSURVEYDATA:"cleansurveydata",
     SURVEYDATABATCHCHANGE:"surveydatabatchchange",
     LOADCSV:"loadcsv",
+    SAVESINGLEQUESTION:"savesinglequestion",
+    CAUSECHANGE:"causechange",
 
     QTYPE_SINGLESELECT:"singleselect",
     QTYPE_MULTISELECT:"multiselect",

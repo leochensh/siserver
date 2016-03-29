@@ -243,7 +243,10 @@ export var Newsurvey = React.createClass({
                 title:"newquestion",
                 ifSaved:false,
                 selectlist:[],
-                id:null
+                id:null,
+                ifhasprecedent : false,
+                precedentindex : -1,
+                precedentselectindex : -1
             };
             var cqlist = this.props.newsurvey.qlist;
             cqlist.push(newQ);
@@ -394,9 +397,10 @@ export var Newsurvey = React.createClass({
         for(var i in this.props.newsurvey.qlist){
             var q = this.props.newsurvey.qlist[i];
             questionList.push(<Question
-                index = {i}
+                index={i}
                 qdata={q}
                 dhandle={this.questiondeleteinform(i)}
+                qlist={this.props.newsurvey.qlist}
                 qhandle={this.questionchange(i)}></Question>);
         }
         var surveyStatusTxt = "Not Published";

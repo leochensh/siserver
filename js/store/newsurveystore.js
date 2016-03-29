@@ -39,7 +39,73 @@ class NewsurveyStore extends Store{
             }
             this.__emitChange();
         }
-        else if(payload.actionType == Constant.LOADCSV){
+        else if(payload.actionType == Constant.CAUSECHANGE){
+            this.__emitChange();
+        }
+        else if(payload.actionType == Constant.SAVESINGLEQUESTION){
+            var qindex = payload.qindex;
+            var qd = surveyData.qlist[qindex];
+            var that = this;
+            if(qd.title){
+                var depid=null;
+                if(qd.precedentindex>=0){
+                    depid = surveyData.qlist[qd.precedentindex].id;
+                }
+                var q = {
+                    title:qd.title,
+                    surveyid:surveyData.surveyid,
+                    type:qd.type,
+                    selectlist:qd.selectlist,
+                    ifhasprecedent:qd.ifhasprecedent,
+                    precedentid:depid,
+                    precedentselectindex:qd.precedentselectindex
+                };
+                //alert(JSON.stringify(this.props.qdata));
+                $("#ajaxloading").show();
+                if(qd.id){
+                    q.questionid = qd.id;
+                    $.ajax({
+                        url: Constant.BASE_URL+"editor/survey/question/edit",
+                        data: JSON.stringify(q),
+                        contentType: 'application/json; charset=utf-8',
+                        type: 'PUT',
+                        success: function(data){
+                            $("#ajaxloading").hide();
+                            qd.ifSaved = true;
+                            SisDispatcher.dispatch({
+                                actionType: Constant.CAUSECHANGE,
+                            });
+                        },
+                        error:function(jxr,scode){
+                            $("#ajaxloading").hide();
+                        }
+                    });
+                }
+                else{
+                    $.ajax({
+                        url: Constant.BASE_URL+"editor/survey/question/add",
+                        data: JSON.stringify(q),
+                        contentType: 'application/json; charset=utf-8',
+                        type: 'POST',
+                        success: function(data){
+                            $("#ajaxloading").hide();
+                            qd.ifSaved = true;
+                            qd.id = JSON.parse(data).body;
+                            SisDispatcher.dispatch({
+                                actionType: Constant.CAUSECHANGE,
+                            });
+
+                        },
+                        error:function(jxr,scode){
+                            $("#ajaxloading").hide();
+                        }
+                    });
+                }
+
+            }
+            else{
+                alert("Question data is incomplete to save.")
+            }
 
         }
     }

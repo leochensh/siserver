@@ -111,58 +111,63 @@ export var Question = React.createClass({
         return dfunc;
     },
     savequestion(){
-        if(this.props.qdata.title &&
-            (this.props.qdata.selectlist.length>0 || this.props.qdata.type == Constant.QTYPE_DESCRIPTION)){
-            var q = {
-                title:this.props.qdata.title,
-                surveyid:this.props.qdata.surveyid,
-                type:this.props.qdata.type,
-                selectlist:this.props.qdata.selectlist
-            };
-            //alert(JSON.stringify(this.props.qdata));
-            $("#ajaxloading").show();
-            var that = this;
-            if(this.props.qdata.id){
-                q.questionid = this.props.qdata.id;
-                $.ajax({
-                    url: Constant.BASE_URL+"editor/survey/question/edit",
-                    data: JSON.stringify(q),
-                    contentType: 'application/json; charset=utf-8',
-                    type: 'PUT',
-                    success: function(data){
-                        $("#ajaxloading").hide();
-                        that.informChange({
-                            ifSaved:true,
-                        });
-                    },
-                    error:function(jxr,scode){
-                        $("#ajaxloading").hide();
-                    }
-                });
-            }
-            else{
-                $.ajax({
-                    url: Constant.BASE_URL+"editor/survey/question/add",
-                    data: JSON.stringify(q),
-                    contentType: 'application/json; charset=utf-8',
-                    type: 'POST',
-                    success: function(data){
-                        $("#ajaxloading").hide();
-                        that.informChange({
-                            ifSaved:true,
-                            id:JSON.parse(data).body
-                        });
-                    },
-                    error:function(jxr,scode){
-                        $("#ajaxloading").hide();
-                    }
-                });
-            }
+        SisDispatcher.dispatch({
 
-        }
-        else{
-            alert("Question data is incomplete to save.")
-        }
+            actionType: Constant.SAVESINGLEQUESTION,
+            qindex:this.props.index
+        });
+        //if(this.props.qdata.title &&
+        //    (this.props.qdata.selectlist.length>0 || this.props.qdata.type == Constant.QTYPE_DESCRIPTION)){
+        //    var q = {
+        //        title:this.props.qdata.title,
+        //        surveyid:this.props.qdata.surveyid,
+        //        type:this.props.qdata.type,
+        //        selectlist:this.props.qdata.selectlist
+        //    };
+        //    //alert(JSON.stringify(this.props.qdata));
+        //    $("#ajaxloading").show();
+        //    var that = this;
+        //    if(this.props.qdata.id){
+        //        q.questionid = this.props.qdata.id;
+        //        $.ajax({
+        //            url: Constant.BASE_URL+"editor/survey/question/edit",
+        //            data: JSON.stringify(q),
+        //            contentType: 'application/json; charset=utf-8',
+        //            type: 'PUT',
+        //            success: function(data){
+        //                $("#ajaxloading").hide();
+        //                that.informChange({
+        //                    ifSaved:true,
+        //                });
+        //            },
+        //            error:function(jxr,scode){
+        //                $("#ajaxloading").hide();
+        //            }
+        //        });
+        //    }
+        //    else{
+        //        $.ajax({
+        //            url: Constant.BASE_URL+"editor/survey/question/add",
+        //            data: JSON.stringify(q),
+        //            contentType: 'application/json; charset=utf-8',
+        //            type: 'POST',
+        //            success: function(data){
+        //                $("#ajaxloading").hide();
+        //                that.informChange({
+        //                    ifSaved:true,
+        //                    id:JSON.parse(data).body
+        //                });
+        //            },
+        //            error:function(jxr,scode){
+        //                $("#ajaxloading").hide();
+        //            }
+        //        });
+        //    }
+        //
+        //}
+        //else{
+        //    alert("Question data is incomplete to save.")
+        //}
     },
     deletequestion(){
         if(this.props.qdata.id){
@@ -200,6 +205,7 @@ export var Question = React.createClass({
         //alert(JSON.stringify(this.props))
         var colorClass = this.props.qdata.ifSaved?"blue":"red";
         var qid = "questionname"+this.props.index;
+
         var typestr = Constant.QTYPE_NAME_MAP[this.props.qdata.type];
         var slist = [];
         for(var i in this.props.qdata.selectlist){
@@ -282,6 +288,28 @@ export var Question = React.createClass({
 
             )
         }
+
+        var dpoptionsList = [];
+        dpoptionsList.push(<option value="-1">
+            None
+        </option>);
+        for(var i in this.props.qlist){
+            dpoptionsList.push(<option value={i}>
+                {parseInt(i)+1},{this.props.qlist[i].title}
+            </option>)
+        }
+        var selectoptionsList = [];
+        selectoptionsList.push(<option value="-1">
+            None
+        </option>);
+        if(this.props.qdata.precedentindex>=0){
+            for(var i in this.props.qlist[this.props.qdata.precedentindex].selectlist){
+                var s = this.props.qlist[this.props.qdata.precedentindex].selectlist[i];
+                selectoptionsList.push(<option value={i}>
+                    {parseInt(i)+1},{s.title}
+                </option>);
+            }
+        }
         return(
             <div className="panel panel-default">
                 <div className="panel-heading">
@@ -301,6 +329,31 @@ export var Question = React.createClass({
                                 </textarea>
                             </div>
                         </div>
+
+                        <div className="form-group">
+                            <label className="col-sm-2 control-label">Dependent Question</label>
+                            <div className="col-sm-10">
+                                <select className="form-control"
+                                        value={this.props.qdata.precedentindex}
+                                        onChange={this.handleChange.bind(this,"precedentindex")}
+                                >
+                                    {dpoptionsList}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label className="col-sm-2 control-label">Dependent Select</label>
+                            <div className="col-sm-10">
+                                <select className="form-control"
+                                        value={this.props.qdata.precedentselectindex}
+                                        onChange={this.handleChange.bind(this,"precedentselectindex")}
+                                >
+                                    {selectoptionsList}
+                                </select>
+                            </div>
+                        </div>
+
                         {slist}
 
                     </form>
