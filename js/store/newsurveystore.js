@@ -2,6 +2,7 @@ import {Store} from 'flux/utils';
 import {SisDispatcher} from "../dispatcher"
 import {Constant} from "../constant"
 import _ from "underscore";
+import async from "async"
 
 var surveyData = {
     surveyname:"new survey",
@@ -10,6 +11,65 @@ var surveyData = {
     ifSurveyNameEmpty:false,
     surveystatus:Constant.SURVEYSTATUS_EDIT,
     qlist:[]
+}
+
+function saveQuestion(qd,suceditcallback,sucnewcallback,faileditcallback,failnewcallback){
+    if(true){
+        var depid=null;
+        var ifhasp = false;
+        if(qd.precedentindex>=0){
+            depid = surveyData.qlist[qd.precedentindex].id;
+            ifhasp = true;
+        }
+        var q = {
+            title:qd.title,
+            surveyid:surveyData.surveyid,
+            type:qd.type,
+            selectlist:qd.selectlist,
+            ifhasprecedent:ifhasp,
+            precedentid:depid,
+            precedentselectindex:qd.precedentselectindex
+        };
+        //alert(JSON.stringify(this.props.qdata));
+        $("#ajaxloading").show();
+        if(qd.id){
+            q.questionid = qd.id;
+            $.ajax({
+                url: Constant.BASE_URL+"editor/survey/question/edit",
+                data: JSON.stringify(q),
+                contentType: 'application/json; charset=utf-8',
+                type: 'PUT',
+                success: function(data){
+                    suceditcallback(data);
+
+                },
+                error:function(jxr,scode){
+                    faileditcallback();
+
+                }
+            });
+        }
+        else{
+            $.ajax({
+                url: Constant.BASE_URL+"editor/survey/question/add",
+                data: JSON.stringify(q),
+                contentType: 'application/json; charset=utf-8',
+                type: 'POST',
+                success: function(data){
+                    sucnewcallback(data);
+
+                },
+                error:function(jxr,scode){
+                    failnewcallback();
+                }
+            });
+        }
+
+    }
+    else{
+        alert("Question data is incomplete to save.")
+    }
+
 }
 
 class NewsurveyStore extends Store{
@@ -45,68 +105,52 @@ class NewsurveyStore extends Store{
         else if(payload.actionType == Constant.SAVESINGLEQUESTION){
             var qindex = payload.qindex;
             var qd = surveyData.qlist[qindex];
-            var that = this;
-            if(qd.title){
-                var depid=null;
-                if(qd.precedentindex>=0){
-                    depid = surveyData.qlist[qd.precedentindex].id;
-                }
-                var q = {
-                    title:qd.title,
-                    surveyid:surveyData.surveyid,
-                    type:qd.type,
-                    selectlist:qd.selectlist,
-                    ifhasprecedent:qd.ifhasprecedent,
-                    precedentid:depid,
-                    precedentselectindex:qd.precedentselectindex
-                };
-                //alert(JSON.stringify(this.props.qdata));
-                $("#ajaxloading").show();
-                if(qd.id){
-                    q.questionid = qd.id;
-                    $.ajax({
-                        url: Constant.BASE_URL+"editor/survey/question/edit",
-                        data: JSON.stringify(q),
-                        contentType: 'application/json; charset=utf-8',
-                        type: 'PUT',
-                        success: function(data){
-                            $("#ajaxloading").hide();
-                            qd.ifSaved = true;
-                            SisDispatcher.dispatch({
-                                actionType: Constant.CAUSECHANGE,
-                            });
-                        },
-                        error:function(jxr,scode){
-                            $("#ajaxloading").hide();
-                        }
+
+            saveQuestion(qd,function(data){
+                $("#ajaxloading").hide();
+                qd.ifSaved = true;
+                SisDispatcher.dispatch({
+                    actionType: Constant.CAUSECHANGE,
+                });
+            },function(data){
+                $("#ajaxloading").hide();
+                qd.ifSaved = true;
+                qd.id = JSON.parse(data).body;
+                SisDispatcher.dispatch({
+                    actionType: Constant.CAUSECHANGE,
+                });
+            },function(){
+                $("#ajaxloading").hide();
+            },function(){
+                $("#ajaxloading").hide();
+            });
+
+
+
+        }
+        else if(payload.actionType == Constant.SAVEALLQUESTION){
+            async.forEachOfSeries(surveyData.qlist,function(v,i,cb){
+                saveQuestion(v,function(data){
+                    v.ifSaved = true;
+                    SisDispatcher.dispatch({
+                        actionType: Constant.CAUSECHANGE,
                     });
-                }
-                else{
-                    $.ajax({
-                        url: Constant.BASE_URL+"editor/survey/question/add",
-                        data: JSON.stringify(q),
-                        contentType: 'application/json; charset=utf-8',
-                        type: 'POST',
-                        success: function(data){
-                            $("#ajaxloading").hide();
-                            qd.ifSaved = true;
-                            qd.id = JSON.parse(data).body;
-                            SisDispatcher.dispatch({
-                                actionType: Constant.CAUSECHANGE,
-                            });
-
-                        },
-                        error:function(jxr,scode){
-                            $("#ajaxloading").hide();
-                        }
+                    cb();
+                },function(data){
+                    v.ifSaved = true;
+                    v.id = JSON.parse(data).body;
+                    SisDispatcher.dispatch({
+                        actionType: Constant.CAUSECHANGE,
                     });
-                }
-
-            }
-            else{
-                alert("Question data is incomplete to save.")
-            }
-
+                    cb();
+                },function(){
+                    cb();
+                },function(){
+                    cb();
+                });
+            },function(err){
+                $("#ajaxloading").hide();
+            });
         }
     }
 }

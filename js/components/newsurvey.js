@@ -323,7 +323,6 @@ export var Newsurvey = React.createClass({
                 }
                 //alert(JSON.stringify(that.state.tmsg))
                 SisDispatcher.dispatch({
-
                     actionType: Constant.SURVEYDATABATCHCHANGE,
                     value:{
                         ifSaved:true,
@@ -331,6 +330,13 @@ export var Newsurvey = React.createClass({
                         qlist:that.state.tmsg
                     }
                 });
+
+                setTimeout(function(){
+                    SisDispatcher.dispatch({
+                        actionType: Constant.SAVEALLQUESTION,
+
+                    });
+                },500);
             })
         }
     },
