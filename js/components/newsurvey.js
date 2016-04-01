@@ -437,39 +437,39 @@ export var Newsurvey = React.createClass({
                         </li>
                         <li>
                             <a onClick={this.singleselect}>
-                                    <span className="glyphicon glyphicon-minus" aria-hidden="true"></span>
-                                    &nbsp;&nbsp;Single Selection
+                                <span className="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                                &nbsp;&nbsp;Single Selection
 
                             </a>
                         </li>
                         <li>
                             <a  onClick={this.multiselect}>
-                                    <span className="glyphicon glyphicon-th-list" aria-hidden="true"></span>
-                                    &nbsp;&nbsp;Multiple Selection
+                                <span className="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                                &nbsp;&nbsp;Multiple Selection
                             </a>
                         </li>
                         <li>
                             <a  onClick={this.description}>
-                                    <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                                    &nbsp;&nbsp;Subjective Item
+                                <span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                                &nbsp;&nbsp;Subjective Item
                             </a>
                         </li>
                         <li>
                             <a  onClick={this.sorttype}>
-                                    <span className="glyphicon glyphicon-signal" aria-hidden="true"></span>
-                                    &nbsp;&nbsp;Sort
+                                <span className="glyphicon glyphicon-signal" aria-hidden="true"></span>
+                                &nbsp;&nbsp;Sort
                             </a>
                         </li>
                         <li>
                             <a  onClick={this.scoretype}>
-                                    <span className="glyphicon glyphicon-sort-by-order" aria-hidden="true"></span>
-                                    &nbsp;&nbsp;Score
+                                <span className="glyphicon glyphicon-sort-by-order" aria-hidden="true"></span>
+                                &nbsp;&nbsp;Score
                             </a>
                         </li>
                         <li>
-                                <Dropzone onDrop={this.onDrop} accept="text/csv">
-                                    <div>Drop xlsx file here or click.</div>
-                                </Dropzone>
+                            <Dropzone onDrop={this.onDrop} accept="text/csv">
+                                <div>Drop xlsx file here or click.</div>
+                            </Dropzone>
                         </li>
 
                     </ul>
@@ -588,24 +588,25 @@ export var Newsurvey = React.createClass({
                         <div className="modal-content">
                             <div className="modal-header">
                                 <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 className="modal-title" >Clean All Data</h4>
+                                <h4 className="modal-title" >Import new survey</h4>
                             </div>
                             <div className="modal-body">
-                                <h3>
+                                <p>
                                     This operation will create a new survey.Please input survey's name.
-                                </h3>
-                                <div className="form-group form-group-lg">
-                                    <label htmlFor="surveynewform" className="col-sm-2 control-label">Survey Name</label>
-                                    <div className="col-sm-10">
+                                </p>
+                                <form>
+                                    <div className="form-group">
+                                        <label htmlFor="surveynewform">Survey Name</label>
                                         <input type="text"
                                                className="form-control"
                                                id="inputPasswordxxx"
                                                placeholder=""
                                                value={this.props.newsurvey.surveyname}
                                                onChange={this.handleChange.bind(this,"surveyname")}
-                                        />
+                                            />
                                     </div>
-                                </div>
+                                </form>
+
 
 
                             </div>

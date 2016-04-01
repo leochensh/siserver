@@ -180,9 +180,9 @@ export var Personal = React.createClass({
             notequalpassstyle = {}
         }
         return (
-            <div>
+            <div >
                 <div className="row">
-                    <div className="col-md-3">
+                    <div className="col-md-3 col-md-offset-1">
                         <h3 className="title"> Personal Users List </h3>
 
                     </div>
@@ -195,21 +195,24 @@ export var Personal = React.createClass({
 
 
                 </div>
-                <table  className="table">
-                    <thead>
-                    <tr>
-                        <th><span className="">No.</span></th>
-                        <th><span className="">User Name</span></th>
-                        <th><span className="">Create Time</span></th>
-                        <th><span className="">Operations</span></th>
-                    </tr>
-                    </thead>
-                    <tbody>
+                <div className="panel panel-default paddingpanel">
+                    <table  className="table" >
+                        <thead>
+                        <tr>
+                            <th><span className="">##</span></th>
+                            <th><span className="">User Name</span></th>
+                            <th><span className="">Create Time</span></th>
+                            <th><span className="">Operations</span></th>
+                        </tr>
+                        </thead>
+                        <tbody>
 
-                    {mlist}
+                        {mlist}
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
+
                 <div className="modal fade" id="newpersonal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div className="modal-dialog">
                         <div className="modal-content">
