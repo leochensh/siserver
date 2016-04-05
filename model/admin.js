@@ -533,3 +533,19 @@ Admin.addAd = function(orgid,title,image,link,callback){
         }
     });
 };
+
+Admin.getSurveyAnswerList = function(surveyid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("answers",function(err,collection){
+                collection.find({surveyid:surveyid}).sort({ctime:-1}).toArray(function(err,sus){
+                    mongoPool.release(db);
+                    callback(err,sus);
+                });
+            });
+        }
+    });
+}

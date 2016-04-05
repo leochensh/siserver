@@ -10,6 +10,11 @@ export var Constant = {
     SAVESINGLEQUESTION:"savesinglequestion",
     CAUSECHANGE:"causechange",
     SAVEALLQUESTION:"saveallquestion",
+    GETSURVEYEDITLIST:"getsurveyeditlist",
+    FORCEEDITORSURVEYCHANGE:"forceeditorsurveychange",
+    DELETESURVEY:"deletesurvey",
+    EDITSURVEY:"editsurvey",
+    PARSESURVEYDETAIL:"parsesurveydetail",
 
     QTYPE_SINGLESELECT:"singleselect",
     QTYPE_MULTISELECT:"multiselect",
@@ -41,12 +46,17 @@ export var Constant = {
     SURVEYSTATUS_REJECT:"surveyreject",
     SURVEYSTATUS_NORMAL:"surveynormal",
 
+    SURVEYSTATUSMAP:{
+        "surveyedit":"Edit",
+        "surveynormal":"Published"
+    },
+
     //BASE_URL:"http://localhost:3000/",
     //BASE_URL:"http://121.40.94.201:3005/",
     //BASE_URL:"/tracker/"
     //BASE_URL:"http://121.40.94.201/mmn/",
-    //BASE_URL:"/si/",
-    //BASE_IMAGEURL:"/si/uploads/"
-    BASE_URL:"/",
-    BASE_IMAGEURL:"/uploads/"
+    BASE_URL:"/si/",
+    BASE_IMAGEURL:"/si/uploads/"
+    //BASE_URL:"/",
+    //BASE_IMAGEURL:"/uploads/"
 };

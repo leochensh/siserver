@@ -591,9 +591,9 @@ export var Newsurvey = React.createClass({
                                 <h4 className="modal-title" >Import new survey</h4>
                             </div>
                             <div className="modal-body">
-                                <p>
+                                <h3>
                                     This operation will create a new survey.Please input survey's name.
-                                </p>
+                                </h3>
                                 <form>
                                     <div className="form-group">
                                         <label htmlFor="surveynewform">Survey Name</label>

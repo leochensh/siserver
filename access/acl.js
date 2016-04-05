@@ -29,7 +29,7 @@ mongoPool.acquire(function(err, db){
                 {resources:'/admin/staff/add',permissions:'post'},
                 {resources:'/admin/staff/resetpass',permissions:'put'},
                 {resources:'/admin/staff/delete',permissions:'delete'},
-                {resources:'/admin/survey',permissions:['put']},
+                {resources:'/admin/survey',permissions:['put','get']},
                 {resources:'/admin/version',permissions:['post']},
                 {resources:'/admin/ad',permissions:['post']}
             ]
@@ -44,7 +44,7 @@ mongoPool.acquire(function(err, db){
         {
             roles:[dict.STAFF_EDITOR,dict.STAFF_PERSONAL],
             allows:[
-                {resources:'/editor/survey',permissions:['post','delete','put']}
+                {resources:'/editor/survey',permissions:['post','delete','put','get']}
             ]
         },
         {

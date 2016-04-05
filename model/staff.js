@@ -92,6 +92,24 @@ Staff.createSurvey = function(orgid,uid,name,type,callback){
     });
 };
 
+Staff.getEditorSurveyList = function(editorid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+
+                collection.find({editorid:editorid},{orgid:0,questionlist:0,editorid:0})
+                    .sort({ctime:-1}).toArray(function(err,surveys){
+                    mongoPool.release(db);
+                    callback(err,surveys);
+                });
+            });
+        }
+    });
+};
+
 Staff.editSurvey = function(name,surveyid,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -298,6 +316,49 @@ Staff.proposeSurvey = function(orgid,surveyid,callback){
     });
 };
 
+Staff.deleteSurvey = function(surveyid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+                collection.find({_id:ObjectID(surveyid)}).limit(1).next(function(err,survey){
+                    if(survey){
+                        db.collection("admins",function(err,admincollection){
+                            admincollection.find({"surveyList.surveyid":surveyid})
+                                .toArray(function(err,arr){
+                                    async.forEach(arr,function(sur,cb){
+                                        var slist= sur.surveyList;
+                                        var el = [];
+                                        for(var i in slist){
+                                            if(slist[i].surveyid!=surveyid){
+                                                el.push(slist[i]);
+                                            }
+                                        }
+                                        admincollection.updateOne({_id:sur._id},{$set:{surveyList:el},function(err,ur){
+                                            cb();
+                                        }});
+                                    },function(err){
+                                        collection.deleteOne({_id:ObjectID(surveyid)},function(err,dr){
+                                            mongoPool.release(db);
+                                            callback(err,dr);
+                                        });
+                                    });
+                                });
+                        })
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound")
+                    }
+                })
+            });
+        }
+    });
+};
+
+
 Staff.getStaffSurveyList = function(staffid,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -374,6 +435,55 @@ Staff.getSurveyDetail = function(surveyid,callback){
     });
 };
 
+Staff.getSurveyFullDetail = function(surveyid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,surveycollection){
+                surveycollection.find({_id:ObjectID(surveyid)})
+                    .limit(1).next(function(err,survey){
+                        if(survey){
+                            var qList = [];
+                            var qDetailList = [];
+                            if(survey.questionlist){
+                                qList = survey.questionlist;
+
+                            }
+                            db.collection("questions",function(err,questioncollection){
+                                async.forEachOfSeries(qList,function(q,index,cb){
+                                    questioncollection.find({_id:q}).limit(1).next(function(qerr,question){
+                                        if(question){
+                                            question.index = index;
+                                            for(var si in question.selectlist){
+                                                question.selectlist[si].index = si;
+                                            }
+                                            qDetailList.push(question);
+                                        }
+                                        cb()
+                                    })
+                                },function(err){
+                                    survey.questionlist = qDetailList;
+                                    mongoPool.release(db);
+                                    callback(err,survey);
+                                })
+                            });
+
+                        }
+                        else{
+                            mongoPool.release(db);
+                            callback(err,"notfound")
+                        }
+                    }
+                );
+
+
+            });
+        }
+    });
+};
+
 Staff.saveAnswers = function(answerdata,staffid,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -382,7 +492,10 @@ Staff.saveAnswers = function(answerdata,staffid,callback){
         else{
             db.collection("answers",function(err,collection){
                 answerdata.ctime = new Date();
-                answerdata.investigatorid = staffid;
+                if(staffid){
+                    answerdata.investigatorid = staffid;
+                }
+
                 collection.insertOne(answerdata,function(err,res){
                     mongoPool.release(db);
                     callback(err,res.insertedId);

@@ -9,7 +9,7 @@ var fs = require('fs');
 var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var XLSX = require('xlsx');
-
+var  path = require('path');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -78,7 +78,9 @@ app.use(session({
         url: 'mongodb://localhost:27017/smartinsight'
     })
 }));
-
+app.get('/public/*', function (request, response){
+    response.sendFile(path.resolve(__dirname, 'public', 'index.html'))
+})
 app.get('/', function (req, res) {
     res.send('Hello World!');
 });
@@ -639,6 +641,22 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+
+    app.get("/editor/survey/list",acl.middleware(2),function(req,res){
+        var editorid = req.session.uid;
+        Staff.getEditorSurveyList(editorid,function(err,ss){
+            if(!ss){
+                ss = [];
+            }
+            logger.logger.log("info","editor get survey list",{
+                editorid:req.session.uid});
+            res.status(200);
+            successMsg.body = ss;
+
+            res.send(JSON.stringify(successMsg));
+        });
+    });
+
     app.delete("/editor/survey/question/delete",acl.middleware(2),function(req,res){
         var qid = req.body.questionid;
 
@@ -688,6 +706,61 @@ aclHandler.registerWait(function(acl){
                         editorid:req.session.uid});
                     res.status(200);
                     successMsg.body = null;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.delete("/editor/survey/delete",acl.middleware(2),function(req,res){
+        var surveyid = req.body.surveyid;
+        if(surveyid && ObjectID.isValid(surveyid)){
+            Staff.deleteSurvey(surveyid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff propose survey delete",{
+                        id:surveyid,
+                        editorid:req.session.uid});
+                    res.status(200);
+                    successMsg.body = null;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/editor/survey/detail/:surveyid",acl.middleware(2),function(req,res){
+        var surveyid = req.params.surveyid;
+        if(surveyid && ObjectID.isValid(surveyid)){
+            Staff.getSurveyFullDetail(surveyid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff get survey detail",{
+                        id:req.session.uid,
+                        surveyid:surveyid
+                    });
+                    res.status(200);
+                    successMsg.body = msg;
 
                     res.send(JSON.stringify(successMsg));
                 }
@@ -770,7 +843,22 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(errorMsg));
         }
     });
+    app.get("/admin/survey/answer/list/:surveyid",acl.middleware(2),function(req,res){
+        var surveyid = req.params.surveyid;
+        if(surveyid && ObjectID.isValid(surveyid)){
+            Admin.getSurveyAnswerList(surveyid,function(err,answers){
+                successMsg.body = answers;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
 
+
+    });
     app.get("/removerepeatassign",function(req,res){ //临时接口，用于去除问卷分配的重复
         Admin.removeAssginRepeat(function(err,msg){
             successMsg.body = null;
@@ -825,6 +913,33 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+    app.get("/anonymous/survey/detail/:surveyid",function(req,res){
+        var surveyid = req.params.surveyid;
+        if(surveyid && ObjectID.isValid(surveyid)){
+            Staff.getSurveyDetail(surveyid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","anonymous get survey detail",{
+                        surveyid:surveyid
+                    });
+                    res.status(200);
+                    successMsg.body = msg;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
     app.post("/investigator/survey/answer/add",acl.middleware(2),function(req,res){
         var surveyid = req.body.surveyid;
         var investigatorid = req.session.uid;
@@ -833,6 +948,27 @@ aclHandler.registerWait(function(acl){
             Staff.saveAnswers(req.body,investigatorid,function(err,msg){
                 logger.logger.log("info","staff send survey answer",{
                     staffid:req.session.uid,
+                    surveyid:surveyid,
+                    answerid:msg
+                });
+                res.status(200);
+                successMsg.body = msg;
+
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.post("/anonymous/survey/answer/add",function(req,res){
+        var surveyid = req.body.surveyid;
+        if(surveyid && ObjectID.isValid(surveyid) && req.body.answerlist){
+            Staff.saveAnswers(req.body,null,function(err,msg){
+                logger.logger.log("info","anonymous send survey answer",{
                     surveyid:surveyid,
                     answerid:msg
                 });

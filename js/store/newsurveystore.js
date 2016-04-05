@@ -152,6 +152,67 @@ class NewsurveyStore extends Store{
                 $("#ajaxloading").hide();
             });
         }
+        else if(payload.actionType == Constant.EDITSURVEY){
+            var sid = payload.id;
+            var that = this;
+            $("#ajaxloading").show();
+            $.ajax({
+                url: Constant.BASE_URL+"editor/survey/detail/"+sid,
+
+                type: 'GET',
+                success: function (data) {
+                    //alert(data);
+                    $("#ajaxloading").hide();
+                    var msg = JSON.parse(data).body;
+
+                    //editSurveyList = msg;
+                    SisDispatcher.dispatch({
+                        actionType: Constant.PARSESURVEYDETAIL,
+                        survey:msg
+                    });
+                },
+                error:function(){
+                    $("#ajaxloading").hide();
+                }
+            });
+        }
+        else if(payload.actionType == Constant.PARSESURVEYDETAIL){
+            var survey = payload.survey;
+            if(survey){
+                surveyData = {
+                    surveyname:survey.name,
+                    ifSaved:true,
+                    surveyid:survey._id,
+                    ifSurveyNameEmpty:false,
+                    surveystatus:survey.status,
+                    qlist:[]
+                }
+                var nqlist = survey.questionlist;
+                for(var i in nqlist){
+                    var nq = {
+                        id:nqlist[i]._id,
+                        title:nqlist[i].title,
+                        ifSaved:true,
+                        type:nqlist[i].type,
+                        selectlist:nqlist[i].selectlist
+                    }
+                    if(nqlist[i].ifhasprecedent){
+                        var findex = _.findIndex(nqlist,function(item){
+                            return nqlist[i].precedentid == item._id;
+                        })
+                        if(findex>=0){
+                            nq.precedentindex = findex;
+
+                        }
+                        nq.precedentselectindex = nqlist[i].precedentselectindex;
+                    }
+                    surveyData.qlist.push(nq);
+                }
+                this.__emitChange();
+
+            }
+
+        }
     }
 }
 

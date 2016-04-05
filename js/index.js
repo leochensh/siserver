@@ -4,12 +4,15 @@ import {SisDispatcher} from "./dispatcher";
 import {loginStore} from './store/loginstore';
 import {personalStore} from './store/personalstore'
 
-import {Router, Route, IndexRoute, Link, hashHistory} from 'react-router'
+import {Router, Route, IndexRoute, Link, hashHistory,browserHistory } from 'react-router'
 import {App} from "./components/app"
 import {Login} from "./components/login"
 import {Home} from "./components/home"
 import {Personal} from "./components/personal"
 import {Newsurvey} from "./components/newsurvey"
+import {Surveylist} from "./components/surveylist"
+import {Quest} from "./components/quest"
+import {Stastic} from "./components/stastic"
 
 var main = document.getElementsByTagName('main')[0];
 
@@ -22,6 +25,9 @@ ReactDom.render(
             <Route path="home" component={Home} />
             <Route path="personal" component={Personal} />
             <Route path="newsurvey" component={Newsurvey} />
+            <Route path="surveylist" component={Surveylist} />
+            <Route path="quest/:id" component={Quest} />
+            <Route path="stastic/:id" component={Stastic} />
         </Route>
     </Router>,
     main

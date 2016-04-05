@@ -10,6 +10,9 @@ export var Home = React.createClass({
     newsurvey(event){
         this.context.router.push("/newsurvey");
     },
+    surveymanage(event){
+        this.context.router.push("/surveylist")
+    },
 
     render() {
         var style = {
@@ -28,6 +31,7 @@ export var Home = React.createClass({
         }
         else if(loginInfo.role == "personal"){
             newsurveyDisable = "";
+            surveyManageDisable = "";
         }
         return (
             <div>
@@ -79,7 +83,7 @@ export var Home = React.createClass({
                         </div>
                     </button>
                     <button className="col-md-3 btn btn-default"
-                    disabled={surveyManageDisable}>
+                    disabled={surveyManageDisable} onClick={this.surveymanage}>
 
                         <div className="fixed-size-square">
                             <div>
