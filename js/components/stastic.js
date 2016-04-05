@@ -78,8 +78,8 @@ export var Stastic = React.createClass({
                     var snum = _.reduce(this.state.answerlist,function(memo,item){
                         var alist = item.answerlist;
                         var qfi = _.findIndex(alist,function(item){
-                            return item.questionid = q._id;
-                        })
+                            return item.questionid == q._id;
+                        });
                         if(qfi>=0){
                             var sfi = _.indexOf(alist[qfi].selectindexlist,j);
                             if(sfi>=0){
