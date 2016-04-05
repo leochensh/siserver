@@ -130,15 +130,23 @@ export var Stastic = React.createClass({
 
         return (
             <div className="container">
+
                 <h2>
                     {this.state.survey?this.state.survey.name:""}
                 </h2>
-                <div className="well">
+
+                <div className="well" >
                     <h3>
                         Total {totalNum} answers. {clientNum} answers from Android Client and {totalNum-clientNum} answers from web anonymous users.
                     </h3>
                 </div>
-                {qlist}
+                <a className="btn btn-primary" role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    Toggle Survey Answers General Data
+                </a>
+                <div className="collapse"  id="collapseExample">
+                    {qlist}
+                </div>
+
             </div>
         )
     }
