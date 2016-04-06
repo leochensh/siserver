@@ -109,7 +109,7 @@ export var Stastic = React.createClass({
                             <div className="col-md-4" >
                                 <div  className="alert alert-success">
                                     <span className="grey">{parseInt(j)+1}</span>
-                                    <span>&nbsp;&nbsp;{s.title}</span>
+                                    <span>&nbsp;&nbsp;{s.title?s.title:""}</span>
                                 </div>
 
                             </div>
@@ -271,7 +271,7 @@ export var Stastic = React.createClass({
                     <div className="panel panel-default">
                         <div className="panel-heading">
                             <span className="green">{parseInt(i)+1}</span>
-                            <span>&nbsp;&nbsp;{currentQ.title}</span>
+                            <span>&nbsp;&nbsp;{currentQ.title?currentQ.title:""}</span>
                             <span>&nbsp;&nbsp;Type: {Constant.QTYPE_NAME_MAP[currentQ.type]}</span>
                         </div>
                         <div className="panel-body">
