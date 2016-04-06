@@ -258,11 +258,15 @@ export var Stastic = React.createClass({
                         if(q.text){
                             qtStyle = {};
                         }
+                        var stitle = "";
+                        if(currentQ.selectlist && currentQ.selectlist[sindex] && currentQ.selectlist[sindex].title){
+                            stitle = currentQ.selectlist[sindex].title;
+                        }
                         sdisList.push(
                             <div>
                                 <p>
                                     <span className="grey">{parseInt(sindex)+1}</span>
-                                    {currentQ.selectlist[sindex].title?currentQ.selectlist[sindex].title:""}
+                                    {stitle}
                                 </p>
                                 <div style={qtStyle}  className="alert alert-success">
                                     {q.text?q.text:""}
