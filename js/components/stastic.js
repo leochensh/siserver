@@ -258,12 +258,7 @@ export var Stastic = React.createClass({
 
                     for(var j in q.selectindexlist){
                         var sindex = q.selectindexlist[j];
-                        var qtStyle = {
-                            display:"none"
-                        };
-                        if(q.text){
-                            qtStyle = {};
-                        }
+
                         var stitle = "";
                         if(currentQ.selectlist && currentQ.selectlist[sindex] && currentQ.selectlist[sindex].title){
                             stitle = currentQ.selectlist[sindex].title;
@@ -274,16 +269,24 @@ export var Stastic = React.createClass({
                                     <span className="grey">{parseInt(sindex)+1}</span>
                                     {stitle}
                                 </p>
-                                <div style={qtStyle}  className="alert alert-success">
-                                    {q.text?q.text:""}
-                                </div>
+
 
                             </div>
 
                         )
                     }
                 }
-
+                var qtStyle = {
+                    display:"none"
+                };
+                if(q.text){
+                    qtStyle = {};
+                }
+                sdisList.push(
+                    <div style={qtStyle}  className="alert alert-success">
+                        {q.text?q.text:""}
+                    </div>
+                )
                 detailModal.push(
                     <div className="panel panel-default">
                         <div className="panel-heading">
