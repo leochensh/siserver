@@ -102,9 +102,9 @@ Staff.getEditorSurveyList = function(editorid,callback){
 
                 collection.find({editorid:editorid},{orgid:0,questionlist:0,editorid:0})
                     .sort({ctime:-1}).toArray(function(err,surveys){
-                    mongoPool.release(db);
-                    callback(err,surveys);
-                });
+                        mongoPool.release(db);
+                        callback(err,surveys);
+                    });
             });
         }
     });
@@ -511,11 +511,11 @@ var processAnswers = function(answers,db,callback){
             db.collection("surveys",function(error,surveycollection){
                 surveycollection.find({_id:ObjectID(answer.surveyid)},{name:1})
                     .limit(1).next(function(err,survey){
-                    if(survey){
-                        answer.surveyname = survey.name;
-                    }
-                    cb();
-                })
+                        if(survey){
+                            answer.surveyname = survey.name;
+                        }
+                        cb();
+                    })
             });
         }
         else{
@@ -544,8 +544,8 @@ Staff.getAnswerList = function(pagesize,pagenum,staffid,callback){
                 else{
                     collection.find({investigatorid:staffid},{_id:1,surveyid:1,ctime:1})
                         .skip(pagenum*pagesize).limit(pagesize).toArray(function(err,answers){
-                        processAnswers(answers,db,callback)
-                    });
+                            processAnswers(answers,db,callback)
+                        });
                 }
 
             });
@@ -562,14 +562,32 @@ Staff.getAnswerDetail = function(answerid,callback){
             db.collection("answers",function(err,collection){
                 collection.find({_id:ObjectID(answerid)})
                     .limit(1).next(function(err,answer){
-                    mongoPool.release(db);
-                    if(answer){
-                        callback(err,answer);
-                    }
-                    else{
-                        callback(err,"notfound");
-                    }
-                });
+
+                        if(answer){
+                            if(answer.investigatorid){
+                                db.collection("admins",function(err,admincollection){
+                                    admincollection.find({_id:ObjectID(answer.investigatorid)})
+                                        .limit(1).next(function(err,admin){
+                                            if(admin){
+                                                answer.investigatorname = admin.name;
+                                            }
+
+                                            mongoPool.release(db);
+                                            callback(err,answer);
+                                        })
+                                });
+                            }
+                            else{
+                                mongoPool.release(db);
+                                callback(err,answer);
+                            }
+
+                        }
+                        else{
+                            mongoPool.release(db);
+                            callback(err,"notfound");
+                        }
+                    });
             });
         }
     });
@@ -601,9 +619,9 @@ Staff.getVersionInfo = function(orgid,platform,callback){
             db.collection("versions",function(err,collection){
                 collection.find({orgid:orgid,platform:platform},{_id:0,orgid:0}).sort({ctime:-1})
                     .limit(1).next(function(err,ver){
-                    mongoPool.release(db);
-                    callback(err,ver);
-                })
+                        mongoPool.release(db);
+                        callback(err,ver);
+                    })
             });
         }
     });

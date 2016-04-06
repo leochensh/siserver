@@ -542,8 +542,32 @@ Admin.getSurveyAnswerList = function(surveyid,callback){
         else{
             db.collection("answers",function(err,collection){
                 collection.find({surveyid:surveyid}).sort({ctime:-1}).toArray(function(err,sus){
-                    mongoPool.release(db);
-                    callback(err,sus);
+
+                    async.each(sus,function(item,cb){
+                        if(item.investigatorid){
+                            db.collection("admins",function(err,admincollection){
+                                admincollection.find({_id:ObjectID(item.investigatorid)})
+                                    .limit(1).next(function(err,admin){
+                                        if(admin){
+                                            item.investigatorname = admin.name;
+                                        }
+                                        else{
+                                            item.investigatorname = "";
+                                        }
+
+                                        cb();
+                                    })
+                            });
+                        }
+                        else{
+                            item.investigatorname = "";
+                            cb()
+                        }
+                    },function(err){
+                        mongoPool.release(db);
+                        callback(err,sus);
+                    });
+
                 });
             });
         }

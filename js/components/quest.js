@@ -5,6 +5,7 @@ import {Question} from "./question"
 import _ from "underscore"
 import crypto from "crypto"
 import async from "async"
+import {Starrating} from "./starrating"
 
 export var Quest = React.createClass({
     getInitialState(){
@@ -72,55 +73,69 @@ export var Quest = React.createClass({
         return v.split("/@/")[0];
     },
     nextq(direction){
-        var step = 1;
-        var next;
-        if(direction == "right"){
-            next = this.state.survey.questionlist[this.state.currentIndex+step];
-        }
-        else{
-            next = this.state.survey.questionlist[this.state.currentIndex-step];
-        }
-        while(next && next.ifhasprecedent){
-            var preid = next.precedentid;
-            var preselectindex = next.precedentselectindex;
-            var amatchindex = _.findIndex(this.state.answer.answerlist,function(item){
-                return item.questionid == preid;
-            });
-            console.log(amatchindex);
-            if(amatchindex>=0){
-                var sindexarr = this.state.answer.answerlist[amatchindex].selectindexlist;
-                var newmatchindex = _.find(sindexarr,function(item){
-                    return item == preselectindex
-                })
-                console.log(newmatchindex);
-                if(newmatchindex>=0){
-                    break;
-                }
-                else{
-                    step+=1;
-                }
-                if(direction == "right"){
-                    next = this.state.survey.questionlist[this.state.currentIndex+step];
-                }
-                else{
-                    next = this.state.survey.questionlist[this.state.currentIndex-step];
-                }
+        var qsize = this.state.survey.questionlist.length;
+        if((direction=="left" && this.state.currentIndex>0) ||
+            (direction=="right" && this.state.currentIndex<qsize-1)){
+            var step = 1;
+            var next;
+            if(direction == "right"){
+                next = this.state.survey.questionlist[this.state.currentIndex+step];
             }
             else{
-                break;
+                next = this.state.survey.questionlist[this.state.currentIndex-step];
             }
+            while(next && next.ifhasprecedent){
+                var preid = next.precedentid;
+                var preselectindex = next.precedentselectindex;
+                var amatchindex = _.findIndex(this.state.answer.answerlist,function(item){
+                    return item.questionid == preid;
+                });
+                console.log(amatchindex);
+                if(amatchindex>=0){
+                    var sindexarr = this.state.answer.answerlist[amatchindex].selectindexlist;
+                    var newmatchindex = _.find(sindexarr,function(item){
+                        return item == preselectindex
+                    })
+                    console.log(newmatchindex);
+                    if(newmatchindex>=0){
+                        break;
+                    }
+                    else{
+                        step+=1;
+                    }
+                    if(direction == "right"){
+                        next = this.state.survey.questionlist[this.state.currentIndex+step];
+                    }
+                    else{
+                        next = this.state.survey.questionlist[this.state.currentIndex-step];
+                    }
+                }
+                else{
+                    break;
+                }
 
+            }
+            if(direction == "right"){
+                this.setState({
+                    currentIndex:this.state.currentIndex+step
+                })
+            }
+            else{
+                this.setState({
+                    currentIndex:this.state.currentIndex-step
+                })
+            }
+            //var scoreList = this.state.answer.answerlist[this.state.currentIndex].scorelist;
+            //var sindex = _.findIndex(scoreList,function(item){
+            //    return item.index == 0
+            //})
+            //var svalue = 0;
+            //if(sindex>=0){
+            //    svalue = scoreList[sindex].score?scoreList[sindex].score:0;
+            //}
+            //$("#inputrating").rating("update",svalue);
         }
-        if(direction == "right"){
-            this.setState({
-                currentIndex:this.state.currentIndex+step
-            })
-        }
-        else{
-            this.setState({
-                currentIndex:this.state.currentIndex-step
-            })
-        }
+
 
     },
     leftclick(){
@@ -171,11 +186,25 @@ export var Quest = React.createClass({
                     answer:answer
                 })
 
+                //setTimeout(function(){
+                //
+                //    $("#inputrating").rating();
+                //    $('#inputrating').on('rating.change', function(event, value, caption) {
+                //        alert(that.state.currentIndex);
+                //        that.state.answer.answerlist[that.state.currentIndex].scorelist = [{
+                //            index:0,
+                //            score:value
+                //        }];
+                //
+                //    });
+                //},200)
+
             },
             error:function(){
                 $("#ajaxloading").hide();
             }
         });
+
     },
     submit(){
         var that = this;
@@ -291,6 +320,19 @@ export var Quest = React.createClass({
                     </div>
                 )
             }
+            if(currentType == Constant.QTYPE_SCORE){
+                var oarray = [];
+                for(var i=0;i<=9;i++){
+                    oarray.push(
+                        <option value={i}>{i}Stars</option>
+                    )
+                }
+                slist.push(
+                    <select className="form-control">
+                        {oarray}
+                    </select>
+                )
+            }
             var mainPart = (
                 <div className="container">
                     <div className="progress">
@@ -302,7 +344,6 @@ export var Quest = React.createClass({
                     <form className="form-horizontal">
                         {slist}
                     </form>
-
                     <p>
                         <a className="btn btn-primary btn-lg "
                            disabled={leftDisabled}

@@ -61,6 +61,7 @@
     "csv": "^0.4.6",
     "flux": "^2.1.1",
     "react": "^0.14.7",
+    "react-bootstrap-star-rating": "0.0.2",
     "react-dom": "^0.14.7",
     "react-dropzone": "^3.3.2",
     "react-route": "^1.0.3",
