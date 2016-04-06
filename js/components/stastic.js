@@ -243,30 +243,37 @@ export var Stastic = React.createClass({
                 var qsindex = _.findIndex(this.state.survey.questionlist,function(item){
                     return item._id == qid
                 });
-                var currentQ = this.state.survey.questionlist[qsindex];
+                var currentQ = null;
+                if(qsindex>=0){
+                    currentQ = this.state.survey.questionlist[qsindex];
+                }
                 var sdisList = [];
-                for(var j in q.selectindexlist){
-                    var sindex = q.selectindexlist[j];
-                    var qtStyle = {
-                        display:"none"
-                    };
-                    if(q.text){
-                        qtStyle = {};
-                    }
-                    sdisList.push(
-                        <div>
-                            <p>
-                                <span className="grey">{parseInt(sindex)+1}</span>
-                                {currentQ.selectlist[sindex].title?currentQ.selectlist[sindex].title:""}
-                            </p>
-                            <div style={qtStyle}  className="alert alert-success">
-                                {q.text?q.text:""}
+                if(currentQ){
+
+                    for(var j in q.selectindexlist){
+                        var sindex = q.selectindexlist[j];
+                        var qtStyle = {
+                            display:"none"
+                        };
+                        if(q.text){
+                            qtStyle = {};
+                        }
+                        sdisList.push(
+                            <div>
+                                <p>
+                                    <span className="grey">{parseInt(sindex)+1}</span>
+                                    {currentQ.selectlist[sindex].title?currentQ.selectlist[sindex].title:""}
+                                </p>
+                                <div style={qtStyle}  className="alert alert-success">
+                                    {q.text?q.text:""}
+                                </div>
+
                             </div>
 
-                        </div>
-
-                    )
+                        )
+                    }
                 }
+
                 detailModal.push(
                     <div className="panel panel-default">
                         <div className="panel-heading">
