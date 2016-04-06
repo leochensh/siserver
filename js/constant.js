@@ -55,8 +55,8 @@ export var Constant = {
     //BASE_URL:"http://121.40.94.201:3005/",
     //BASE_URL:"/tracker/"
     //BASE_URL:"http://121.40.94.201/mmn/",
-    //BASE_URL:"/si/",
-    //BASE_IMAGEURL:"/si/uploads/"
-    BASE_URL:"/",
-    BASE_IMAGEURL:"/uploads/"
+    BASE_URL:"/si/",
+    BASE_IMAGEURL:"/si/uploads/"
+    //BASE_URL:"/",
+    //BASE_IMAGEURL:"/uploads/"
 };
