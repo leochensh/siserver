@@ -90,45 +90,96 @@ export var Stastic = React.createClass({
             for(var i in this.state.survey.questionlist){
                 var q = this.state.survey.questionlist[i];
                 var slist = [];
-                for(var j in q.selectlist){
-                    var s = q.selectlist[j];
-                    var snum = _.reduce(this.state.answerlist,function(memo,item){
-                        var alist = item.answerlist;
-                        var qfi = _.findIndex(alist,function(item){
-                            return item.questionid == q._id;
-                        });
-                        if(qfi>=0){
-                            var sfi = _.indexOf(alist[qfi].selectindexlist,j);
-                            if(sfi>=0){
-                                return memo+1;
+                if(q.type == Constant.QTYPE_MULTISELECT || q.type == Constant.QTYPE_SINGLESELECT){
+                    for(var j in q.selectlist){
+                        var s = q.selectlist[j];
+                        var snum = _.reduce(this.state.answerlist,function(memo,item){
+                            var alist = item.answerlist;
+                            var qfi = _.findIndex(alist,function(item){
+                                return item.questionid == q._id;
+                            });
+                            if(qfi>=0){
+                                var sfi = _.indexOf(alist[qfi].selectindexlist,j);
+                                if(sfi>=0){
+                                    return memo+1;
+                                }
+                                else{
+                                    return memo;
+                                }
                             }
                             else{
                                 return memo;
                             }
-                        }
-                        else{
-                            return memo;
-                        }
-                    },0);
-                    slist.push(
-                        <div className="row">
-                            <div className="col-md-4" >
-                                <div  className="alert alert-success">
-                                    <span className="grey">{parseInt(j)+1}</span>
-                                    <span>&nbsp;&nbsp;{s.title?s.title:""}</span>
+                        },0);
+                        slist.push(
+                            <div className="row">
+                                <div className="col-md-4" >
+                                    <div  className="alert alert-success">
+                                        <span className="grey">{parseInt(j)+1}</span>
+                                        <span>&nbsp;&nbsp;{s.title?s.title:""}</span>
+                                    </div>
+
+                                </div>
+                                <div className="col-md-8">
+                                    <div className="alert alert-info">&nbsp;&nbsp;
+                                        {snum} selected,{parseInt(snum)/parseInt(totalNum)*100}%
+                                    </div>
                                 </div>
 
-                            </div>
-                            <div className="col-md-8">
-                                <div className="alert alert-info">&nbsp;&nbsp;
-                                    {snum} selected,{parseInt(snum)/parseInt(totalNum)*100}%
-                                </div>
-                            </div>
 
-
-                        </div>
-                    )
+                            </div>
+                        )
+                    }
                 }
+                else if(q.type == Constant.QTYPE_SCORE){
+                    for(var i=0;i<=10;i++){
+                        var snum = _.reduce(this.state.answerlist,function(memo,item){
+                            var alist = item.answerlist;
+                            var qfi = _.findIndex(alist,function(item){
+                                return item.questionid == q._id;
+                            });
+                            if(qfi>=0){
+                                if(alist[qfi].scorelist){
+                                    var sfi = _.findIndex(alist[qfi].scorelist,function(item){
+                                        return item.index == 0;
+                                    })
+                                    if(sfi>=0 && alist[qfi].scorelist[sfi].score==i){
+                                        return memo+1;
+                                    }
+                                    else{
+                                        return memo;
+                                    }
+                                }
+                                else{
+                                    return memo;
+                                }
+
+                            }
+                            else{
+                                return memo;
+                            }
+                        },0);
+                        slist.push(
+                            <div className="row">
+                                <div className="col-md-4" >
+                                    <div  className="alert alert-success">
+                                        <span className="red">{parseInt(i)}</span>
+                                    </div>
+
+                                </div>
+                                <div className="col-md-8">
+                                    <div className="alert alert-info">&nbsp;&nbsp;
+                                        {snum} selected,{parseInt(snum)/parseInt(totalNum)*100}%
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        )
+                    }
+
+                }
+
                 var qbody = <div className="panel panel-default">
                     <div className="panel-heading">
                         <span className="green">{parseInt(i)+1}</span>
@@ -177,7 +228,7 @@ export var Stastic = React.createClass({
                     </div>
                     <div className="col-md-8">
                         <div  className="alert alert-info">
-                            {ca.investigatorname}
+                            {ca.name}
                         </div>
 
                     </div>
@@ -255,26 +306,54 @@ export var Stastic = React.createClass({
                 }
                 var sdisList = [];
                 if(currentQ){
+                    if(currentQ.type == Constant.QTYPE_MULTISELECT || currentQ.type == Constant.QTYPE_SINGLESELECT){
+                        for(var j in q.selectindexlist){
+                            var sindex = q.selectindexlist[j];
 
-                    for(var j in q.selectindexlist){
-                        var sindex = q.selectindexlist[j];
+                            var stitle = "";
+                            if(currentQ.selectlist && currentQ.selectlist[sindex] && currentQ.selectlist[sindex].title){
+                                stitle = currentQ.selectlist[sindex].title;
+                            }
+                            sdisList.push(
+                                <div>
+                                    <p>
+                                        <span className="grey">{parseInt(sindex)+1}</span>
+                                        {stitle}
+                                    </p>
 
-                        var stitle = "";
-                        if(currentQ.selectlist && currentQ.selectlist[sindex] && currentQ.selectlist[sindex].title){
-                            stitle = currentQ.selectlist[sindex].title;
+
+                                </div>
+
+                            )
+                            if(q.selectextra){
+                                var seindex = _.findIndex(q.selectextra,function(item){
+                                    return item.index == sindex;
+                                })
+                                if(seindex>=0 && q.selectextra[seindex].text){
+                                    sdisList.push(
+                                        <div className="alert alert-success">
+                                            {q.selectextra[seindex].text}
+                                        </div>
+                                    )
+                                }
+                            }
                         }
-                        sdisList.push(
-                            <div>
-                                <p>
-                                    <span className="grey">{parseInt(sindex)+1}</span>
-                                    {stitle}
-                                </p>
-
-
-                            </div>
-
-                        )
                     }
+                    else if(currentQ.type == Constant.QTYPE_SCORE){
+                        var sfi = _.findIndex(q.scorelist,function(item){
+                            return item.index == 0;
+                        });
+                        if(sfi>=0){
+                            sdisList.push(
+                                <div>
+                                    <p>
+                                        <span className="red">{parseInt(q.scorelist[sfi].score)}</span>
+                                    </p>
+                                </div>
+                            )
+                        }
+                    }
+
                 }
                 var qtStyle = {
                     display:"none"

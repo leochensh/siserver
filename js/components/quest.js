@@ -186,25 +186,23 @@ export var Quest = React.createClass({
                     answer:answer
                 })
 
-                //setTimeout(function(){
-                //
-                //    $("#inputrating").rating();
-                //    $('#inputrating').on('rating.change', function(event, value, caption) {
-                //        alert(that.state.currentIndex);
-                //        that.state.answer.answerlist[that.state.currentIndex].scorelist = [{
-                //            index:0,
-                //            score:value
-                //        }];
-                //
-                //    });
-                //},200)
-
             },
             error:function(){
                 $("#ajaxloading").hide();
             }
         });
 
+    },
+    scorevalueChange(event){
+        this.state.answer.answerlist[this.state.currentIndex].scorelist = [
+            {
+                index:0,
+                score:event.target.value
+            }
+        ]
+        this.setState({
+            answer:this.state.answer
+        });
     },
     submit(){
         var that = this;
@@ -321,14 +319,25 @@ export var Quest = React.createClass({
                 )
             }
             if(currentType == Constant.QTYPE_SCORE){
+                var scorelist = this.state.answer.answerlist[this.state.currentIndex].scorelist;
+                var matchIndex = _.findIndex(scorelist,function(item){
+                    return item.index == 0;
+                });
+                var scoreValue = 0;
+                if(matchIndex>=0){
+                    scoreValue = scorelist[matchIndex].score;
+                }
                 var oarray = [];
                 for(var i=0;i<=9;i++){
                     oarray.push(
-                        <option value={i}>{i}Stars</option>
+                        <option value={i}>{i}</option>
                     )
                 }
                 slist.push(
-                    <select className="form-control">
+                    <select className="form-control input-lg"
+                            value={scoreValue}
+                            onChange={this.scorevalueChange}
+                    >
                         {oarray}
                     </select>
                 )
