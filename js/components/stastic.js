@@ -54,6 +54,12 @@ export var Stastic = React.createClass({
                 success: function (data) {
                     $("#ajaxloading").hide();
                     var msg = JSON.parse(data).body;
+                    for(var i in msg){
+                        var answerlist = msg[i].answerlist;
+                        if(_.isString(answerlist)){
+                            msg[i].answerlist = JSON.parse(answerlist);
+                        }
+                    }
                     that.setState({
                         answerlist:msg,
                     });
