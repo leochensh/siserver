@@ -47,7 +47,10 @@ export var Login = React.createClass({
                         role:msg.body.role,
                         id:msg.body.id
                     });
-                    that.context.router.push("/home");
+                    setTimeout(function(){
+                        that.context.router.push("/home");
+                    },200);
+
                 },
                 error:function(){
                     $("#ajaxloading").hide();
