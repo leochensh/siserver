@@ -1,5 +1,5 @@
 @import "../bower_components/bootstrap/dist/css/bootstrap.min.css";
-
+@import "./checkradio.css";
 $loginmargin:30px;
 
 body {
@@ -9,6 +9,8 @@ body {
 .paddingpanel{
   padding:30px;
 }
+
+
 
 .divLogin{
   margin-top:30px;

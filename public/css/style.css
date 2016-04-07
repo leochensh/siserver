@@ -1,4 +1,5 @@
 @import url(../bower_components/bootstrap/dist/css/bootstrap.min.css);
+@import url(./checkradio.css);
 body {
   padding-top: 50px;
   padding-bottom: 70px; }

@@ -271,12 +271,15 @@ export var Quest = React.createClass({
 
                     slist.push(
                         <div className="form-group">
-                            <div className="col-sm-2">
-                                <input className="form-control"
+                            <div className="col-sm-1">
+                                <input type="radio"
+                                       id={"radio"+i}
                                        name="x"
                                        onChange={this.checkedchange(i)}
                                        checked={_.indexOf(sindexlist,i)>=0}
-                                       type="radio"/>
+                                       className="regular-radio big-radio" />
+                                <label htmlFor={"radio"+i}></label>
+
                             </div>
                             <div className="col-sm-8">
                                 {image}
@@ -289,11 +292,13 @@ export var Quest = React.createClass({
                 else if(currentType == Constant.QTYPE_MULTISELECT){
                     slist.push(
                         <div className="form-group">
-                            <div className="col-sm-2">
-                                <input className="form-control"
+                            <div className="col-sm-1">
+                                <input type="checkbox"
+                                       id={"checkbox"+i}
                                        onChange={this.checkedchange(i)}
                                        checked={_.indexOf(sindexlist,i)>=0}
-                                       type="checkbox"/>
+                                       className="regular-checkbox big-checkbox" />
+                                <label htmlFor={"checkbox"+i}></label>
                             </div>
                             <div className="col-sm-8">
                                 {image}
