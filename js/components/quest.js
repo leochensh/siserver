@@ -206,13 +206,16 @@ export var Quest = React.createClass({
     },
     submit(){
         var that = this;
+        this.state.answer.endtime = new Date().toISOString();
+        this.state.answer.name = this.state.survey.name+"-anonymous-"
+            +this.state.answer.endtime
+            +"-"+"none-none-none";
         $.ajax({
             url: Constant.BASE_URL+"anonymous/survey/answer/add",
             data: JSON.stringify(that.state.answer),
             contentType: 'application/json; charset=utf-8',
             type: 'POST',
             success: function(data){
-
                 that.setState({
                     ifsubmit:true
                 })
@@ -342,7 +345,7 @@ export var Quest = React.createClass({
                     <select className="form-control input-lg"
                             value={scoreValue}
                             onChange={this.scorevalueChange}
-                    >
+                        >
                         {oarray}
                     </select>
                 )
