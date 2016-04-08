@@ -87,8 +87,8 @@ export var Stastic = React.createClass({
         },0);
         var qlist = [];
         if(this.state.survey){
-            for(var i in this.state.survey.questionlist){
-                var q = this.state.survey.questionlist[i];
+            for(var qindex in this.state.survey.questionlist){
+                var q = this.state.survey.questionlist[qindex];
                 var slist = [];
                 if(q.type == Constant.QTYPE_MULTISELECT || q.type == Constant.QTYPE_SINGLESELECT){
                     for(var j in q.selectlist){
@@ -182,7 +182,7 @@ export var Stastic = React.createClass({
 
                 var qbody = <div className="panel panel-default">
                     <div className="panel-heading">
-                        <span className="green">{parseInt(i)+1}</span>
+                        <span className="green">{parseInt(qindex)+1}</span>
                         <span>&nbsp;&nbsp;{q.title}</span>
                         <span>&nbsp;&nbsp;Type: {Constant.QTYPE_NAME_MAP[q.type]}</span>
                     </div>

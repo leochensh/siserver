@@ -39,7 +39,7 @@ export var Login = React.createClass({
                 type: 'POST',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function (data) {
-                    $("#ajaxloading").hide();
+
                     var msg = JSON.parse(data);
 
                     SisDispatcher.dispatch({
@@ -48,8 +48,9 @@ export var Login = React.createClass({
                         id:msg.body.id
                     });
                     setTimeout(function(){
+                        $("#ajaxloading").hide();
                         that.context.router.push("/home");
-                    },200);
+                    },1000);
 
                 },
                 error:function(){
