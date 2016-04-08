@@ -427,7 +427,7 @@ export var Newsurvey = React.createClass({
 
                     <ul className="sidebar-nav">
                         <div id="notsavealert" className="alert alert-danger alert-dismissible fade in" role="alert" style={{display:"none"}}>
-                            <button className="close" aria-label="Close" data-dismiss="alert" type="button"></button>
+                            <a className="close" aria-label="Close" data-dismiss="alert" type="button"></a>
                             <h4>You should save survey name first.</h4>
                         </div>
                         <li className="sidebar-brand">
@@ -489,19 +489,19 @@ export var Newsurvey = React.createClass({
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             <span style={surveyStatusClassStyle}>{surveyStatusTxt}</span>
                                             &nbsp;&nbsp;&nbsp;&nbsp;
-                                            <button type="button"
+                                            <a type="button"
                                                     onClick={this.publishsurvey}
                                                     className="btn btn-primary">
                                                 <span className="glyphicon glyphicon-check" aria-hidden="true"></span>
                                                 <span>&nbsp;&nbsp;Publish it</span>
-                                            </button>
+                                            </a>
                                             &nbsp;&nbsp;
-                                            <button type="button"
+                                            <a type="button"
                                                     onClick={this.cleanall}
                                                     className="btn btn-warning">
                                                 <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                                                 <span>&nbsp;&nbsp;Clean all data</span>
-                                            </button>
+                                            </a>
                                         </h3>
                                     </div>
                                 </nav>
@@ -522,10 +522,10 @@ export var Newsurvey = React.createClass({
 
                                     <div className="form-group">
                                         <div className="col-sm-offset-2 col-sm-10">
-                                            <button className="btn btn-primary"
+                                            <a className="btn btn-primary"
                                                     onClick={this.savesurvey}>
                                                 Save
-                                            </button>
+                                            </a>
                                         </div>
                                     </div>
                                 </form>
@@ -555,8 +555,8 @@ export var Newsurvey = React.createClass({
 
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
-                                <button type="button" className="btn btn-primary" onClick={this.confirmpublish}>Confirm</button>
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmpublish}>Confirm</a>
                             </div>
                         </div>
                     </div>
@@ -576,8 +576,8 @@ export var Newsurvey = React.createClass({
 
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
-                                <button type="button" className="btn btn-primary" onClick={this.confirmclean}>Confirm</button>
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmclean}>Confirm</a>
                             </div>
                         </div>
                     </div>
@@ -611,8 +611,8 @@ export var Newsurvey = React.createClass({
 
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
-                                <button type="button" className="btn btn-primary" onClick={this.confirmnewfromfile}>Confirm</button>
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmnewfromfile}>Confirm</a>
                             </div>
                         </div>
                     </div>

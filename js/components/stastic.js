@@ -223,10 +223,10 @@ export var Stastic = React.createClass({
                     <td>{a.investigatorid?"Android Client":"Web"}</td>
                     <td className="list_btn">
                         <div className="btn-group" role="group" >
-                            <button
+                            <a
                                 type="button"
                                 onClick={this.viewdetail(i)}
-                                className="btn btn-danger">View</button>
+                                className="btn btn-danger">View</a>
                         </div>
                     </td>
 
@@ -456,7 +456,7 @@ export var Stastic = React.createClass({
                                 {detailModal}
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Close</a>
                             </div>
                         </div>
                     </div>

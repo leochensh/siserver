@@ -33,10 +33,10 @@ export var App = React.createClass({
         this.context.router.push("/login");
     },
     _onChange() {
-        var loginInfo = loginStore.getLoginInfo();
-        if(!loginInfo.ifLogin){
-            this.context.router.push("/login");
-        }
+        //var loginInfo = loginStore.getLoginInfo();
+        //if(!loginInfo.ifLogin){
+        //    this.context.router.push("/login");
+        //}
         this.setState({a:1});
     },
     render() {

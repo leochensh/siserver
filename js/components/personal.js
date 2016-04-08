@@ -187,10 +187,10 @@ export var Personal = React.createClass({
 
                     </div>
                     <div className="col-md-3">
-                        <button type="button" className="btn btn-lg btn-primary"
+                        <a type="button" className="btn btn-lg btn-primary"
                                 style={{marginTop:"20px"}}
                                 onClick={this.addNewPerson}
-                        >Create</button>
+                        >Create</a>
                     </div>
 
 
@@ -241,8 +241,8 @@ export var Personal = React.createClass({
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
-                                <button type="button" className="btn btn-primary" onClick={this.confirmNew}>Confirm</button>
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmNew}>Confirm</a>
                             </div>
                         </div>
                     </div>
@@ -276,8 +276,8 @@ export var Personal = React.createClass({
 
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
-                                <button type="button" className="btn btn-primary" onClick={this.confirmReset}>Confirm</button>
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmReset}>Confirm</a>
                             </div>
                         </div>
                     </div>

@@ -41,16 +41,14 @@ export var Login = React.createClass({
                 success: function (data) {
 
                     var msg = JSON.parse(data);
-
+                    $("#ajaxloading").hide();
+                    that.context.router.push("/home");
                     SisDispatcher.dispatch({
                         actionType: Constant.LOGINSUCCESS,
                         role:msg.body.role,
                         id:msg.body.id
                     });
-                    setTimeout(function(){
-                        $("#ajaxloading").hide();
-                        that.context.router.push("/home");
-                    },1000);
+
 
                 },
                 error:function(){
@@ -58,6 +56,7 @@ export var Login = React.createClass({
                     that.setState({iferror:true});
                 }
             });
+            return false;
         }
     },
     render() {
@@ -102,11 +101,10 @@ export var Login = React.createClass({
                         </div>
                         <div className="form-group form-group-lg">
                             <div className="col-sm-offset-2 col-sm-10">
-                                <button
-                                    type="submit"
+                                <a
                                     className="btn btn-default"
                                     onClick={this.handleClick}
-                                >Log in</button>
+                                >Log in</a>
                             </div>
                         </div>
                     </form>

@@ -231,12 +231,12 @@ export var Question = React.createClass({
                 <div className="panel panel-info">
                     <div className="panel-heading">
                         Selection&nbsp;&nbsp;<span className="grey">{parseInt(i)+1}</span>
-                        <button type="button"
+                        <a type="button"
                                 onClick={this.deleteselection(i)}
                                 className="btn btn-danger right">
                             <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                             <span>&nbsp;&nbsp;Delete</span>
-                        </button>
+                        </a>
                     </div>
                     <div className="panel-body">
                         <div className="form-group">
@@ -361,26 +361,26 @@ export var Question = React.createClass({
                 <div className="panel-footer">
                     <span className={colorClass}>{parseInt(this.props.index)+1}</span>
                     <span>&nbsp;&nbsp;</span>
-                    <button type="button"
+                    <a type="button"
                             onClick={this.addselection}
                             className="btn btn-primary">
                         <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
                         <span>&nbsp;&nbsp;Add new selection item </span>
-                    </button>
+                    </a>
                     &nbsp;&nbsp;
-                    <button type="button"
+                    <a type="button"
                             onClick={this.savequestion}
                             className="btn btn-info">
                         <span className="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
                         <span>&nbsp;&nbsp;Save question</span>
-                    </button>
+                    </a>
                     &nbsp;&nbsp;
-                    <button type="button"
+                    <a type="button"
                             onClick={this.deletequestion}
                             className="btn btn-danger">
                         <span className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
                         <span>&nbsp;&nbsp;Delete question</span>
-                    </button>
+                    </a>
                 </div>
             </div>
 
