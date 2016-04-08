@@ -2,6 +2,7 @@ import React from 'react';
 import {Constant} from "../constant"
 import {SisDispatcher} from "../dispatcher";
 import {Question} from "./question"
+import {RgraphControl} from "./rgraphcontrol"
 import _ from "underscore"
 import crypto from "crypto"
 import async from "async"
@@ -91,7 +92,10 @@ export var Stastic = React.createClass({
                 var q = this.state.survey.questionlist[qindex];
                 var slist = [];
                 if(q.type == Constant.QTYPE_MULTISELECT || q.type == Constant.QTYPE_SINGLESELECT){
+                    var labelList = [];
+                    var valueList = [];
                     for(var j in q.selectlist){
+                        labelList.push("S"+(parseInt(j)+1));
                         var s = q.selectlist[j];
                         var snum = _.reduce(this.state.answerlist,function(memo,item){
                             var alist = item.answerlist;
@@ -111,6 +115,7 @@ export var Stastic = React.createClass({
                                 return memo;
                             }
                         },0);
+                        valueList.push(snum);
                         slist.push(
                             <div className="row">
                                 <div className="col-md-4" >
@@ -130,9 +135,16 @@ export var Stastic = React.createClass({
                             </div>
                         )
                     }
+                    slist.push(
+                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList}>
+                        </RgraphControl>
+                    )
                 }
                 else if(q.type == Constant.QTYPE_SCORE){
+                    var labelList = [];
+                    var valueList = [];
                     for(var i=0;i<=10;i++){
+                        labelList.push(i);
                         var snum = _.reduce(this.state.answerlist,function(memo,item){
                             var alist = item.answerlist;
                             var qfi = _.findIndex(alist,function(item){
@@ -159,6 +171,7 @@ export var Stastic = React.createClass({
                                 return memo;
                             }
                         },0);
+                        valueList.push(snum);
                         slist.push(
                             <div className="row">
                                 <div className="col-md-4" >
@@ -177,6 +190,10 @@ export var Stastic = React.createClass({
                             </div>
                         )
                     }
+                    slist.push(
+                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList}>
+                        </RgraphControl>
+                    )
 
                 }
 
