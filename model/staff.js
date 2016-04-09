@@ -372,9 +372,25 @@ Staff.getStaffSurveyList = function(staffid,callback){
                         var returnList = [];
                         if(staff.surveyList){
                             returnList = staff.surveyList;
+                            async.each(returnList,function(item,cb){
+                                db.collection("surveys",function(err,surveycollection){
+                                    surveycollection.find({_id:ObjectID(item.surveyid)}).limit(1).next(function(err,survey){
+                                        if(survey){
+                                            item.status = survey.status;
+                                        }
+                                        cb();
+                                    })
+                                });
+                            },function(err){
+                                mongoPool.release(db);
+                                callback(err,returnList);
+                            });
                         }
-                        mongoPool.release(db);
-                        callback(err,returnList);
+                        else{
+                            mongoPool.release(db);
+                            callback(err,returnList);
+                        }
+
                     }
                     else{
                         mongoPool.release(db);

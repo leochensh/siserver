@@ -169,7 +169,7 @@ app.post("/staff/login",function(req,res){
     var pass = req.body.password;
     var username = req.body.username;
     if(username && pass){
-        Staff.login(username,pass,function(err,msg){
+        Staff.logfin(username,pass,function(err,msg){
             if(msg == "error"){
                 req.session.userId = null;
                 res.status(400);
