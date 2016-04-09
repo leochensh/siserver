@@ -13,6 +13,7 @@ import {Newsurvey} from "./components/newsurvey"
 import {Surveylist} from "./components/surveylist"
 import {Quest} from "./components/quest"
 import {Stastic} from "./components/stastic"
+import {Ads} from "./components/ads"
 
 var main = document.getElementsByTagName('main')[0];
 
@@ -28,6 +29,7 @@ ReactDom.render(
             <Route path="surveylist" component={Surveylist} />
             <Route path="quest/:id" component={Quest} />
             <Route path="stastic/:id" component={Stastic} />
+            <Route path="ads" component={Ads} />
         </Route>
     </Router>,
     main

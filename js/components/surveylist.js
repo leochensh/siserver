@@ -59,29 +59,29 @@ export var Surveylist = React.createClass({
         for(var i in selist){
             var stext = Constant.SURVEYSTATUSMAP[selist[i].status];
             mlist.push(
-                <tr>
+                <tr key={"slist"+i}>
                     <td>{i}</td>
                     <td>{selist[i].name}</td>
                     <td>{new Date(selist[i].ctime).toLocaleString()}</td>
                     <td>{ stext }</td>
                     <td className="list_btn">
                         <div className="btn-group" role="group" >
-                            <button
+                            <a
                                 type="button"
                                 onClick={this.deleteButtonClick(i)}
-                                className="btn btn-danger">Delete</button>
-                            <button
+                                className="btn btn-danger">Delete</a>
+                            <a
                                 type="button"
                                 onClick={this.editButtonClick(i)}
-                                className="btn btn-primary">Edit</button>
-                            <button
+                                className="btn btn-primary">Edit</a>
+                            <a
                                 type="button"
                                 onClick={this.shareItClick(i)}
-                                className="btn btn-primary">Share it</button>
-                            <button
+                                className="btn btn-primary">Share it</a>
+                            <a
                                 type="button"
                                 onClick={this.stastic(i)}
-                                className="btn btn-primary">Stastic</button>
+                                className="btn btn-primary">Stastic</a>
                         </div>
                     </td>
 

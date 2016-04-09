@@ -378,6 +378,86 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(errorMsg));
         }
     });
+    app.get("/sadmin/ad/list",acl.middleware(1),function(req,res){
+        Admin.getSadminAdList(function(err,msg){
+            res.status(200);
+            successMsg.body = msg;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
+    app.post("/sadmin/ad/add",acl.middleware(1),function(req,res){
+        var title = req.body.title;
+        var image = req.body.image;
+        var link = req.body.link;
+        if(title&&image&&link){
+            Admin.addSadminAd(title,image,link,function(err,msg){
+                res.status(200);
+                successMsg.body = "ok";
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+    });
+
+    app.put("/sadmin/ad/edit",acl.middleware(1),function(req,res){
+        var adid = req.body.id;
+        var title = req.body.title;
+        var image = req.body.image;
+        var link = req.body.link;
+        if(adid&&ObjectID.isValid(adid)&&title&&image&&link){
+            Admin.editSadminAd(adid,title,image,link,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "admin not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = "ok";
+                    res.send(JSON.stringify(successMsg));
+                }
+
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+    });
+
+    app.delete("/sadmin/ad/delete",acl.middleware(1),function(req,res){
+        var adid = req.body.id;
+
+        if(adid&&ObjectID.isValid(adid)){
+            Admin.deleteSadminAd(adid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "admin not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = "ok";
+                    res.send(JSON.stringify(successMsg));
+                }
+
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+    });
 
     app.put("/admin/pass/change",acl.middleware(),function(req,res){
         var oldpass = req.body.oldpassword;

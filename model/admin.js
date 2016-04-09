@@ -572,4 +572,94 @@ Admin.getSurveyAnswerList = function(surveyid,callback){
             });
         }
     });
-}
+};
+
+Admin.getSadminAdList = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("ads",function(err,collection){
+                collection.find().sort({ctime:-1})
+                    .toArray(function(err,ads){
+                        mongoPool.release(db);
+                        callback(err,ads);
+                    })
+            });
+        }
+    });
+};
+
+Admin.addSadminAd = function(title,image,link,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("ads",function(err,collection){
+                var newad = {
+                    title:title,
+                    image:image,
+                    link:link,
+                    ctime:new Date()
+                };
+                collection.insertOne(newad,function(err,insert){
+                    mongoPool.release(db);
+                    callback(err,insert.insertedId);
+                });
+            });
+        }
+    });
+};
+
+Admin.editSadminAd = function(adid,title,image,link,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("ads",function(err,collection){
+
+                collection.find({_id:ObjectID(adid)}).limit(1).next(function(err,ad){
+                    if(ad){
+                        collection.updateOne({_id:ObjectID(adid)},
+                            {$set:{title:title,image:image,link:link}},function(err,msg){
+                                mongoPool.release(db);
+                                callback(err,"ok");
+                            });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+};
+
+Admin.deleteSadminAd = function(adid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("ads",function(err,collection){
+
+                collection.find({_id:ObjectID(adid)}).limit(1).next(function(err,ad){
+                    if(ad){
+                        collection.deleteOne({_id:ObjectID(adid)},function(err,msg){
+                                mongoPool.release(db);
+                                callback(err,"ok");
+                            });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+};

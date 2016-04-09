@@ -650,7 +650,7 @@ Staff.getAdInfo = function(orgid,callback){
         }
         else{
             db.collection("ads",function(err,collection){
-                collection.find({orgid:orgid},{_id:0,orgid:0}).sort({ctime:-1})
+                collection.find().sort({ctime:-1})
                     .toArray(function(err,ads){
                         mongoPool.release(db);
                         callback(err,ads);

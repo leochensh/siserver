@@ -3,6 +3,7 @@ import {loginStore} from '../store/loginstore';
 import {personalStore} from '../store/personalstore'
 import {newsurveyStore} from '../store/newsurveystore'
 import {surveyEditListStore} from '../store/surveyeditliststore'
+import {adStore} from '../store/adstore'
 import {Link} from 'react-router'
 
 export var App = React.createClass({
@@ -14,12 +15,14 @@ export var App = React.createClass({
         this.ptoken = personalStore.addListener(this._onChange);
         this.newstoken = newsurveyStore.addListener(this._onChange);
         this.eslisttoken = surveyEditListStore.addListener(this._onChange);
+        this.adtoken = adStore.addListener(this._onChange);
     },
     componentWillUnmount(){
         loginStore.remove(this.token);
         personalStore.remove(this.ptoken);
         newsurveyStore.remove(this.newstoken);
         surveyEditListStore.remove(this.eslisttoken);
+        adStore.remove(this.adtoken);
     },
     homeclick(){
         var cpath = this.props.routes[this.props.routes.length-1]['path']
@@ -33,10 +36,10 @@ export var App = React.createClass({
         this.context.router.push("/login");
     },
     _onChange() {
-        //var loginInfo = loginStore.getLoginInfo();
-        //if(!loginInfo.ifLogin){
-        //    this.context.router.push("/login");
-        //}
+        var loginInfo = loginStore.getLoginInfo();
+        if(!loginInfo.ifLogin){
+            this.context.router.push("/login");
+        }
         this.setState({a:1});
     },
     render() {
@@ -61,7 +64,9 @@ export var App = React.createClass({
                         {loginInfo:loginStore.getLoginInfo(),
                             newsurvey:newsurveyStore.getAll(),
                             personalList:personalStore.getAll(),
-                            surveyeditlist:surveyEditListStore.getAll()})
+                            surveyeditlist:surveyEditListStore.getAll(),
+                            adlist:adStore.getAll()
+                        })
                 }
             </div>
 

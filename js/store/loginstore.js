@@ -20,6 +20,12 @@ class LoginStore extends Store{
             loginInfo.id = payload.id;
             this.__emitChange();
         }
+        else if(payload.actionType == Constant.ERROR500){
+            loginInfo.ifLogin = false;
+            loginInfo.role = null;
+            loginInfo.id = null;
+            this.__emitChange();
+        }
     }
 }
 

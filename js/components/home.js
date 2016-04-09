@@ -14,6 +14,9 @@ export var Home = React.createClass({
         this.context.router.push("/surveylist")
     },
 
+    adsclick(event){
+        this.context.router.push("/ads")
+    },
     render() {
         var style = {
             marginTop:"30px"
@@ -24,10 +27,12 @@ export var Home = React.createClass({
         var personalDisable = "disabled";
         var newsurveyDisable = "disabled";
         var surveyManageDisable = "disabled";
+        var adsDisable = "disabled";
 
         if(loginInfo.role == "sadmin"){
             orgDisable = "";
             personalDisable = "";
+            adsDisable = "";
         }
         else if(loginInfo.role == "personal"){
             newsurveyDisable = "";
@@ -95,6 +100,24 @@ export var Home = React.createClass({
                             </div>
                         </div>
                     </button>
+
+                </div>
+
+                <div className="row">
+                    <button className="col-md-3 col-md-offset-3 btn btn-default"
+                            disabled={adsDisable} onClick={this.adsclick}>
+
+                        <div className="fixed-size-square">
+                            <div>
+                            <span className="glyphicon glyphicon-picture" aria-hidden="true">
+                            </span>
+                            </div>
+                            <div>
+                                <span>{"Ads&Client"}</span>
+                            </div>
+                        </div>
+                    </button>
+
 
                 </div>
 

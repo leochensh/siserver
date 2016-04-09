@@ -478,8 +478,8 @@ export var Newsurvey = React.createClass({
                 </div>
 
                 <div id="page-content-wrapper">
-                    <div class="container-fluid">
-                        <div class="row">
+                    <div className="container-fluid">
+                        <div className="row">
 
 
                             <div id="scrollright" className="col-md-12" style={{paddingBottom:"70px"}}>

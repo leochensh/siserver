@@ -1,6 +1,7 @@
 export var Constant = {
 
     LOGINSUCCESS:"loginsuccess",
+    ERROR500:"error500",
     GETPERSONAL_LIST:"getpersonallist",
     ADDNEWPERSON:"addnewperson",
     SURVEYVALUECHANGE:"surveyvaluechange",
@@ -15,6 +16,10 @@ export var Constant = {
     DELETESURVEY:"deletesurvey",
     EDITSURVEY:"editsurvey",
     PARSESURVEYDETAIL:"parsesurveydetail",
+    GETADLIST:"getadlist",
+    FORCEADLISTREFRESH:"forceadlistrefresh",
+    DELETEAD:"deletead",
+    ADDAD:"addad",
 
     QTYPE_SINGLESELECT:"singleselect",
     QTYPE_MULTISELECT:"multiselect",

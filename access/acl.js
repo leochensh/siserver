@@ -35,7 +35,7 @@ mongoPool.acquire(function(err, db){
             ]
         },
         {
-            roles:[dict.STAFF_EDITOR,dict.STAFF_INVESTIGATOR,dict.STAFF_PERSONAL],
+            roles:[dict.STAFF_EDITOR,dict.STAFF_INVESTIGATOR,dict.STAFF_PERSONAL,'sadmin'],
             allows:[
                 {resources:'/staff/pass/change',permissions:'put'},
                 {resources:'/staff/upload',permissions:"post"}
