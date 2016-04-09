@@ -302,6 +302,9 @@ export var Question = React.createClass({
         selectoptionsList.push(<option value="-1">
             None
         </option>);
+        var ifDisplaySelectStyle = {
+            display:"none"
+        };
         if(this.props.qdata.precedentindex>=0){
             for(var i in this.props.qlist[this.props.qdata.precedentindex].selectlist){
                 var s = this.props.qlist[this.props.qdata.precedentindex].selectlist[i];
@@ -309,7 +312,11 @@ export var Question = React.createClass({
                     {parseInt(i)+1},{s.title}
                 </option>);
             }
+            ifDisplaySelectStyle = {};
         }
+
+
+
         return(
             <div className="panel panel-default">
                 <div className="panel-heading">
@@ -342,7 +349,7 @@ export var Question = React.createClass({
                             </div>
                         </div>
 
-                        <div className="form-group">
+                        <div className="form-group" style={ifDisplaySelectStyle}>
                             <label className="col-sm-2 control-label">Dependent Select</label>
                             <div className="col-sm-10">
                                 <select className="form-control"
