@@ -69,8 +69,8 @@ export var Constant = {
     },
 
 
-    //BASE_URL:"/si/",
-    //BASE_IMAGEURL:"/si/uploads/"
-    BASE_URL:"/",
-    BASE_IMAGEURL:"/uploads/"
+    BASE_URL:"/si/",
+    BASE_IMAGEURL:"/si/uploads/"
+    //BASE_URL:"/",
+    //BASE_IMAGEURL:"/uploads/"
 };
