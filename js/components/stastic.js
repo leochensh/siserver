@@ -91,7 +91,12 @@ export var Stastic = React.createClass({
             for(var qindex in this.state.survey.questionlist){
                 var q = this.state.survey.questionlist[qindex];
                 var slist = [];
-                if(q.type == Constant.QTYPE_MULTISELECT || q.type == Constant.QTYPE_SINGLESELECT){
+                if(q.type == Constant.QTYPE_MULTISELECT ||
+                    q.type == Constant.QTYPE_SINGLESELECT ||
+                    q.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+                    q.type == Constant.QTYPE_MULTISELECT_TEXT ||
+                    q.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                    q.type == Constant.QTYPE_SINGLESELECT_TEXT){
                     var labelList = [];
                     var valueList = [];
                     for(var j in q.selectlist){
@@ -143,7 +148,18 @@ export var Stastic = React.createClass({
                 else if(q.type == Constant.QTYPE_SCORE){
                     var labelList = [];
                     var valueList = [];
-                    for(var i=0;i<=10;i++){
+
+                    var scoreStart = 0;
+                    var scoreEnd = 10;
+                    var scoreStep = 1;
+
+                    if(q.scorelist && _.isArray(q.scorelist)){
+                        scoreStart = parseInt(q.scorelist[0].start);
+                        scoreEnd = parseInt(q.scorelist[0].end);
+                        scoreStep = parseInt(q.scorelist[0].step);
+                    }
+
+                    for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
                         labelList.push(i);
                         var snum = _.reduce(this.state.answerlist,function(memo,item){
                             var alist = item.answerlist;
@@ -323,7 +339,12 @@ export var Stastic = React.createClass({
                 }
                 var sdisList = [];
                 if(currentQ){
-                    if(currentQ.type == Constant.QTYPE_MULTISELECT || currentQ.type == Constant.QTYPE_SINGLESELECT){
+                    if(currentQ.type == Constant.QTYPE_MULTISELECT ||
+                        currentQ.type == Constant.QTYPE_SINGLESELECT ||
+                        currentQ.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+                        currentQ.type == Constant.QTYPE_MULTISELECT_TEXT ||
+                        currentQ.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                        currentQ.type == Constant.QTYPE_SINGLESELECT_TEXT){
                         for(var j in q.selectindexlist){
                             var sindex = q.selectindexlist[j];
 

@@ -2,6 +2,7 @@ import React from 'react';
 import {Constant} from "../constant"
 import {SisDispatcher} from "../dispatcher";
 import crypto from "crypto"
+import _ from "underscore"
 var Dropzone = require('react-dropzone');
 
 
@@ -84,6 +85,51 @@ export var Question = React.createClass({
             })
         }
         return handleTC;
+    },
+    handleScoreStartChange(event){
+        var scoreStart = parseInt(event.target.value);
+        var scoreEnd = 10;
+        var scoreStep = 1;
+        if(this.props.qdata.scorelist && _.isArray(this.props.qdata.scorelist)){
+            scoreEnd = this.props.qdata.scorelist[0].end;
+            scoreStep = this.props.qdata.scorelist[0].step;
+        }
+        this.informChange({scorelist:[{
+            index:0,
+            start:scoreStart,
+            end:scoreEnd,
+            step:scoreStep
+        }]});
+    },
+    handleScoreEndChange(event){
+        var scoreStart = 0;
+        var scoreEnd = parseInt(event.target.value);
+        var scoreStep = 1;
+        if(this.props.qdata.scorelist && _.isArray(this.props.qdata.scorelist)){
+            scoreStart = this.props.qdata.scorelist[0].start;
+            scoreStep = this.props.qdata.scorelist[0].step;
+        }
+        this.informChange({scorelist:[{
+            index:0,
+            start:scoreStart,
+            end:scoreEnd,
+            step:scoreStep
+        }]})
+    },
+    handleScoreStepChange(event){
+        var scoreStart = 0;
+        var scoreEnd = 10;
+        var scoreStep = parseInt(event.target.value);
+        if(this.props.qdata.scorelist && _.isArray(this.props.qdata.scorelist)){
+            scoreStart = this.props.qdata.scorelist[0].start;
+            scoreEnd = this.props.qdata.scorelist[0].end;
+        }
+        this.informChange({scorelist:[{
+            index:0,
+            start:scoreStart,
+            end:scoreEnd,
+            step:scoreStep
+        }]})
     },
     informChange(obj){
         if(!obj.ifSaved){
@@ -323,6 +369,24 @@ export var Question = React.createClass({
             ifDisplaySelectStyle = {};
         }
 
+        var ifDisplayScoreBeginEndStepStyle = {
+            display:"none"
+        };
+        var scoreStart = 0;
+        var scoreEnd = 10;
+        var scoreStep = 1;
+        if(this.props.qdata.type == Constant.QTYPE_SCORE){
+            ifDisplayScoreBeginEndStepStyle = {};
+            //console.log(this.props.qdata.scorelist);
+            if(this.props.qdata.scorelist && _.isArray(this.props.qdata.scorelist)){
+
+                scoreStart = parseInt(this.props.qdata.scorelist[0].start);
+                scoreEnd = parseInt(this.props.qdata.scorelist[0].end);
+                scoreStep = parseInt(this.props.qdata.scorelist[0].step);
+            }
+        }
+
+
 
 
         return(
@@ -378,6 +442,32 @@ export var Question = React.createClass({
                                 >
                                     {selectoptionsList}
                                 </select>
+                            </div>
+                        </div>
+                        <div className="form-group" style={ifDisplayScoreBeginEndStepStyle}>
+                            <label className="col-sm-2 control-label">Score Start</label>
+                            <div className="col-sm-2">
+                                <input type="number" className="form-control"
+                                        value={scoreStart}
+                                        onChange={this.handleScoreStartChange}
+                                    >
+                                </input>
+                            </div>
+                            <label className="col-sm-2 control-label">Score End</label>
+                            <div className="col-sm-2">
+                                <input type="number" className="form-control"
+                                        value={scoreEnd}
+                                        onChange={this.handleScoreEndChange}
+                                    >
+                                </input>
+                            </div>
+                            <label className="col-sm-2 control-label">Score Step</label>
+                            <div className="col-sm-2">
+                                <input type="number" className="form-control"
+                                        value={scoreStep}
+                                        onChange={this.handleScoreStepChange}
+                                    >
+                                </input>
                             </div>
                         </div>
 

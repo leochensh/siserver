@@ -25,10 +25,14 @@ export var Quest = React.createClass({
             var Qlist = that.state.survey.questionlist;
             var currentQ = Qlist[that.state.currentIndex];
             if(event.target.checked){
-                if(currentQ.type == Constant.QTYPE_SINGLESELECT){
+                if(currentQ.type == Constant.QTYPE_SINGLESELECT ||
+                    currentQ.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                    currentQ.type == Constant.QTYPE_SINGLESELECT_TEXT){
                     that.state.answer.answerlist[that.state.currentIndex].selectindexlist = [index];
                 }
-                else if(currentQ.type == Constant.QTYPE_MULTISELECT){
+                else if(currentQ.type == Constant.QTYPE_MULTISELECT ||
+                    currentQ.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+                    currentQ.type == Constant.QTYPE_MULTISELECT_TEXT){
                     that.state.answer.answerlist[that.state.currentIndex].selectindexlist.push(index);
                 }
 
@@ -270,7 +274,9 @@ export var Quest = React.createClass({
 
                                 </textarea>
                 }
-                if(currentType == Constant.QTYPE_SINGLESELECT){
+                if(currentType == Constant.QTYPE_SINGLESELECT ||
+                    currentType == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                    currentType == Constant.QTYPE_SINGLESELECT_TEXT){
 
                     slist.push(
                         <div className="form-group">
@@ -292,7 +298,9 @@ export var Quest = React.createClass({
                         </div>
                     )
                 }
-                else if(currentType == Constant.QTYPE_MULTISELECT){
+                else if(currentType == Constant.QTYPE_MULTISELECT ||
+                    currentType == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+                    currentType == Constant.QTYPE_MULTISELECT_TEXT){
                     slist.push(
                         <div className="form-group">
                             <div className="col-sm-1">
@@ -314,7 +322,9 @@ export var Quest = React.createClass({
 
 
             }
-            if(currentType == Constant.QTYPE_DESCRIPTION){
+            if(currentType == Constant.QTYPE_DESCRIPTION ||
+                currentType == Constant.QTYPE_DESCRIPTION_IMAGE_TEXT ||
+                currentType == Constant.QTYPE_DESCRIPTION_RECORD_TEXT){
                 slist.push(
                     <div className="form-group">
                                 <textarea className="form-control input-lg"
@@ -331,16 +341,28 @@ export var Quest = React.createClass({
                 var matchIndex = _.findIndex(scorelist,function(item){
                     return item.index == 0;
                 });
-                var scoreValue = 0;
+                var scoreStart = 0;
+                var scoreEnd = 10;
+                var scoreStep = 1;
+                if(currentQ.scorelist && _.isArray(currentQ.scorelist)){
+                    scoreStart = parseInt(currentQ.scorelist[0].start);
+                    scoreEnd = parseInt(currentQ.scorelist[0].end);
+                    scoreStep = parseInt(currentQ.scorelist[0].step);
+                }
+                var scoreValue = scoreStart;
                 if(matchIndex>=0){
                     scoreValue = scorelist[matchIndex].score;
                 }
                 var oarray = [];
-                for(var i=0;i<=9;i++){
+                var startI = scoreStart;
+                while(startI<=scoreEnd){
                     oarray.push(
-                        <option value={i}>{i}</option>
+                        <option value={startI}>{startI}</option>
                     )
+                    startI+=scoreStep;
                 }
+
+                console.log("here4")
                 slist.push(
                     <select className="form-control input-lg"
                             value={scoreValue}

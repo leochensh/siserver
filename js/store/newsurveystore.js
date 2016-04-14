@@ -195,7 +195,8 @@ class NewsurveyStore extends Store{
                         title:nqlist[i].title,
                         ifSaved:true,
                         type:nqlist[i].type,
-                        selectlist:nqlist[i].selectlist
+                        selectlist:nqlist[i].selectlist,
+                        scorelist:nqlist[i].scorelist
                     }
                     if(nqlist[i].ifhasprecedent){
                         var findex = _.findIndex(nqlist,function(item){

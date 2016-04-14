@@ -199,7 +199,7 @@ Staff.editQuestion = function(orgid,questiondata,callback){
                                 questioncollection.find({_id:ObjectID(questiondata.questionid)}).limit(1).next(function(err,question){
                                     if(question){
                                         questioncollection.updateOne({_id:ObjectID(questiondata.questionid)},
-                                            {$set:{title:questiondata.title,selectlist:questiondata.selectlist}},
+                                            {$set:questiondata},
 
                                             function(err,insertresult){
                                                 console.log(err);
@@ -336,10 +336,11 @@ Staff.deleteSurvey = function(surveyid,callback){
                                                 el.push(slist[i]);
                                             }
                                         }
-                                        admincollection.updateOne({_id:sur._id},{$set:{surveyList:el},function(err,ur){
+                                        admincollection.updateOne({_id:sur._id},{$set:{surveyList:el}},function(err,ur){
                                             cb();
-                                        }});
+                                        });
                                     },function(err){
+                                        console.log(err);
                                         collection.deleteOne({_id:ObjectID(surveyid)},function(err,dr){
                                             mongoPool.release(db);
                                             callback(err,dr);

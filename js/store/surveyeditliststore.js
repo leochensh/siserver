@@ -51,7 +51,7 @@ class EditSurveyList extends Store{
         }
         else if(payload.actionType == Constant.DELETESURVEY){
             var index = payload.index;
-            $("#ajaxloading").hide();
+            $("#ajaxloading").show();
             $.ajax({
                 url: Constant.BASE_URL+"editor/survey/delete",
                 data: $.param({
