@@ -28,7 +28,8 @@ function saveQuestion(qd,suceditcallback,sucnewcallback,faileditcallback,failnew
             selectlist:qd.selectlist,
             ifhasprecedent:ifhasp,
             precedentid:depid,
-            precedentselectindex:qd.precedentselectindex
+            precedentselectindex:qd.precedentselectindex,
+            scorelist:qd.scorelist
         };
         //alert(JSON.stringify(this.props.qdata));
         $("#ajaxloading").show();

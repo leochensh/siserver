@@ -169,7 +169,7 @@ app.post("/staff/login",function(req,res){
     var pass = req.body.password;
     var username = req.body.username;
     if(username && pass){
-        Staff.logfin(username,pass,function(err,msg){
+        Staff.login(username,pass,function(err,msg){
             if(msg == "error"){
                 req.session.userId = null;
                 res.status(400);
@@ -1217,6 +1217,11 @@ aclHandler.registerWait(function(acl){
                             successMsg.body = qlist;
                             res.send(JSON.stringify(successMsg));
                         }
+                        else if(output[0][0] == "3"){
+                            var qlist = parseV3List(output);
+                            successMsg.body = qlist;
+                            res.send(JSON.stringify(successMsg));
+                        }
                         else{
                             var qlist = parseV1List(output);
                             successMsg.body = qlist;
@@ -1261,6 +1266,9 @@ aclHandler.registerWait(function(acl){
                 console.log(resultList);
                 if(resultList[0][0] == "2"){
                     var qlist = parseV2List(resultList);
+                }
+                else if(resultList[0][0] == 3){
+                    var qlist = parseV3List(resultList);
                 }
                 else{
                     var qlist = parseV1List(resultList);
@@ -1396,7 +1404,13 @@ function checkSurveyData(data){
         data.type!=dict.QTYPE_MULTISELECT &&
         data.type!=dict.QTYPE_SEQUENCE &&
         data.type!=dict.QTYPE_SINGLESELECT &&
-        data.type!=dict.QTYPE_SCORE)){
+        data.type!=dict.QTYPE_SCORE &&
+        data.type!=dict.QTYPE_DESCRIPTION_IMAGE_TEXT &&
+        data.type!=dict.QTYPE_DESCRIPTION_RECORD_TEXT &&
+        data.type!=dict.QTYPE_MULTISELECT_RECORD_TEXT &&
+        data.type!=dict.QTYPE_MULTISELECT_TEXT &&
+        data.type!=dict.QTYPE_SINGLESELECT_RECORD_TEXT &&
+        data.type!=dict.QTYPE_SINGLESELECT_TEXT)){
         return false;
     }
     else if(!data.title){
@@ -1524,6 +1538,103 @@ function parseV2List(input){
                         type:stype,
                         title:vtrim
                     });
+                    start+=1;
+                }
+                qlist.push(q)
+            }
+
+
+        }
+    }
+    return qlist;
+}
+
+function parseV3List(input){
+    var qlist = [];
+    var typemap = {
+        "单选题":dict.QTYPE_SINGLESELECT,
+        "单选文本题":dict.QTYPE_SINGLESELECT_TEXT,
+        "单选录音文本题":dict.QTYPE_SINGLESELECT_RECORD_TEXT,
+        "多选题":dict.QTYPE_MULTISELECT,
+        "多选文本题":dict.QTYPE_MULTISELECT_TEXT,
+        "多选录音文本题":dict.QTYPE_MULTISELECT_RECORD_TEXT,
+        "文本题":dict.QTYPE_DESCRIPTION,
+        "录音文本题":dict.QTYPE_DESCRIPTION_RECORD_TEXT,
+        "图片上传文本题":dict.QTYPE_DESCRIPTION_IMAGE_TEXT,
+        "选项排序题":dict.QTYPE_SEQUENCE,
+        "数字题":dict.QTYPE_SCORE
+    };
+
+
+    for(var i in input){
+
+        var q = {}
+        if(i>=2){
+            if(input[i][1] && input[i][2]){
+                var titleSplit = input[i][1].trim().split(",");
+                var tindex = titleSplit[0]
+                if(titleSplit.length==3){
+                    var preindex = parseInt(titleSplit[1]);
+                    var selectindex = parseInt(titleSplit[2]);
+                    q.ifhasprecedent = true;
+                    q.precedentindex = preindex-1;
+                    q.precedentselectindex = selectindex-1;
+                }
+                else{
+                    q.ifhasprecedent = false;
+                    q.precedentindex = -1;
+                    q.precedentselectindex = -1;
+                }
+                q.title = input[i][2].trim();
+                q.type = typemap[tindex]
+                q.selectlist = [];
+                q.scorelist = [];
+                var start = 3;
+                while(input[i][start]){
+                    var stype = dict.SELECTTYPE_TEXT;
+                    var vtrim = input[i][start].trim();
+                    if(q.type == dict.QTYPE_SCORE){
+                        var scoreSplit = vtrim.split(",");
+                        if(scoreSplit.length == 3){
+                            q.scorelist.push({
+                                index:parseInt(start)-3,
+                                start:scoreSplit[0],
+                                end:scoreSplit[1],
+                                step:scoreSplit[2]
+                            })
+                        }
+                        else if(scoreSplit.length == 4){
+                            q.scorelist.push({
+                                index:i,
+                                start:scoreSplit[1],
+                                end:scoreSplit[2],
+                                step:scoreSplit[3]
+                            })
+                            q.selectlist.push({
+                                type:stype,
+                                title:scoreSplit[0]
+                            })
+                        }
+                    }
+                    else{
+                        if(vtrim == "*图形*"){
+                            stype = dict.SELECTTYPE_IMAGE;
+                            vtrim = ""
+                        }
+                        else if(vtrim == "*视频*"){
+                            stype = dict.SELECTTYPE_VIDEO;
+                            vtrim = ""
+                        }
+                        else if(vtrim.indexOf("others")>=0 || vtrim.indexOf("Others")>=0){
+                            stype = dict.SELECTTYPE_DESCRIPTION;
+                        }
+
+                        q.selectlist.push({
+                            type:stype,
+                            title:vtrim
+                        });
+                    }
+
                     start+=1;
                 }
                 qlist.push(q)

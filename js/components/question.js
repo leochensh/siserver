@@ -207,6 +207,14 @@ export var Question = React.createClass({
         var qid = "questionname"+this.props.index;
 
         var typestr = Constant.QTYPE_NAME_MAP[this.props.qdata.type];
+
+        var typeOptions = [];
+        for(var tkey in Constant.QTYPE_NAME_MAP){
+            typeOptions.push(<option value={tkey}>
+                {Constant.QTYPE_NAME_MAP[tkey]}
+            </option>)
+        }
+
         var slist = [];
         for(var i in this.props.qdata.selectlist){
             var s = this.props.qdata.selectlist[i];
@@ -320,8 +328,20 @@ export var Question = React.createClass({
         return(
             <div className="panel panel-default">
                 <div className="panel-heading">
-                    <span className={colorClass}>{parseInt(this.props.index)+1}</span>
-                    <span>&nbsp;&nbsp;{typestr}</span>
+                    <div className="row">
+                        <div className="col-md-4">
+                            <span className={colorClass}>{parseInt(this.props.index)+1}</span>
+                        </div>
+
+                        <form className="col-md-8 form-inline">
+                            <select className="form-control"
+                                    onChange={this.handleChange.bind(this,"type")}
+                                    value={this.props.qdata.type}>
+                                {typeOptions}
+                            </select>
+                        </form>
+                    </div>
+
                 </div>
                 <div className="panel-body">
                     <form className="form-horizontal">
