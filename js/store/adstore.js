@@ -89,7 +89,7 @@ class AdStore extends Store{
             var title = payload.title;
             var image = payload.image;
             var link = payload.link;
-            $("#ajaxloading").hide();
+            $("#ajaxloading").show();
             $.ajax({
                 url: Constant.BASE_URL+"sadmin/ad/add",
                 data: $.param({

@@ -12,11 +12,208 @@ export var Stastic = React.createClass({
         return{
             survey:null,
             answerlist:[],
-            detailid:null
+            detailid:null,
+            ifexport:false,
+            exporturl:null
         }
     },
     contextTypes: {
         router: React.PropTypes.object.isRequired
+    },
+    exportxlsx(){
+        $("#ajaxloading").show();
+        var qout = [];
+        var firstQ = [ "No.","Interviewer","Visit Date",
+            "Country","Customer","Male","Female"];
+
+        for(var qindex in this.state.survey.questionlist){
+            var q = this.state.survey.questionlist[qindex];
+            var base_str = "Q"+(parseInt(qindex)+1);
+            if(q.type == Constant.QTYPE_MULTISELECT ||
+                q.type == Constant.QTYPE_SINGLESELECT ||
+                q.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+                q.type == Constant.QTYPE_MULTISELECT_TEXT ||
+                q.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                q.type == Constant.QTYPE_SINGLESELECT_TEXT){
+                for(var j in q.selectlist){
+                    firstQ.push(base_str+"_"+(parseInt(j)+1))
+                }
+
+            }
+            else if(q.type == Constant.QTYPE_SCORE){
+                var scoreStart = 0;
+                var scoreEnd = 10;
+                var scoreStep = 1;
+
+                if(q.scorelist && _.isArray(q.scorelist)){
+                    scoreStart = parseInt(q.scorelist[0].start);
+                    scoreEnd = parseInt(q.scorelist[0].end);
+                    scoreStep = parseInt(q.scorelist[0].step);
+                }
+
+                for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                    firstQ.push(base_str+"_"+(parseInt(i)))
+                }
+            }
+            else{
+                firstQ.push(base_str);
+            }
+
+
+        }
+
+        qout.push(firstQ);
+
+        for(var aindex in this.state.answerlist){
+            var currentA = this.state.answerlist[aindex];
+            var calist = currentA.answerlist;
+            var dstring = ""
+            if(currentA.begintime){
+                var nd=new Date(currentA.begintime);
+                var year = nd.getFullYear();
+                var month = nd.getMonth()+1;
+                var date = nd.getDate();
+                dstring = year+"/"+month+"/"+date;
+            }
+            firstQ = [(parseInt(aindex)+1),currentA.investigatorname?currentA.investigatorname:"",
+                dstring,"","","",""];
+
+
+            for(var qindex in this.state.survey.questionlist){
+                var q = this.state.survey.questionlist[qindex];
+                var base_str = "Q"+(parseInt(qindex)+1);
+                if(q.type == Constant.QTYPE_MULTISELECT ||
+                    q.type == Constant.QTYPE_SINGLESELECT ||
+                    q.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+                    q.type == Constant.QTYPE_MULTISELECT_TEXT ||
+                    q.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                    q.type == Constant.QTYPE_SINGLESELECT_TEXT){
+                    var tempList = [];
+                    for(var j in q.selectlist){
+                        tempList.push("")
+                    }
+                    var qfi = _.findIndex(calist,function(item){
+                        return item.questionid == q._id;
+                    });
+                    if(qfi>=0){
+                        var slist = calist[qfi].selectindexlist;
+                        for(var sindex in slist){
+                            tempList[slist[sindex]] = 1;
+                        }
+                    }
+                    for(var tindex in tempList){
+                        firstQ.push(tempList[tindex]);
+                    }
+
+                }
+                else if(q.type == Constant.QTYPE_SCORE){
+                    var scoreStart = 0;
+                    var scoreEnd = 10;
+                    var scoreStep = 1;
+                    var tempList = [];
+                    if(q.scorelist && _.isArray(q.scorelist)){
+                        scoreStart = parseInt(q.scorelist[0].start);
+                        scoreEnd = parseInt(q.scorelist[0].end);
+                        scoreStep = parseInt(q.scorelist[0].step);
+                    }
+
+                    for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                        tempList.push("")
+                    }
+                    var qfi = _.findIndex(calist,function(item){
+                        return item.questionid == q._id;
+                    });
+                    if(qfi>=0){
+                        if(calist[qfi].scorelist){
+                            var sfi = _.findIndex(calist[qfi].scorelist,function(item){
+                                return item.index == 0;
+                            })
+                            if(sfi>=0){
+                                for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                                    if(i == calist[qfi].scorelist[sfi].score){
+                                        tempList.push(1);
+                                    }
+                                    else{
+                                        tempList.push("")
+                                    }
+
+                                }
+                            }
+                            else{
+                                for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                                    tempList.push("")
+                                }
+                            }
+
+                        }
+                        else{
+                            for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                                tempList.push("")
+                            }
+                        }
+
+
+                    }
+                    else{
+                        for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                            tempList.push("")
+                        }
+                    }
+                    for(var tindex in tempList){
+                        firstQ.push(tempList[tindex]);
+                    }
+                }
+                else{
+                    var qfi = _.findIndex(calist,function(item){
+                        return item.questionid == q._id;
+                    });
+                    if(qfi>=0){
+                        firstQ.push(calist[qfi].text?calist[qfi].text:"");
+                    }
+                }
+
+
+            }
+
+            qout.push(firstQ);
+
+
+
+        }
+        var that = this;
+        $.ajax({
+            url: Constant.BASE_URL+"admin/exportxlsx",
+            data: JSON.stringify({
+                name:that.state.survey.name,
+                data:qout
+            }),
+            contentType: 'application/json; charset=utf-8',
+            type: 'POST',
+            success: function (data) {
+                $("#ajaxloading").hide();
+                var fu = JSON.parse(data).body;
+                that.setState({
+                    ifexport:true,
+                    exporturl:Constant.BASE_IMAGEURL+fu
+                });
+            },
+            error:function(jxr,scode){
+                $("#ajaxloading").hide();
+            },
+            statusCode:{
+                406:function(){
+
+                },
+                500:function(){
+                    SisDispatcher.dispatch({
+                        actionType: Constant.ERROR500
+                    });
+                },
+                409:function(){
+
+                }
+            }
+        });
     },
     viewdetail(index){
         var that = this;
@@ -87,6 +284,31 @@ export var Stastic = React.createClass({
             }
         },0);
         var qlist = [];
+        var elink = ""
+        if(this.state.ifexport){
+            elink = <a
+                className="btn btn-info"
+                href={this.state.exporturl}>
+                <span className="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>Click to download.
+            </a>;
+        }
+        qlist.push(
+            <div className="row" style={{margin:"15px"}}>
+                <div className="col-md-4">
+                    <a
+                        type="button"
+
+                        onClick={this.exportxlsx}
+                        className="btn btn-primary">
+                        <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span> Export to file
+                    </a>
+                </div>
+                <div className="col-md-8">
+                    {elink}
+                </div>
+            </div>
+
+        );
         if(this.state.survey){
             for(var qindex in this.state.survey.questionlist){
                 var q = this.state.survey.questionlist[qindex];
