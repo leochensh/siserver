@@ -4,6 +4,7 @@ import {personalStore} from '../store/personalstore'
 import {newsurveyStore} from '../store/newsurveystore'
 import {surveyEditListStore} from '../store/surveyeditliststore'
 import {adStore} from '../store/adstore'
+import {versionStore} from "../store/versionstore"
 import {Link} from 'react-router'
 
 export var App = React.createClass({
@@ -16,6 +17,7 @@ export var App = React.createClass({
         this.newstoken = newsurveyStore.addListener(this._onChange);
         this.eslisttoken = surveyEditListStore.addListener(this._onChange);
         this.adtoken = adStore.addListener(this._onChange);
+        this.versiontoken = versionStore.addListener(this._onChange);
     },
     componentWillUnmount(){
         loginStore.remove(this.token);
@@ -23,6 +25,7 @@ export var App = React.createClass({
         newsurveyStore.remove(this.newstoken);
         surveyEditListStore.remove(this.eslisttoken);
         adStore.remove(this.adtoken);
+        versionStore.remove(this.versiontoken);
     },
     homeclick(){
         var cpath = this.props.routes[this.props.routes.length-1]['path']
@@ -43,6 +46,7 @@ export var App = React.createClass({
         this.setState({a:1});
     },
     render() {
+        console.log(versionStore.getAll())
         return (
             <div>
                 <nav className="navbar navbar-default navbar-fixed-top">
@@ -65,7 +69,8 @@ export var App = React.createClass({
                             newsurvey:newsurveyStore.getAll(),
                             personalList:personalStore.getAll(),
                             surveyeditlist:surveyEditListStore.getAll(),
-                            adlist:adStore.getAll()
+                            adlist:adStore.getAll(),
+                            versionlist:versionStore.getAll()
                         })
                 }
             </div>

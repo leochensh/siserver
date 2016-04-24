@@ -8,7 +8,11 @@ export var Ads = React.createClass({
         return{
             newadimage:null,
             newadlink:null,
-            newadtitle:null
+            newadtitle:null,
+
+            newplatform:Constant.PLATFORMTYPE_ANDROID,
+            newfileurl:null,
+            newversionnum:null
         }
     },
     contextTypes: {
@@ -18,6 +22,15 @@ export var Ads = React.createClass({
         var infunc = function(){
             SisDispatcher.dispatch({
                 actionType: Constant.DELETEAD,
+                index:index
+            });
+        };
+        return infunc;
+    },
+    deleteVersion(index){
+        var infunc = function(){
+            SisDispatcher.dispatch({
+                actionType: Constant.DELETEVERSION,
                 index:index
             });
         };
@@ -39,13 +52,31 @@ export var Ads = React.createClass({
             $("#newad").modal("hide");
         }
     },
+    confirmNewVersion:function(){
+        if(this.state.newplatform && this.state.newfileurl && this.state.newversionnum){
+            SisDispatcher.dispatch({
+                actionType: Constant.VERSIONADD,
+                platform:this.state.newplatform,
+                versionnum:this.state.newversionnum,
+                fileurl:this.state.newfileurl
+            });
+            $("#newversion").modal("hide");
+
+        }
+    },
     componentDidMount (){
         this.getAdList();
+        this.getVersionList();
     },
 
     getAdList(){
         SisDispatcher.dispatch({
             actionType: Constant.GETADLIST,
+        });
+    },
+    getVersionList(){
+        SisDispatcher.dispatch({
+            actionType: Constant.GETVERSIONLIST,
         });
     },
     onDropAd: function (files) {
@@ -74,8 +105,35 @@ export var Ads = React.createClass({
             }
         });
     },
+    onDropVersion: function (files) {
+        console.log(files[0].name);
+        var data = new FormData();
+        data.append("name",files[0].name);
+        data.append("file",files[0]);
+        $("#ajaxloading").show();
+        var that  = this;
+        $.ajax({
+            url: Constant.BASE_URL+"staff/upload/audio",
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: function(data){
+                $("#ajaxloading").hide();
+                that.setState({
+                    newfileurl:JSON.parse(data).body
+                });
+                $("#newversion").modal("show");
+            },
+            error:function(jxr,scode){
+                $("#ajaxloading").hide();
+            }
+        });
+    },
     render(){
         var mlist = [];
+        var vlist = [];
         var newimage = "";
         if(this.state.newadimage){
             newimage = <img style={{maxWidth:"200px"}} src={Constant.BASE_IMAGEURL+this.state.newadimage}/>
@@ -89,7 +147,7 @@ export var Ads = React.createClass({
 
             mlist.push(
                 <tr key={"adlist"+i}>
-                    <td>{i}</td>
+                    <td>{(parseInt(i)+1)}</td>
                     <td>{ad.title}</td>
                     <td>{image}</td>
                     <td>{ad.link}</td>
@@ -107,6 +165,34 @@ export var Ads = React.createClass({
                 </tr>
             );
         }
+        for(var i in this.props.versionlist){
+            var version = this.props.versionlist[i];
+
+            vlist.push(
+                <tr key={"verlist"+i}>
+                    <td>{(parseInt(i)+1)}</td>
+                    <td>{version.platform}</td>
+                    <td>
+                        <a href={Constant.BASE_IMAGEURL+version.fileurl}>
+                            {Constant.BASE_IMAGEURL+version.fileurl}
+                        </a>
+                    </td>
+                    <td>{version.versionnum}</td>
+                    <td>{new Date(version.ctime).toLocaleString()}</td>
+                    <td className="list_btn">
+                        <div className="btn-group" role="group" >
+                            <a
+                                type="button"
+                                onClick={this.deleteVersion(i)}
+                                className="btn btn-danger">Delete</a>
+
+                        </div>
+                    </td>
+
+                </tr>
+            );
+        }
+
         return(
             <div>
                 <ul className="nav nav-tabs" role="tablist">
@@ -142,6 +228,29 @@ export var Ads = React.createClass({
                         </div>
                     </div>
                     <div role="tabpanel" className="tab-pane" id="clientversion">
+                        <div className="panel panel-default paddingpanel">
+
+                            <Dropzone onDrop={this.onDropVersion} accept="*.apk">
+                                <div>Drop apk file here</div>
+                            </Dropzone>
+
+                            <table  className="table" >
+                                <thead>
+                                <tr>
+                                    <th><span className="">##</span></th>
+                                    <th><span className="">Platform</span></th>
+                                    <th><span className="">Download Link</span></th>
+                                    <th><span className="">Version Number</span></th>
+                                    <th><span className="">Ctime</span></th>
+                                    <th><span className="">Operations</span></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {vlist}
+
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -170,6 +279,36 @@ export var Ads = React.createClass({
                             <div className="modal-footer">
                                 <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
                                 <a type="button" className="btn btn-primary" onClick={this.confirmNew}>Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div className="modal fade" id="newversion" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >New Version</h4>
+                            </div>
+                            <div className="modal-body">
+                                <form>
+                                    <div className="form-group">
+                                        <label htmlFor="versionplatform">Platform</label>
+                                        <input type="text" className="form-control" id="versionplatform" placeholder="platform"
+                                                value={this.state.newplatform}/>
+                                        <label htmlFor="versionnum">Link</label>
+                                        <input type="text" className="form-control" id="versionnum" placeholder="Version Number"
+                                               onChange={this.handleChange.bind(this,"newversionnum")} value={this.state.newversionnum}/>
+                                    </div>
+
+                                </form>
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmNewVersion}>Confirm</a>
                             </div>
                         </div>
                     </div>

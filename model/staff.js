@@ -627,14 +627,14 @@ Staff.addFeedback = function(feeddata,callback){
     });
 };
 
-Staff.getVersionInfo = function(orgid,platform,callback){
+Staff.getVersionInfo = function(platform,callback){
     mongoPool.acquire(function(err,db){
         if(err){
 
         }
         else{
             db.collection("versions",function(err,collection){
-                collection.find({orgid:orgid,platform:platform},{_id:0,orgid:0}).sort({ctime:-1})
+                collection.find({platform:platform},{_id:0,orgid:0}).sort({ctime:-1})
                     .limit(1).next(function(err,ver){
                         mongoPool.release(db);
                         callback(err,ver);

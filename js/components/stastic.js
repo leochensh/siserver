@@ -81,7 +81,6 @@ export var Stastic = React.createClass({
 
             for(var qindex in this.state.survey.questionlist){
                 var q = this.state.survey.questionlist[qindex];
-                var base_str = "Q"+(parseInt(qindex)+1);
                 if(q.type == Constant.QTYPE_MULTISELECT ||
                     q.type == Constant.QTYPE_SINGLESELECT ||
                     q.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
@@ -117,9 +116,6 @@ export var Stastic = React.createClass({
                         scoreStep = parseInt(q.scorelist[0].step);
                     }
 
-                    for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                        tempList.push("")
-                    }
                     var qfi = _.findIndex(calist,function(item){
                         return item.questionid == q._id;
                     });
@@ -455,7 +451,7 @@ export var Stastic = React.createClass({
             var a = this.state.answerlist[i];
             mlist.push(
                 <tr>
-                    <td>{i}</td>
+                    <td>{(parseInt(i)+1)}</td>
                     <td>{a.name?a.name:""}</td>
                     <td>{new Date(a.ctime).toLocaleString()}</td>
                     <td>{a.investigatorid?"Android Client":"Web"}</td>

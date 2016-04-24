@@ -20,6 +20,10 @@ export var Constant = {
     FORCEADLISTREFRESH:"forceadlistrefresh",
     DELETEAD:"deletead",
     ADDAD:"addad",
+    GETVERSIONLIST:"getversionlist",
+    FORCEVERSIONLISTREFRESH:"forceversionlistrefresh",
+    DELETEVERSION:"deleteversion",
+    VERSIONADD:"versionadd",
 
     QTYPE_SINGLESELECT:"singleselect",//单选题
     QTYPE_SINGLESELECT_TEXT:"singleselect_text",//单选文本题
@@ -68,9 +72,14 @@ export var Constant = {
         "surveynormal":"Published"
     },
 
+    PLATFORMTYPE_ANDROID:"android",
+    PLATFORMTYPE_IOS:"ios",
+    PLATFORMTYPE_WEB:"web",
 
+    BASE_FULL:"http://54.75.231.96/si/public/#/",
     BASE_URL:"/si/",
     BASE_IMAGEURL:"/si/uploads/"
+    //BASE_FULL:"http://localhost:8080/public/#/",
     //BASE_URL:"/",
     //BASE_IMAGEURL:"/uploads/"
 };

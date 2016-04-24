@@ -511,6 +511,97 @@ Admin.addVersion = function(orgid,platform,versionnum,fileurl,callback){
     });
 };
 
+Admin.addSadminVersion = function(platform,versionnum,fileurl,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("versions",function(err,collection){
+                var newversion = {
+                    platform:platform,
+                    versionnum:versionnum,
+                    fileurl:fileurl,
+                    ctime:new Date()
+                };
+                collection.insertOne(newversion,function(err,insert){
+                    mongoPool.release(db);
+                    callback(err,insert.insertedId);
+                });
+            });
+        }
+    });
+};
+
+Admin.getSadminVersionList = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("versions",function(err,collection){
+                collection.find().sort({ctime:-1})
+                    .toArray(function(err,ads){
+                        mongoPool.release(db);
+                        callback(err,ads);
+                    })
+            });
+        }
+    });
+};
+
+Admin.editSadminVersion = function(versionid,platform,versionnum,fileurl,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("versions",function(err,collection){
+
+                collection.find({_id:ObjectID(versionid)}).limit(1).next(function(err,version){
+                    if(version){
+                        collection.updateOne({_id:ObjectID(versionid)},
+                            {$set:{platform:platform,versionnum:versionnum,fileurl:fileurl}},function(err,msg){
+                                mongoPool.release(db);
+                                callback(err,"ok");
+                            });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+};
+
+Admin.deleteSadminVersion = function(versionid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("versions",function(err,collection){
+
+                collection.find({_id:ObjectID(versionid)}).limit(1).next(function(err,ad){
+                    if(ad){
+                        collection.deleteOne({_id:ObjectID(versionid)},function(err,msg){
+                            mongoPool.release(db);
+                            callback(err,"ok");
+                        });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+};
+
+
 Admin.addAd = function(orgid,title,image,link,callback){
     mongoPool.acquire(function(err,db){
         if(err){

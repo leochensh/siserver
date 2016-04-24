@@ -1397,11 +1397,100 @@ aclHandler.registerWait(function(acl){
 
     });
 
+    app.get("/sadmin/version/list",acl.middleware(1),function(req,res){
+        Admin.getSadminVersionList(function(err,msg){
+            res.status(200);
+            successMsg.body = msg;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
+    app.post("/sadmin/version/add",acl.middleware(1),function(req,res){
+        var platform = req.body.platform;
+        var versionnum = req.body.versionnum;
+        var fileurl = req.body.fileurl;
+        if(platform && versionnum && fileurl){
+            Admin.addSadminVersion(platform,versionnum,fileurl,function(err,msg){
+                logger.logger.log("info","admin add new version",{
+                    adminid:req.session.uid,
+                    versionid:msg
+                });
+                res.status(200);
+                successMsg.body = msg;
+
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+
+
+
+    });
+
+    app.put("/sadmin/version/edit",acl.middleware(1),function(req,res){
+        var versionid = req.body.id;
+        var platform = req.body.platform;
+        var versionnum = req.body.versionnum;
+        var fileurl = req.body.fileurl;
+        if(versionid&&ObjectID.isValid(versionid)&&platform&&versionnum&&fileurl){
+            Admin.editSadminVersion(versionid,platform,versionnum,fileurl,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "version not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = "ok";
+                    res.send(JSON.stringify(successMsg));
+                }
+
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+    });
+
+    app.delete("/sadmin/version/delete",acl.middleware(1),function(req,res){
+        var versionid = req.body.id;
+
+        if(versionid&&ObjectID.isValid(versionid)){
+            Admin.deleteSadminVersion(versionid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "version not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = "ok";
+                    res.send(JSON.stringify(successMsg));
+                }
+
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+    });
+
     app.get("/investigator/version/get/:platform",acl.middleware(2),function(req,res){
         var platform = req.params.platform;
         if(platform &&
             (platform == dict.PLATFORMTYPE_ANDROID || platform == dict.PLATFORMTYPE_IOS || platform==dict.PLATFORMTYPE_WEB)){
-            Staff.getVersionInfo(req.session.orgid,platform,function(err,msg){
+            Staff.getVersionInfo(platform,function(err,msg){
                 logger.logger.log("info","staff get version info",{
                     staffid:req.session.uid,
                 });
