@@ -317,6 +317,7 @@ export var Stastic = React.createClass({
                     q.type == Constant.QTYPE_SINGLESELECT_TEXT){
                     var labelList = [];
                     var valueList = [];
+                    var valuePercentList = [];
                     for(var j in q.selectlist){
                         labelList.push("S"+(parseInt(j)+1));
                         var s = q.selectlist[j];
@@ -326,7 +327,7 @@ export var Stastic = React.createClass({
                                 return item.questionid == q._id;
                             });
                             if(qfi>=0){
-                                var sfi = _.indexOf(alist[qfi].selectindexlist,j);
+                                var sfi = _.indexOf(alist[qfi].selectindexlist,parseInt(j));
                                 if(sfi>=0){
                                     return memo+1;
                                 }
@@ -339,6 +340,8 @@ export var Stastic = React.createClass({
                             }
                         },0);
                         valueList.push(snum);
+                        valuePercentList.push(Math.floor(parseInt(snum)/parseInt(totalNum)*100)+"%");
+
                         slist.push(
                             <div className="row">
                                 <div className="col-md-4" >
@@ -350,22 +353,21 @@ export var Stastic = React.createClass({
                                 </div>
                                 <div className="col-md-8">
                                     <div className="alert alert-info">&nbsp;&nbsp;
-                                        {snum} selected,{parseInt(snum)/parseInt(totalNum)*100}%
+                                        {snum} selected,{Math.floor(parseInt(snum)/parseInt(totalNum)*100)}%
                                     </div>
                                 </div>
-
-
                             </div>
                         )
                     }
                     slist.push(
-                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList}>
+                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
                         </RgraphControl>
                     )
                 }
                 else if(q.type == Constant.QTYPE_SCORE){
                     var labelList = [];
                     var valueList = [];
+                    var valuePercentList = [];
 
                     var scoreStart = 0;
                     var scoreEnd = 10;
@@ -406,6 +408,7 @@ export var Stastic = React.createClass({
                             }
                         },0);
                         valueList.push(snum);
+                        valuePercentList.push(Math.floor(parseInt(snum)/parseInt(totalNum)*100)+"%");
                         slist.push(
                             <div className="row">
                                 <div className="col-md-4" >
@@ -425,7 +428,7 @@ export var Stastic = React.createClass({
                         )
                     }
                     slist.push(
-                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList}>
+                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
                         </RgraphControl>
                     )
 

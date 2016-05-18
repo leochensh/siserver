@@ -340,6 +340,11 @@ export var Newsurvey = React.createClass({
             })
         }
     },
+    saveall(){
+        SisDispatcher.dispatch({
+            actionType: Constant.SAVEALLQUESTION,
+        });
+    },
     onDrop(files){
         if(true){
             var data = new FormData();
@@ -490,6 +495,13 @@ export var Newsurvey = React.createClass({
                                             <span style={surveyStatusClassStyle}>{surveyStatusTxt}</span>
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             <a type="button"
+                                               onClick={this.saveall}
+                                               className="btn btn-primary">
+                                                <span className="glyphicon glyphicon-save" aria-hidden="true"></span>
+                                                <span>&nbsp;&nbsp;Save all</span>
+                                            </a>
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <a type="button"
                                                     onClick={this.publishsurvey}
                                                     className="btn btn-primary">
                                                 <span className="glyphicon glyphicon-check" aria-hidden="true"></span>
@@ -500,7 +512,7 @@ export var Newsurvey = React.createClass({
                                                     onClick={this.cleanall}
                                                     className="btn btn-warning">
                                                 <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                                                <span>&nbsp;&nbsp;Clean all data</span>
+                                                <span>&nbsp;&nbsp;Clean data</span>
                                             </a>
                                         </h3>
                                     </div>

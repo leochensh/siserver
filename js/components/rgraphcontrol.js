@@ -44,7 +44,7 @@ export var RgraphControl = React.createClass({
             for(var i in this.props.values){
 
                 if(this.props.values[i]!=0){
-                    localLabels.push(this.props.labels[i]);
+                    localLabels.push(this.props.labels[i]+", "+this.props.pervalues[i]);
                     localValues.push(this.props.values[i]);
                 }
             }

@@ -3,6 +3,7 @@ var dict = require("../dict")
 var Admin = {};
 var async = require("async")
 var ObjectID=require('mongodb').ObjectID;
+var _ = require("underscore");
 
 module.exports = Admin;
 
@@ -102,6 +103,26 @@ Admin.createOrganization = function(orgname,callback){
     });
 };
 
+Admin.getOrgList = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("organization",function(err,collection){
+
+                collection.find().toArray(function(err,orgs){
+                    var forgs = _.filter(orgs,function(org){
+                        return org.name.indexOf("__personal")<0;
+                    });
+                    mongoPool.release(db);
+                    callback(err,forgs);
+                });
+            });
+        }
+    });
+}
+
 Admin.createOrgAdmin = function(orgid,name,pass,role,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -134,6 +155,33 @@ Admin.createOrgAdmin = function(orgid,name,pass,role,callback){
                                     })
                                 }
                             });
+                        });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"orgnotfound");
+                    }
+                });
+            });
+        }
+    });
+};
+
+Admin.getOrgAdminList = function(orgid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("organization",function(err,collection){
+
+                collection.find({_id:ObjectID(orgid)}).limit(1).next(function(err,org){
+                    if(org){
+                        db.collection("admins",function(err,adcollection){
+                            adcollection.find({orgid:orgid,disable:false}).toArray(function(err,admins){
+                                mongoPool.release(db);
+                                callback(err,admins);
+                            })
                         });
                     }
                     else{

@@ -24,6 +24,13 @@ export var Constant = {
     FORCEVERSIONLISTREFRESH:"forceversionlistrefresh",
     DELETEVERSION:"deleteversion",
     VERSIONADD:"versionadd",
+    ADDORGNIZATION:"addorgnization",
+    GETORGNIZATIONLIST:"getorgnizationlist",
+    FORCEORGNIZATIONREFRESH:"forceorgnizationrefresh",
+    DELETEORGNIZATION:"deleteorgnization",
+    CHANGEACTIVEORG:"changeactiveorg",
+    GETORGADMINLIST:"getorgadminlist",
+
 
     QTYPE_SINGLESELECT:"singleselect",//单选题
     QTYPE_SINGLESELECT_TEXT:"singleselect_text",//单选文本题

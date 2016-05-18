@@ -17,6 +17,9 @@ export var Home = React.createClass({
     adsclick(event){
         this.context.router.push("/ads")
     },
+    orgclick(event){
+        this.context.router.push("/org");
+    },
     render() {
         var style = {
             marginTop:"30px"
@@ -43,7 +46,9 @@ export var Home = React.createClass({
                 <div className="row" style={style}>
 
                     <button className="col-md-3 col-md-offset-3 btn btn-default"
-                        disabled={orgDisable}>
+                        disabled={orgDisable}
+                        onClick={this.orgclick}
+                    >
 
                         <div className="fixed-size-square">
                             <div>

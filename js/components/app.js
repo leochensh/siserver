@@ -5,6 +5,7 @@ import {newsurveyStore} from '../store/newsurveystore'
 import {surveyEditListStore} from '../store/surveyeditliststore'
 import {adStore} from '../store/adstore'
 import {versionStore} from "../store/versionstore"
+import {orgStore} from "../store/orgstore"
 import {Link} from 'react-router'
 
 export var App = React.createClass({
@@ -18,6 +19,7 @@ export var App = React.createClass({
         this.eslisttoken = surveyEditListStore.addListener(this._onChange);
         this.adtoken = adStore.addListener(this._onChange);
         this.versiontoken = versionStore.addListener(this._onChange);
+        this.orgtoken = orgStore.addListener(this._onChange);
     },
     componentWillUnmount(){
         loginStore.remove(this.token);
@@ -26,6 +28,7 @@ export var App = React.createClass({
         surveyEditListStore.remove(this.eslisttoken);
         adStore.remove(this.adtoken);
         versionStore.remove(this.versiontoken);
+        orgStore.remove(this.orgtoken);
     },
     homeclick(){
         var cpath = this.props.routes[this.props.routes.length-1]['path']
@@ -70,7 +73,9 @@ export var App = React.createClass({
                             personalList:personalStore.getAll(),
                             surveyeditlist:surveyEditListStore.getAll(),
                             adlist:adStore.getAll(),
-                            versionlist:versionStore.getAll()
+                            versionlist:versionStore.getAll(),
+                            orglist:orgStore.getAll(),
+                            orgdata:orgStore.getData()
                         })
                 }
             </div>

@@ -14,6 +14,7 @@ import {Surveylist} from "./components/surveylist"
 import {Quest} from "./components/quest"
 import {Stastic} from "./components/stastic"
 import {Ads} from "./components/ads"
+import {Org} from "./components/org"
 
 var main = document.getElementsByTagName('main')[0];
 
@@ -30,6 +31,7 @@ ReactDom.render(
             <Route path="quest/:id" component={Quest} />
             <Route path="stastic/:id" component={Stastic} />
             <Route path="ads" component={Ads} />
+            <Route path="org" component={Org} />
         </Route>
     </Router>,
     main

@@ -233,6 +233,13 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+    app.get("/sadmin/org/list",acl.middleware(1),function(req,res){
+        Admin.getOrgList(function(err,orgs){
+            successMsg.body = orgs;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
     app.post("/sadmin/org/admin/add",acl.middleware(1),function(req,res){
         var orgid = req.body.orgid;
         var name = req.body.name;
@@ -255,6 +262,32 @@ aclHandler.registerWait(function(acl){
                     res.status(200);
                     acl.addUserRoles(msg.name, 'admin');
                     successMsg.body = insertedid;
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/org/admin/list/:orgid",acl.middleware(1),function(req,res){
+        var orgid = req.params.orgid;
+
+        if(orgid && ObjectID.isValid(orgid)){
+            Admin.getOrgAdminList(orgid,function(err,msg){
+                if(msg == "orgnotfound"){
+                    res.status(404);
+                    errorMsg.code = "organization not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    //logger.logger.log("info","new organization admin created",{name:msg.name});
+                    res.status(200);
+                    //acl.addUserRoles(msg.name, 'admin');
+                    successMsg.body = msg;
                     res.send(JSON.stringify(successMsg));
                 }
             })

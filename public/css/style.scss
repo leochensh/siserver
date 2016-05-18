@@ -345,6 +345,10 @@ span.pink {
   text-decoration: none;
 }
 
+.sidebar-nav li a.active{
+  background-color:white;
+}
+
 .sidebar-nav > .sidebar-brand {
   height: 65px;
   font-size: 18px;
