@@ -1576,7 +1576,11 @@ aclHandler.registerWait(function(acl){
         })
     });
 
-    var smtpTransport = nodemailer.createTransport('smtps://ouresateam%40163.com:ouresa777@smtp.163.com');
+    //var from = "ouresateam@163.com";
+    //var smtpTransport = nodemailer.createTransport('smtps://ouresateam%40163.com:ouresa777@smtp.163.com');
+
+    var from = "leochen.shanghai@gmail.com";
+    var smtpTransport = nodemailer.createTransport('smtps://leochen.shanghai%40gmail.com:Bobo16188@smtp.gmail.com');
 
     app.get("/testemail",function(req,res){
 
@@ -1584,7 +1588,7 @@ aclHandler.registerWait(function(acl){
         //var smtpTransport = nodemailer.createTransport('smtp://ouresateam%40sina.com:ouresa666@smtp.sina.com');
 
         var mailOptions = {
-            from: "ouresateam@163.com",
+            from: from,
             to: "leochen.shanghai@qq.com",
             subject: "Account Verified Code",
             text: "Your Ouresa account verified code is 23457867885. Please input it into register form."
@@ -1611,7 +1615,7 @@ aclHandler.registerWait(function(acl){
         if(email){
             Admin.generateVerifiedCode(email,function(err,msg){
                 var mailOptions = {
-                    from: "ouresateam@163.com",
+                    from: from,
                     to: email,
                     subject: "Account Verified Code",
                     text: "Your Ouresa account verified code is "+msg+". Please input it into register form."
