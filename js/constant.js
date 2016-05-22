@@ -83,10 +83,10 @@ export var Constant = {
     PLATFORMTYPE_IOS:"ios",
     PLATFORMTYPE_WEB:"web",
 
-    BASE_FULL:"http://54.75.231.96/si/public/#/",
-    BASE_URL:"/si/",
-    BASE_IMAGEURL:"/si/uploads/"
-    //BASE_FULL:"http://localhost:8080/public/#/",
-    //BASE_URL:"/",
-    //BASE_IMAGEURL:"/uploads/"
+    //BASE_FULL:"http://54.75.231.96/si/public/#/",
+    //BASE_URL:"/si/",
+    //BASE_IMAGEURL:"/si/uploads/"
+    BASE_FULL:"http://localhost:8080/public/#/",
+    BASE_URL:"/",
+    BASE_IMAGEURL:"/uploads/"
 };

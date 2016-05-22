@@ -4,6 +4,7 @@ var Admin = {};
 var async = require("async")
 var ObjectID=require('mongodb').ObjectID;
 var _ = require("underscore");
+var randomstring = require("randomstring");
 
 module.exports = Admin;
 
@@ -166,6 +167,98 @@ Admin.createOrgAdmin = function(orgid,name,pass,role,callback){
         }
     });
 };
+
+Admin.createOrgAdminWithEmail = function(orgid,name,pass,email,role,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("organization",function(err,collection){
+
+                collection.find({_id:ObjectID(orgid)}).limit(1).next(function(err,org){
+                    if(org){
+                        db.collection("admins",function(err,adcollection){
+                            adcollection.find({name:name}).limit(1).next(function(err,admin){
+                                if(admin){
+                                    mongoPool.release(db);
+                                    callback(err,"nameduplicate");
+                                }
+                                else{
+
+                                    var newadmin = {
+                                        name:name,
+                                        passhash:pass,
+                                        email:email,
+                                        orgid:orgid,
+                                        ctime:new Date(),
+                                        disable:false,
+                                        role:role
+                                    };
+                                    adcollection.insertOne(newadmin,function(err,result){
+                                        mongoPool.release(db);
+                                        callback(err,newadmin,result.insertedId);
+                                    })
+                                }
+                            });
+                        });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"orgnotfound");
+                    }
+                });
+            });
+        }
+    });
+};
+
+Admin.createOrgAdminWithFbid = function(orgid,name,pass,email,fbid,role,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("organization",function(err,collection){
+
+                collection.find({_id:ObjectID(orgid)}).limit(1).next(function(err,org){
+                    if(org){
+                        db.collection("admins",function(err,adcollection){
+                            adcollection.find({name:name}).limit(1).next(function(err,admin){
+                                if(admin){
+                                    mongoPool.release(db);
+                                    callback(err,"nameduplicate");
+                                }
+                                else{
+
+                                    var newadmin = {
+                                        name:name,
+                                        passhash:pass,
+                                        email:email,
+                                        orgid:orgid,
+                                        fbid:fbid,
+                                        ctime:new Date(),
+                                        disable:false,
+                                        role:role
+                                    };
+                                    adcollection.insertOne(newadmin,function(err,result){
+                                        mongoPool.release(db);
+                                        callback(err,newadmin,result.insertedId);
+                                    })
+                                }
+                            });
+                        });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"orgnotfound");
+                    }
+                });
+            });
+        }
+    });
+};
+
 
 Admin.getOrgAdminList = function(orgid,callback){
     mongoPool.acquire(function(err,db){
@@ -477,7 +570,7 @@ Admin.assignSurvey = function(orgid,surveyid,staffid,callback){
                                                     function(err,ures){
                                                         callback(err,ures);
                                                         mongoPool.release(db);
-                                                });
+                                                    });
                                             }
                                         }
                                         else{
@@ -687,15 +780,15 @@ Admin.getSurveyAnswerList = function(surveyid,callback){
                             db.collection("admins",function(err,admincollection){
                                 admincollection.find({_id:ObjectID(item.investigatorid)})
                                     .limit(1).next(function(err,admin){
-                                        if(admin){
-                                            item.investigatorname = admin.name;
-                                        }
-                                        else{
-                                            item.investigatorname = "";
-                                        }
+                                    if(admin){
+                                        item.investigatorname = admin.name;
+                                    }
+                                    else{
+                                        item.investigatorname = "";
+                                    }
 
-                                        cb();
-                                    })
+                                    cb();
+                                })
                             });
                         }
                         else{
@@ -789,9 +882,9 @@ Admin.deleteSadminAd = function(adid,callback){
                 collection.find({_id:ObjectID(adid)}).limit(1).next(function(err,ad){
                     if(ad){
                         collection.deleteOne({_id:ObjectID(adid)},function(err,msg){
-                                mongoPool.release(db);
-                                callback(err,"ok");
-                            });
+                            mongoPool.release(db);
+                            callback(err,"ok");
+                        });
                     }
                     else{
                         mongoPool.release(db);
@@ -799,6 +892,99 @@ Admin.deleteSadminAd = function(adid,callback){
                     }
                 })
             });
+        }
+    });
+};
+
+Admin.generateVerifiedCode = function(email,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("emailverified",function(err,collection){
+                var randStr = randomstring.generate(10);
+
+                collection.find({email:email}).limit(1).next(function(err,vericode){
+                    if(vericode){
+                        collection.updateOne({email:email},{$set:{code:randStr}},function(err,msg){
+                            mongoPool.release(db);
+                            callback(err,randStr);
+                        })
+                    }
+                    else{
+                        var ndb = {
+                            email:email,
+                            code:randStr
+                        };
+                        collection.insertOne(ndb,function(err,insert){
+                            mongoPool.release(db);
+                            callback(err,randStr);
+                        });
+                    }
+                })
+            });
+        }
+    });
+};
+
+Admin.checkVerifiedCode = function(email,verifiedcode,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("emailverified",function(err,collection){
+                collection.find({email:email,code:verifiedcode}).limit(1).next(function(err,vericode){
+                    if(vericode){
+                        mongoPool.release(db);
+                        callback(err,true);
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,false);
+                    }
+                })
+            });
+        }
+    });
+};
+
+Admin.deleteVerifiedCode = function(email,verifiedcode,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("emailverified",function(err,collection){
+                collection.deleteOne({email:email,code:verifiedcode},function(err,msg){
+                    mongoPool.release(db);
+                    callback(err,msg);
+                })
+            });
+        }
+    });
+};
+
+Admin.lookupFacebookId = function(fbid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,adcollection){
+                adcollection.find({fbid:fbid}).limit(1).next(function(err,admin){
+                    if(admin){
+                        mongoPool.release(db);
+                        callback(err,admin);
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                });
+            });
+
         }
     });
 };

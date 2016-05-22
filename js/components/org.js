@@ -149,20 +149,26 @@ export var Org = React.createClass({
 
 
                             <div id="scrollright" className="col-md-12">
-                                <div className="panel panel-default paddingpanel">
-                                    <div className="row">
-                                        <div className="col-md-3">
-                                            Admin List
-                                        </div>
-                                        <div className="col-md-5">
-                                            <a type="button"
-                                               onClick={this.newOrg}
-                                               className="btn btn-primary" disabled="false">
-                                                <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                                                <span>&nbsp;&nbsp;Create Admin</span>
-                                            </a>
+                                <div className="panel panel-default">
+                                    <div className="panel-heading">
+                                        <div className="row">
+                                            <div className="col-md-3">
+                                                Admin List
+                                            </div>
+                                            <div className="col-md-5">
+                                                <a type="button"
+                                                   onClick={this.newOrg}
+                                                   className="btn btn-primary" disabled="false">
+                                                    <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                                    <span>&nbsp;&nbsp;Create Admin</span>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
+                                    <div className="panel-body">
+                                        Panel content
+                                    </div>
+
                                 </div>
                             </div>
                         </div>

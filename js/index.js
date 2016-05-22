@@ -7,6 +7,7 @@ import {personalStore} from './store/personalstore'
 import {Router, Route, IndexRoute, Link, hashHistory,browserHistory } from 'react-router'
 import {App} from "./components/app"
 import {Login} from "./components/login"
+import {Register} from "./components/register"
 import {Home} from "./components/home"
 import {Personal} from "./components/personal"
 import {Newsurvey} from "./components/newsurvey"
@@ -24,6 +25,7 @@ ReactDom.render(
         <Route path='/' component={App}>
             <IndexRoute component={Login}/>
             <Route path="login" component={Login} />
+            <Route path="register" component={Register} />
             <Route path="home" component={Home} />
             <Route path="personal" component={Personal} />
             <Route path="newsurvey" component={Newsurvey} />

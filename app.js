@@ -10,6 +10,7 @@ var multer  = require('multer');
 var upload = multer({ dest: 'uploads/' });
 var XLSX = require('xlsx');
 var  path = require('path');
+var nodemailer= require('nodemailer');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -1573,6 +1574,218 @@ aclHandler.registerWait(function(acl){
 
             res.send(JSON.stringify(successMsg));
         })
+    });
+
+    var smtpTransport = nodemailer.createTransport('smtps://ouresateam%40163.com:ouresa777@smtp.163.com');
+
+    app.get("/testemail",function(req,res){
+
+        //var smtpTransport = nodemailer.createTransport('smtps://leochen.shanghai%40gmail.com:Bobo16188@smtp.gmail.com');
+        //var smtpTransport = nodemailer.createTransport('smtp://ouresateam%40sina.com:ouresa666@smtp.sina.com');
+
+        var mailOptions = {
+            from: "ouresateam@163.com",
+            to: "leochen.shanghai@qq.com",
+            subject: "Account Verified Code",
+            text: "Your Ouresa account verified code is 23457867885. Please input it into register form."
+        }
+        smtpTransport.sendMail(mailOptions, function(error, response){
+            if(error){
+                console.log(error);
+                res.status(500);
+                errorMsg.code = "wrong";
+                res.send(JSON.stringify(errorMsg));
+            }else{
+                console.log("ok");
+                res.status(200);
+                successMsg.body = "ok";
+
+                res.send(JSON.stringify(successMsg));
+            }
+        });
+    });
+
+    app.post("/sendverifiedcode",function(req,res){
+        var email = req.body.email;
+
+        if(email){
+            Admin.generateVerifiedCode(email,function(err,msg){
+                var mailOptions = {
+                    from: "ouresateam@163.com",
+                    to: email,
+                    subject: "Account Verified Code",
+                    text: "Your Ouresa account verified code is "+msg+". Please input it into register form."
+                };
+                smtpTransport.sendMail(mailOptions, function(error, response){
+                    if(error){
+                        console.log(error);
+                        res.status(500);
+                        errorMsg.code = "wrong";
+                        res.send(JSON.stringify(errorMsg));
+                    }else{
+                        console.log("ok");
+                        res.status(200);
+                        successMsg.body = "ok";
+
+                        res.send(JSON.stringify(successMsg));
+                    }
+                });
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.post("/addpersonalfree",function(req,res){
+        var name = req.body.name;
+        var pass = req.body.password;
+        var email = req.body.email;
+        var verifiedcode = req.body.verifiedcode;
+
+        if(name && pass && email && verifiedcode){
+            Admin.checkVerifiedCode(email,verifiedcode,function(err,msg){
+                if(msg){
+                    var orgname = "__personal"+name;
+                    if(orgname){
+                        Admin.createOrganization(orgname,function(err,msg,insertedid){
+                            if(msg == "duplicate"){
+                                res.status(409);
+                                errorMsg.code = "duplicate";
+                                res.send(JSON.stringify(errorMsg));
+                            }
+                            else{
+                                logger.logger.log("info","new organization created",{name:msg.name});
+                                var orgid = insertedid.toString();
+                                Admin.createOrgAdminWithEmail(orgid,name,pass,email,dict.STAFF_PERSONAL,function(err,msg,insertedid){
+                                    if(msg == "nameduplicate"){
+                                        res.status(409);
+                                        errorMsg.code = "name duplicate";
+                                        res.send(JSON.stringify(errorMsg));
+                                    }
+                                    else if(msg == "orgnotfound"){
+                                        res.status(404);
+                                        errorMsg.code = "organization not found";
+                                        res.send(JSON.stringify(errorMsg));
+                                    }
+                                    else{
+                                        logger.logger.log("info","new organization admin created",{name:msg.name});
+
+                                        acl.addUserRoles(msg.name, dict.STAFF_PERSONAL);
+                                        Admin.deleteVerifiedCode(email,verifiedcode,function(err,msg){
+                                            res.status(200);
+                                            successMsg.body = insertedid;
+                                            res.send(JSON.stringify(successMsg));
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }
+                    else{
+                        res.status(406);
+                        errorMsg.code = "wrong";
+                        res.send(JSON.stringify(errorMsg));
+                    }
+                }
+                else{
+                    res.status(404);
+                    errorMsg.code = "notmatched";
+                    res.send(JSON.stringify(errorMsg));
+                }
+            })
+
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.post("/lookupfbid",function(req,res){
+        var fbid = req.body.fbid;
+
+        if(fbid){
+            Admin.lookupFacebookId(fbid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = msg;
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.post("/addfbuser",function(req,res){
+        var name = req.body.fbname;
+        var pass = req.body.fbpass;
+        var email = req.body.fbemail;
+        var fbid = req.body.fbid;
+
+        if(name && pass && email && fbid){
+
+            var orgname = "__personal"+name;
+            if(orgname){
+                Admin.createOrganization(orgname,function(err,msg,insertedid){
+                    if(msg == "duplicate"){
+                        res.status(409);
+                        errorMsg.code = "duplicate";
+                        res.send(JSON.stringify(errorMsg));
+                    }
+                    else{
+                        logger.logger.log("info","new organization created",{name:msg.name});
+                        var orgid = insertedid.toString();
+                        Admin.createOrgAdminWithFbid(orgid,name,pass,email,fbid,dict.STAFF_PERSONAL,function(err,msg,insertedid){
+                            if(msg == "nameduplicate"){
+                                res.status(409);
+                                errorMsg.code = "name duplicate";
+                                res.send(JSON.stringify(errorMsg));
+                            }
+                            else if(msg == "orgnotfound"){
+                                res.status(404);
+                                errorMsg.code = "organization not found";
+                                res.send(JSON.stringify(errorMsg));
+                            }
+                            else{
+                                logger.logger.log("info","new organization admin created",{name:msg.name});
+
+                                acl.addUserRoles(msg.name, dict.STAFF_PERSONAL);
+                                res.status(200);
+                                successMsg.body = {
+                                    id:insertedid,
+                                    role:msg.role
+                                };
+                                res.send(JSON.stringify(successMsg));
+                            }
+                        })
+                    }
+                })
+            }
+            else{
+                res.status(406);
+                errorMsg.code = "wrong";
+                res.send(JSON.stringify(errorMsg));
+            }
+
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
     });
 
 });
