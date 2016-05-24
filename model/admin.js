@@ -988,3 +988,27 @@ Admin.lookupFacebookId = function(fbid,callback){
         }
     });
 };
+
+Admin.deleteAnswer = function(answerid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("answers",function(err,collection){
+                collection.find({_id:ObjectID(answerid)}).limit(1).next(function(err,answer){
+                    if(answer){
+                        collection.deleteOne({_id:ObjectID(answerid)},function(err,msg){
+                            mongoPool.release(db);
+                            callback(err,msg);
+                        })
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+};

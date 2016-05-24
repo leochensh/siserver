@@ -221,7 +221,37 @@ export var Stastic = React.createClass({
         };
         return infunc;
     },
-    componentDidMount (){
+    deleteAnswer(index){
+        var that  = this;
+        var infunc = function(){
+            var aid = that.state.answerlist[index]._id;
+            $("#ajaxloading").show();
+            $.ajax({
+                url: Constant.BASE_URL+"admin/survey/answer/delete",
+                data: $.param({
+                    answerid:aid
+                }),
+                type: 'DELETE',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    var msg = JSON.parse(data);
+                    $("#ajaxloading").hide();
+                    that.fetchAndRefresh();
+
+                },
+                error:function(){
+                    $("#ajaxloading").hide();
+                },
+                statusCode:{
+                    404:function(){
+
+                    }
+                }
+            });
+        };
+        return infunc;
+    },
+    fetchAndRefresh(){
         $("#ajaxloading").show();
         var that = this;
         async.series([function(cb){
@@ -267,6 +297,9 @@ export var Stastic = React.createClass({
         }],function(err){
             $("#ajaxloading").hide();
         });
+    },
+    componentDidMount (){
+        this.fetchAndRefresh();
 
     },
     render(){
@@ -463,7 +496,13 @@ export var Stastic = React.createClass({
                             <a
                                 type="button"
                                 onClick={this.viewdetail(i)}
-                                className="btn btn-danger">View</a>
+                                className="btn btn-info">View</a>
+
+
+                            <a
+                                type="button"
+                                onClick={this.deleteAnswer(i)}
+                                className="btn btn-danger">Delete</a>
                         </div>
                     </td>
 

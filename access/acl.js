@@ -29,7 +29,7 @@ mongoPool.acquire(function(err, db){
                 {resources:'/admin/staff/add',permissions:'post'},
                 {resources:'/admin/staff/resetpass',permissions:'put'},
                 {resources:'/admin/staff/delete',permissions:'delete'},
-                {resources:'/admin/survey',permissions:['put','get']},
+                {resources:'/admin/survey',permissions:['put','get','delete']},
                 {resources:'/admin/version',permissions:['post']},
                 {resources:'/admin/ad',permissions:['post']},
                 {resources:'/admin/exportxlsx',permissions:['post']}

@@ -1054,6 +1054,29 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+    app.delete("/admin/survey/answer/delete",acl.middleware(2),function(req,res){
+        var answerid = req.body.answerid;
+        if(answerid && ObjectID.isValid(answerid)){
+            Admin.deleteAnswer(answerid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = "ok";
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
     app.post("/investigator/survey/answer/add",acl.middleware(2),function(req,res){
         var surveyid = req.body.surveyid;
         var investigatorid = req.session.uid;
