@@ -300,6 +300,30 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+    app.delete("/sadmin/org/admin/delete",acl.middleware(1),function(req,res){
+        var adminid = req.body.adminid;
+
+        if(adminid && ObjectID.isValid(adminid)){
+            Admin.deleteAdmin(adminid,function(err,msg){
+                if(msg == "orgnotfound"){
+                    res.status(404);
+                    errorMsg.code = "admin not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = "ok";
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
     app.post("/sadmin/personal/add",acl.middleware(1),function(req,res){
         var name = req.body.name;
         var pass = req.body.password;
@@ -356,6 +380,15 @@ aclHandler.registerWait(function(acl){
 
     app.get("/sadmin/personal/list",acl.middleware(1),function(req,res){
         Admin.getPersonalList(function(err,msg){
+            res.status(200);
+            successMsg.body = msg;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
+    app.get("/admin/staff/list",acl.middleware(2),function(req,res){
+        var orgid = req.session.orgid;
+        Admin.getOrgStaffList(orgid,function(err,msg){
             res.status(200);
             successMsg.body = msg;
             res.send(JSON.stringify(successMsg));
@@ -1239,12 +1272,8 @@ aclHandler.registerWait(function(acl){
                 res.send("filename error")
             }
             else{
-
                 successMsg.body = req.file.filename;
-
                 res.send(JSON.stringify(successMsg));
-
-
             }
         });
 

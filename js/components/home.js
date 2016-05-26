@@ -37,6 +37,9 @@ export var Home = React.createClass({
             personalDisable = "";
             adsDisable = "";
         }
+        else if(loginInfo.role == "admin"){
+            personalDisable = "";
+        }
         else if(loginInfo.role == "personal"){
             newsurveyDisable = "";
             surveyManageDisable = "";

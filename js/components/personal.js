@@ -83,23 +83,53 @@ export var Personal = React.createClass({
     },
     getPList(){
         var that = this;
-        $.ajax({
-            url: Constant.BASE_URL+"sadmin/personal/list",
+        if(this.props.loginInfo.role == "sadmin"){
+            $.ajax({
+                url: Constant.BASE_URL+"sadmin/personal/list",
 
-            type: 'GET',
-            success: function (data) {
-                $("#ajaxloading").hide();
-                var msg = JSON.parse(data);
-                SisDispatcher.dispatch({
-                    actionType: Constant.GETPERSONAL_LIST,
-                    plist:msg.body
-                });
+                type: 'GET',
+                success: function (data) {
+                    $("#ajaxloading").hide();
+                    var msg = JSON.parse(data);
+                    SisDispatcher.dispatch({
+                        actionType: Constant.GETPERSONAL_LIST,
+                        plist:msg.body
+                    });
 
-            },
-            error:function(){
-                $("#ajaxloading").hide();
-            }
-        });
+                },
+                error:function(){
+                    $("#ajaxloading").hide();
+                }
+            });
+        }
+        else if(this.props.loginInfo.role == "admin"){
+            $.ajax({
+                url: Constant.BASE_URL+"admin/staff/list",
+
+                type: 'GET',
+                success: function (data) {
+                    $("#ajaxloading").hide();
+                    var msg = JSON.parse(data);
+                    SisDispatcher.dispatch({
+                        actionType: Constant.GETPERSONAL_LIST,
+                        plist:msg.body
+                    });
+
+                },
+                error:function(){
+                    $("#ajaxloading").hide();
+                },
+                statusCode:{
+
+                    500:function(){
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500
+                        });
+                    }
+                }
+            });
+        }
+
     },
     componentDidMount(){
         this.getPList();
@@ -180,22 +210,25 @@ export var Personal = React.createClass({
             notequalpassstyle = {}
         }
         return (
-            <div >
-                <div className="row">
-                    <div className="col-md-3 col-md-offset-1">
-                        <h3 className="title"> Personal Users List </h3>
+            <div className="panel panel-default">
+                <div className="panel-heading">
+                    <div className="row">
+                        <div className="col-md-3 col-md-offset-1">
+                            <h3 className="title"> Personal Users List </h3>
+
+                        </div>
+                        <div className="col-md-3">
+                            <a type="button" className="btn btn-lg btn-primary"
+                               style={{marginTop:"20px"}}
+                               onClick={this.addNewPerson}
+                            >Create</a>
+                        </div>
+
 
                     </div>
-                    <div className="col-md-3">
-                        <a type="button" className="btn btn-lg btn-primary"
-                                style={{marginTop:"20px"}}
-                                onClick={this.addNewPerson}
-                        >Create</a>
-                    </div>
-
-
                 </div>
-                <div className="panel panel-default paddingpanel">
+
+                <div className="panel-body">
                     <table  className="table" >
                         <thead>
                         <tr>

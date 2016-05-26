@@ -58,24 +58,28 @@ class OrgStore extends Store{
         }
         else if(payload.actionType == Constant.CHANGEACTIVEORG){
             orgData.activeorgindex = payload.index;
-            this.__emitChange();
+            setTimeout(function(){
+                SisDispatcher.dispatch({
+                    actionType: Constant.GETORGADMINLIST
+                });
+            },100);
+
         }
-        else if(payload.actionType == Constant.DELETEORGNIZATION){
+        else if(payload.actionType == Constant.DELETEORGADMIN){
             var index = payload.index;
             $("#ajaxloading").hide();
             $.ajax({
-                url: Constant.BASE_URL+"sadmin/ad/delete",
+                url: Constant.BASE_URL+"sadmin/org/admin/delete",
                 data: $.param({
-                    id:adList[index]._id
+                    adminid:orgData.adminlist[index]._id
                 }),
                 type: 'DELETE',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function (data) {
                     $("#ajaxloading").hide();
                     var msg = JSON.parse(data);
-                    adList.splice(index,1);
                     SisDispatcher.dispatch({
-                        actionType: Constant.FORCEADLISTREFRESH
+                        actionType: Constant.GETORGADMINLIST
                     });
                 },
                 error:function(jxr,scode){
@@ -101,7 +105,7 @@ class OrgStore extends Store{
                 var that = this;
                 $("#ajaxloading").show();
                 $.ajax({
-                    url: Constant.BASE_URL+"sadmin/org/admin/list/"+orgList[0]._id,
+                    url: Constant.BASE_URL+"sadmin/org/admin/list/"+orgList[orgData.activeorgindex]._id,
 
                     type: 'GET',
                     success: function (data) {

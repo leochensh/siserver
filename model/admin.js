@@ -271,7 +271,7 @@ Admin.getOrgAdminList = function(orgid,callback){
                 collection.find({_id:ObjectID(orgid)}).limit(1).next(function(err,org){
                     if(org){
                         db.collection("admins",function(err,adcollection){
-                            adcollection.find({orgid:orgid,disable:false}).toArray(function(err,admins){
+                            adcollection.find({orgid:orgid,role:"admin",disable:false}).toArray(function(err,admins){
                                 mongoPool.release(db);
                                 callback(err,admins);
                             })
@@ -284,6 +284,33 @@ Admin.getOrgAdminList = function(orgid,callback){
                 });
             });
         }
+    });
+};
+
+Admin.deleteAdmin = function(adminid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,collection){
+                collection.find({_id:ObjectID(adminid)}).limit(1).next(function(err,admin){
+                    if(admin){
+                        collection.updateOne({_id:ObjectID(adminid)},
+                            {$set:{disable:true}},
+                            function(err,msg){
+                                mongoPool.release(db);
+                                callback(err,msg);
+                            })
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+
     });
 };
 
@@ -321,6 +348,29 @@ Admin.getPersonalList = function(callback){
             db.collection("admins",function(err,collection){
 
                 collection.find({role:dict.STAFF_PERSONAL}).sort({ctime:-1}).toArray(function(err,admins){
+                    if(admins){
+                        mongoPool.release(db);
+                        callback(err,admins);
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,[]);
+                    }
+                });
+            });
+        }
+    });
+}
+
+Admin.getOrgStaffList = function(orgid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,collection){
+
+                collection.find({role:dict.STAFF_ORG,orgid:orgid}).sort({ctime:-1}).toArray(function(err,admins){
                     if(admins){
                         mongoPool.release(db);
                         callback(err,admins);

@@ -68,15 +68,33 @@ export var Stastic = React.createClass({
             var currentA = this.state.answerlist[aindex];
             var calist = currentA.answerlist;
             var dstring = ""
-            if(currentA.begintime){
-                var nd=new Date(currentA.begintime);
+
+            var country = "";
+            var customer = "";
+            var male = "";
+            var female = "";
+
+            var aNameList = currentA.name.split("_");
+            if(aNameList[2]){
+                var nd=new Date(aNameList[2]);
                 var year = nd.getFullYear();
                 var month = nd.getMonth()+1;
                 var date = nd.getDate();
                 dstring = year+"/"+month+"/"+date;
             }
+            country = aNameList[3]?aNameList[3]:"";
+            customer = aNameList[5]?aNameList[5]:"";
+            if(aNameList[6]){
+                if(aNameList[6] == "male"){
+                    male = "1";
+                }
+                else if(aNameList[6] == "female"){
+                    female = "1";
+                }
+            }
+
             firstQ = [(parseInt(aindex)+1),currentA.investigatorname?currentA.investigatorname:"",
-                dstring,"","","",""];
+                dstring,country,customer,male,female];
 
 
             for(var qindex in this.state.survey.questionlist){
@@ -505,7 +523,6 @@ export var Stastic = React.createClass({
                                 className="btn btn-danger">Delete</a>
                         </div>
                     </td>
-
                 </tr>
             )
         }
@@ -526,7 +543,7 @@ export var Stastic = React.createClass({
 
                     </div>
                 </div>
-            )
+            );
             detailModal.push(
                 <div className="row">
                     <div className="col-md-4">
@@ -541,7 +558,7 @@ export var Stastic = React.createClass({
 
                     </div>
                 </div>
-            )
+            );
             detailModal.push(
                 <div className="row">
                     <div className="col-md-4">
@@ -556,7 +573,7 @@ export var Stastic = React.createClass({
 
                     </div>
                 </div>
-            )
+            );
             detailModal.push(
                 <div className="row">
                     <div className="col-md-4">
@@ -571,7 +588,7 @@ export var Stastic = React.createClass({
 
                     </div>
                 </div>
-            )
+            );
             detailModal.push(
                 <div className="row">
                     <div className="col-md-4">
@@ -586,7 +603,7 @@ export var Stastic = React.createClass({
 
                     </div>
                 </div>
-            )
+            );
             for(var i in ca.answerlist){
                 var q = ca.answerlist[i];
                 var qid = q.questionid;
@@ -618,8 +635,6 @@ export var Stastic = React.createClass({
                                         <span className="grey">{parseInt(sindex)+1}</span>
                                         {stitle}
                                     </p>
-
-
                                 </div>
 
                             )

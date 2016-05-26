@@ -32,7 +32,8 @@ mongoPool.acquire(function(err, db){
                 {resources:'/admin/survey',permissions:['put','get','delete']},
                 {resources:'/admin/version',permissions:['post']},
                 {resources:'/admin/ad',permissions:['post']},
-                {resources:'/admin/exportxlsx',permissions:['post']}
+                {resources:'/admin/exportxlsx',permissions:['post']},
+                {resources:'/admin/staff',permissions:["get","post","put","delete"]}
             ]
         },
         {
