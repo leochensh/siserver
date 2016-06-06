@@ -24,7 +24,7 @@ export var Stastic = React.createClass({
         $("#ajaxloading").show();
         var qout = [];
         var firstQ = [ "No.","Interviewer","Visit Date",
-            "Country","Customer","Male","Female"];
+                       "Country","City","Customer","Male","Female"];
 
         for(var qindex in this.state.survey.questionlist){
             var q = this.state.survey.questionlist[qindex];
@@ -70,6 +70,7 @@ export var Stastic = React.createClass({
             var dstring = ""
 
             var country = "";
+            var city = "";
             var customer = "";
             var male = "";
             var female = "";
@@ -83,6 +84,7 @@ export var Stastic = React.createClass({
                 dstring = year+"/"+month+"/"+date;
             }
             country = aNameList[3]?aNameList[3]:"";
+            city = aNameList[4]?aNameList[4]:"";
             customer = aNameList[5]?aNameList[5]:"";
             if(aNameList[6]){
                 if(aNameList[6] == "male"){
@@ -94,7 +96,7 @@ export var Stastic = React.createClass({
             }
 
             firstQ = [(parseInt(aindex)+1),currentA.investigatorname?currentA.investigatorname:"",
-                dstring,country,customer,male,female];
+                      dstring,country,city,customer,male,female];
 
 
             for(var qindex in this.state.survey.questionlist){
@@ -183,6 +185,9 @@ export var Stastic = React.createClass({
                     });
                     if(qfi>=0){
                         firstQ.push(calist[qfi].text?calist[qfi].text:"");
+                    }
+                    else{
+                        firstQ.push("");
                     }
                 }
 
