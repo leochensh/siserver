@@ -1761,6 +1761,64 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+    app.post("/addmobilepersonal",function(req,res){
+        var name = req.body.name;
+        var pass = req.body.password;
+        var email = req.body.email;
+
+        console.log(name);
+        
+        if(name && pass && email){
+            var orgname = "__personal"+name;
+            if(orgname){
+                Admin.createOrganization(orgname,function(err,msg,insertedid){
+                    if(msg == "duplicate"){
+                        res.status(409);
+                        errorMsg.code = "duplicate";
+                        res.send(JSON.stringify(errorMsg));
+                    }
+                    else{
+                        logger.logger.log("info","new organization created",{name:msg.name});
+                        var orgid = insertedid.toString();
+                        Admin.createOrgAdminWithEmail(orgid,name,pass,email,dict.STAFF_PERSONAL,function(err,msg,insertedid){
+                            if(msg == "nameduplicate"){
+                                res.status(409);
+                                errorMsg.code = "name duplicate";
+                                res.send(JSON.stringify(errorMsg));
+                            }
+                            else if(msg == "orgnotfound"){
+                                res.status(404);
+                                errorMsg.code = "organization not found";
+                                res.send(JSON.stringify(errorMsg));
+                            }
+                            else{
+                                logger.logger.log("info","new organization admin created",{name:msg.name});
+
+                                acl.addUserRoles(msg.name, dict.STAFF_PERSONAL);
+                                res.status(200);
+                                successMsg.body = insertedid;
+                                res.send(JSON.stringify(successMsg));
+
+                            }
+                        })
+                    }
+                })
+            }
+            else{
+                res.status(406);
+                errorMsg.code = "wrong";
+                res.send(JSON.stringify(errorMsg));
+            }
+
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+
     app.post("/lookupfbid",function(req,res){
         var fbid = req.body.fbid;
 
