@@ -15,36 +15,71 @@ class EditSurveyList extends Store{
         if(payload.actionType == Constant.GETSURVEYEDITLIST){
             var that = this;
             $("#ajaxloading").show();
-            $.ajax({
-                url: Constant.BASE_URL+"editor/survey/list",
+            if(payload.role == "admin"){
+                $.ajax({
+                    url: Constant.BASE_URL+"admin/survey/list",
 
-                type: 'GET',
-                success: function (data) {
-                    //alert(data);
-                    $("#ajaxloading").hide();
-                    var msg = JSON.parse(data).body;
-                    editSurveyList = msg;
-                    SisDispatcher.dispatch({
-                        actionType: Constant.FORCEEDITORSURVEYCHANGE,
-                    });
-                },
-                error:function(){
-                    $("#ajaxloading").hide();
-                },
-                statusCode:{
-                    406:function(){
-
-                    },
-                    500:function(){
+                    type: 'GET',
+                    success: function (data) {
+                        //alert(data);
+                        $("#ajaxloading").hide();
+                        var msg = JSON.parse(data).body;
+                        editSurveyList = msg;
                         SisDispatcher.dispatch({
-                            actionType: Constant.ERROR500
+                            actionType: Constant.FORCEEDITORSURVEYCHANGE,
                         });
                     },
-                    409:function(){
+                    error:function(){
+                        $("#ajaxloading").hide();
+                    },
+                    statusCode:{
+                        406:function(){
 
+                        },
+                        500:function(){
+                            SisDispatcher.dispatch({
+                                actionType: Constant.ERROR500
+                            });
+                        },
+                        409:function(){
+
+                        }
                     }
-                }
-            });
+                });
+            }
+            else{
+                $.ajax({
+                    url: Constant.BASE_URL+"editor/survey/list",
+
+                    type: 'GET',
+                    success: function (data) {
+                        //alert(data);
+                        $("#ajaxloading").hide();
+                        var msg = JSON.parse(data).body;
+                        editSurveyList = msg;
+                        SisDispatcher.dispatch({
+                            actionType: Constant.FORCEEDITORSURVEYCHANGE,
+                        });
+                    },
+                    error:function(){
+                        $("#ajaxloading").hide();
+                    },
+                    statusCode:{
+                        406:function(){
+
+                        },
+                        500:function(){
+                            SisDispatcher.dispatch({
+                                actionType: Constant.ERROR500
+                            });
+                        },
+                        409:function(){
+
+                        }
+                    }
+                });
+            }
+
         }
         else if(payload.actionType == Constant.FORCEEDITORSURVEYCHANGE){
             this.__emitChange();

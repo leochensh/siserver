@@ -13,7 +13,25 @@ export var Newsurvey = React.createClass({
             ifSaved:false,
             surveyid:null,
             ifSurveyNameEmpty:false,
-            qlist:[]
+            qlist:[],
+            publishToPrivate:true
+        }
+    },
+    ownChecked(event){
+        if(event.target.checked){
+            this.setState({
+                publishToPrivate:true
+            })
+        }
+    },
+    contextTypes: {
+        router: React.PropTypes.object.isRequired
+    },
+    allChecked(event){
+        if(event.target.checked){
+            this.setState({
+                publishToPrivate:false
+            })
         }
     },
     handleChange(name,event){
@@ -44,94 +62,177 @@ export var Newsurvey = React.createClass({
         $("#cleanall").modal("hide");
     },
     publishsurvey(){
-        if(this.props.newsurvey.surveyid){
+        if(this.props.newsurvey.surveystatus!=Constant.SURVEYSTATUS_NORMAL && this.props.newsurvey.surveyid){
             $("#publishsurvey").modal("show");
         }
-
     },
     confirmpublish(){
 
         var that = this;
         if(this.props.newsurvey.surveyid){
             $("#ajaxloading").show();
-            $.ajax({
-                url: Constant.BASE_URL+"editor/survey/rfp",
-                data: $.param({
-                    surveyid:that.props.newsurvey.surveyid
-                }),
-                type: 'PUT',
-                contentType: 'application/x-www-form-urlencoded',
-                success: function (data) {
+            if(this.state.publishToPrivate){
+                $.ajax({
+                    url: Constant.BASE_URL+"admin/survey/publishtoown",
+                    data: $.param({
+                        surveyid:that.props.newsurvey.surveyid
+                    }),
+                    type: 'POST',
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function (data) {
 
-                    $.ajax({
-                        url: Constant.BASE_URL+"admin/survey/audit",
-                        data: $.param({
-                            surveyid:that.props.newsurvey.surveyid,
-                            status:"surveynormal"
-                        }),
-                        type: 'PUT',
-                        contentType: 'application/x-www-form-urlencoded',
-                        success: function (data) {
-                            $.ajax({
-                                url: Constant.BASE_URL+"admin/survey/assign",
-                                data: $.param({
-                                    surveyid:that.props.newsurvey.surveyid,
-                                    staffid:that.props.loginInfo.id
-                                }),
-                                type: 'PUT',
-                                contentType: 'application/x-www-form-urlencoded',
-                                success: function (data) {
-                                    $("#ajaxloading").hide();
-                                    $("#publishsurvey").modal("hide");
+                        $("#ajaxloading").hide();
+                        $("#publishsurvey").modal("hide");
 
-                                    SisDispatcher.dispatch({
-                                        actionType: Constant.SURVEYVALUECHANGE,
-                                        name:"surveystatus",
-                                        value:Constant.SURVEYSTATUS_NORMAL
-                                    });
+                        SisDispatcher.dispatch({
+                            actionType: Constant.SURVEYVALUECHANGE,
+                            name:"surveystatus",
+                            value:Constant.SURVEYSTATUS_NORMAL
+                        });
 
-                                },
-                                error:function(jxr,scode){
-                                    $("#ajaxloading").hide();
-                                },
-                                statusCode:{
-                                    406:function(){
-                                    },
-                                    500:function(){
-                                        that.context.router.push("/login");
-                                    },
-                                    409:function(){
-                                    }
-                                }
-                            });
+                        setTimeout(function(){
+                            that.confirmclean();
+                            setTimeout(function(){
+                                that.context.router.push("/surveylist");
+                            },1000)
+                        },200);
+
+
+                    },
+                    error:function(jxr,scode){
+                        $("#ajaxloading").hide();
+                    },
+                    statusCode:{
+                        406:function(){
                         },
-                        error:function(jxr,scode){
-                            $("#ajaxloading").hide();
+                        500:function(){
+                            that.context.router.push("/login");
                         },
-                        statusCode:{
-                            406:function(){
-                            },
-                            500:function(){
-                                that.context.router.push("/login");
-                            },
-                            409:function(){
-                            }
+                        409:function(){
                         }
-                    });
-                },
-                error:function(jxr,scode){
-                    $("#ajaxloading").hide();
-                },
-                statusCode:{
-                    406:function(){
-                    },
-                    500:function(){
-                        that.context.router.push("/login");
-                    },
-                    409:function(){
                     }
-                }
-            });
+                });
+            }
+            else{
+                $.ajax({
+                    url: Constant.BASE_URL+"admin/survey/publishtoall",
+                    data: $.param({
+                        surveyid:that.props.newsurvey.surveyid
+                    }),
+                    type: 'POST',
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function (data) {
+
+                        $("#ajaxloading").hide();
+                        $("#publishsurvey").modal("hide");
+
+                        SisDispatcher.dispatch({
+                            actionType: Constant.SURVEYVALUECHANGE,
+                            name:"surveystatus",
+                            value:Constant.SURVEYSTATUS_NORMAL
+                        });
+                        setTimeout(function(){
+                            that.confirmclean();
+                            setTimeout(function(){
+                                that.context.router.push("/surveylist");
+                            },1000)
+                        },200);
+
+                    },
+                    error:function(jxr,scode){
+                        $("#ajaxloading").hide();
+                    },
+                    statusCode:{
+                        406:function(){
+                        },
+                        500:function(){
+                            that.context.router.push("/login");
+                        },
+                        409:function(){
+                        }
+                    }
+                });
+            }
+
+
+            //$.ajax({
+            //    url: Constant.BASE_URL+"editor/survey/rfp",
+            //    data: $.param({
+            //        surveyid:that.props.newsurvey.surveyid
+            //    }),
+            //    type: 'PUT',
+            //    contentType: 'application/x-www-form-urlencoded',
+            //    success: function (data) {
+            //
+            //        $.ajax({
+            //            url: Constant.BASE_URL+"admin/survey/audit",
+            //            data: $.param({
+            //                surveyid:that.props.newsurvey.surveyid,
+            //                status:"surveynormal"
+            //            }),
+            //            type: 'PUT',
+            //            contentType: 'application/x-www-form-urlencoded',
+            //            success: function (data) {
+            //                $.ajax({
+            //                    url: Constant.BASE_URL+"admin/survey/assign",
+            //                    data: $.param({
+            //                        surveyid:that.props.newsurvey.surveyid,
+            //                        staffid:that.props.loginInfo.id
+            //                    }),
+            //                    type: 'PUT',
+            //                    contentType: 'application/x-www-form-urlencoded',
+            //                    success: function (data) {
+            //                        $("#ajaxloading").hide();
+            //                        $("#publishsurvey").modal("hide");
+            //
+            //                        SisDispatcher.dispatch({
+            //                            actionType: Constant.SURVEYVALUECHANGE,
+            //                            name:"surveystatus",
+            //                            value:Constant.SURVEYSTATUS_NORMAL
+            //                        });
+            //
+            //                    },
+            //                    error:function(jxr,scode){
+            //                        $("#ajaxloading").hide();
+            //                    },
+            //                    statusCode:{
+            //                        406:function(){
+            //                        },
+            //                        500:function(){
+            //                            that.context.router.push("/login");
+            //                        },
+            //                        409:function(){
+            //                        }
+            //                    }
+            //                });
+            //            },
+            //            error:function(jxr,scode){
+            //                $("#ajaxloading").hide();
+            //            },
+            //            statusCode:{
+            //                406:function(){
+            //                },
+            //                500:function(){
+            //                    that.context.router.push("/login");
+            //                },
+            //                409:function(){
+            //                }
+            //            }
+            //        });
+            //    },
+            //    error:function(jxr,scode){
+            //        $("#ajaxloading").hide();
+            //    },
+            //    statusCode:{
+            //        406:function(){
+            //        },
+            //        500:function(){
+            //            that.context.router.push("/login");
+            //        },
+            //        409:function(){
+            //        }
+            //    }
+            //});
         }
 
     },
@@ -419,8 +520,10 @@ export var Newsurvey = React.createClass({
             color:"red",
             fontSize:"10px"
         };
+        var ifDisablePublish = "";
         if(this.props.newsurvey.surveystatus==Constant.SURVEYSTATUS_NORMAL){
-            surveyStatusTxt = "Published"
+            surveyStatusTxt = "Published";
+            ifDisablePublish = "disabled";
             surveyStatusClassStyle = {
                 color:"blue",
                 fontSize:"10px"
@@ -502,6 +605,7 @@ export var Newsurvey = React.createClass({
                                             </a>
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             <a type="button"
+                                                    disabled={ifDisablePublish}
                                                     onClick={this.publishsurvey}
                                                     className="btn btn-primary">
                                                 <span className="glyphicon glyphicon-check" aria-hidden="true"></span>
@@ -561,9 +665,22 @@ export var Newsurvey = React.createClass({
                                 <h4 className="modal-title" >Publish Survey</h4>
                             </div>
                             <div className="modal-body">
-                                <h3>
-                                    Make sure you already save all data before publish.
-                                </h3>
+                                <div className="radio">
+                                    <label>
+                                        <input type="radio"
+                                               onChange={this.ownChecked}
+                                               name="optionsRadios" checked={this.state.publishToPrivate}/>
+                                            Publish this survey to own.
+                                    </label>
+                                </div>
+                                <div className="radio">
+                                    <label>
+                                        <input type="radio"
+                                               onChange={this.allChecked}
+                                               name="optionsRadios" checked={!this.state.publishToPrivate}/>
+                                            Publish this survey to all users.
+                                    </label>
+                                </div>
 
                             </div>
                             <div className="modal-footer">

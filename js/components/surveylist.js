@@ -22,6 +22,7 @@ export var Surveylist = React.createClass({
     getSurveyList(){
         SisDispatcher.dispatch({
             actionType: Constant.GETSURVEYEDITLIST,
+            role:this.props.loginInfo.role
         });
     },
     deleteButtonClick(index){
@@ -75,11 +76,16 @@ export var Surveylist = React.createClass({
         var selist = this.props.surveyeditlist;
         for(var i in selist){
             var stext = Constant.SURVEYSTATUSMAP[selist[i].status];
+            var pdate = "";
+            if(selist[i].publishtime){
+                pdate = new Date(selist[i].publishtime).toLocaleString();
+            }
             mlist.push(
                 <tr key={"slist"+i}>
                     <td>{i}</td>
                     <td>{selist[i].name}</td>
                     <td>{new Date(selist[i].ctime).toLocaleString()}</td>
+                    <td>{pdate}</td>
                     <td>{ stext }</td>
                     <td className="list_btn">
                         <div className="btn-group" role="group" >
@@ -115,6 +121,7 @@ export var Surveylist = React.createClass({
                             <th><span className="">##</span></th>
                             <th><span className="">Survey Name</span></th>
                             <th><span className="">Create Time</span></th>
+                            <th><span className="">Publish Time</span></th>
                             <th><span className="">Status</span></th>
                             <th><span className="">Operations</span></th>
                         </tr>

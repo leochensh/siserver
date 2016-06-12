@@ -39,42 +39,84 @@ export var Personal = React.createClass({
             hash.update(this.state.password);
             $("#ajaxloading").show();
             var that = this;
-            $.ajax({
-                url: Constant.BASE_URL+"sadmin/personal/add",
-                data: $.param({
-                    name:that.state.username,
-                    password:hash.digest("hex")
-                }),
-                type: 'POST',
-                contentType: 'application/x-www-form-urlencoded',
-                success: function (data) {
-                    $("#newpersonal").modal("hide");
-                    $("#ajaxloading").hide();
-                    var msg = JSON.parse(data);
-                    //SisDispatcher.dispatch({
-                    //    actionType: Constant.ADDNEWPERSON
-                    //});
-                    that.getPList();
+            if(this.props.loginInfo.role == "sadmin"){
+                $.ajax({
+                    url: Constant.BASE_URL+"sadmin/personal/add",
+                    data: $.param({
+                        name:that.state.username,
+                        password:hash.digest("hex")
+                    }),
+                    type: 'POST',
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function (data) {
+                        $("#newpersonal").modal("hide");
+                        $("#ajaxloading").hide();
+                        var msg = JSON.parse(data);
+                        //SisDispatcher.dispatch({
+                        //    actionType: Constant.ADDNEWPERSON
+                        //});
+                        that.getPList();
 
-
-                },
-                error:function(jxr,scode){
-                    $("#ajaxloading").hide();
-                },
-                statusCode:{
-                    406:function(){
 
                     },
-                    500:function(){
-                        that.context.router.push("/login");
+                    error:function(jxr,scode){
+                        $("#ajaxloading").hide();
                     },
-                    409:function(){
-                        that.setState({
-                            ifduplicate:true
-                        })
+                    statusCode:{
+                        406:function(){
+
+                        },
+                        500:function(){
+                            that.context.router.push("/login");
+                        },
+                        409:function(){
+                            that.setState({
+                                ifduplicate:true
+                            })
+                        }
                     }
-                }
-            });
+                });
+            }
+            else if(this.props.loginInfo.role == "admin"){
+                $.ajax({
+                    url: Constant.BASE_URL+"admin/staff/add",
+                    data: $.param({
+                        name:that.state.username,
+                        password:hash.digest("hex"),
+                        role:Constant.STAFF_ORG
+                    }),
+                    type: 'POST',
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function (data) {
+                        $("#newpersonal").modal("hide");
+                        $("#ajaxloading").hide();
+                        var msg = JSON.parse(data);
+                        //SisDispatcher.dispatch({
+                        //    actionType: Constant.ADDNEWPERSON
+                        //});
+                        that.getPList();
+
+
+                    },
+                    error:function(jxr,scode){
+                        $("#ajaxloading").hide();
+                    },
+                    statusCode:{
+                        406:function(){
+
+                        },
+                        500:function(){
+                            that.context.router.push("/login");
+                        },
+                        409:function(){
+                            that.setState({
+                                ifduplicate:true
+                            })
+                        }
+                    }
+                });
+            }
+
         }
 
     },
@@ -83,52 +125,10 @@ export var Personal = React.createClass({
     },
     getPList(){
         var that = this;
-        if(this.props.loginInfo.role == "sadmin"){
-            $.ajax({
-                url: Constant.BASE_URL+"sadmin/personal/list",
-
-                type: 'GET',
-                success: function (data) {
-                    $("#ajaxloading").hide();
-                    var msg = JSON.parse(data);
-                    SisDispatcher.dispatch({
-                        actionType: Constant.GETPERSONAL_LIST,
-                        plist:msg.body
-                    });
-
-                },
-                error:function(){
-                    $("#ajaxloading").hide();
-                }
-            });
-        }
-        else if(this.props.loginInfo.role == "admin"){
-            $.ajax({
-                url: Constant.BASE_URL+"admin/staff/list",
-
-                type: 'GET',
-                success: function (data) {
-                    $("#ajaxloading").hide();
-                    var msg = JSON.parse(data);
-                    SisDispatcher.dispatch({
-                        actionType: Constant.GETPERSONAL_LIST,
-                        plist:msg.body
-                    });
-
-                },
-                error:function(){
-                    $("#ajaxloading").hide();
-                },
-                statusCode:{
-
-                    500:function(){
-                        SisDispatcher.dispatch({
-                            actionType: Constant.ERROR500
-                        });
-                    }
-                }
-            });
-        }
+        SisDispatcher.dispatch({
+            actionType: Constant.GETPERSONAL_LIST,
+            role:this.props.loginInfo.role
+        });
 
     },
     componentDidMount(){
@@ -214,7 +214,7 @@ export var Personal = React.createClass({
                 <div className="panel-heading">
                     <div className="row">
                         <div className="col-md-3 col-md-offset-1">
-                            <h3 className="title"> Personal Users List </h3>
+                            <h3 className="title"> Staffs List </h3>
 
                         </div>
                         <div className="col-md-3">

@@ -110,6 +110,24 @@ Staff.getEditorSurveyList = function(editorid,callback){
     });
 };
 
+Staff.getAdminSurveyList = function(orgid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+
+                collection.find({orgid:orgid},{orgid:0,questionlist:0,editorid:0})
+                    .sort({ctime:-1}).toArray(function(err,surveys){
+                    mongoPool.release(db);
+                    callback(err,surveys);
+                });
+            });
+        }
+    });
+};
+
 Staff.editSurvey = function(name,surveyid,callback){
     mongoPool.acquire(function(err,db){
         if(err){

@@ -12,6 +12,9 @@ var XLSX = require('xlsx');
 var  path = require('path');
 var nodemailer= require('nodemailer');
 
+var mime = require('mime');
+
+
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/')
@@ -151,6 +154,7 @@ app.post("/admin/login",function(req,res){
                     req.session.orgid = msg.orgid;
                 }
                 req.session.uid = msg._id;
+                req.session.role = msg.role;
                 logger.logger.log("info","admin log in",{name:msg.name});
                 res.send(JSON.stringify(successMsg));
             }
@@ -186,6 +190,7 @@ app.post("/staff/login",function(req,res){
                 req.session.userId = msg.name;
                 req.session.orgid = msg.orgid;
                 req.session.uid = msg._id;
+                req.session.role = msg.role;
                 logger.logger.log("info","staff log in",{name:msg.name});
                 res.send(JSON.stringify(successMsg));
             }
@@ -200,7 +205,33 @@ app.post("/staff/login",function(req,res){
 
 });
 
+app.get("/firstpagevisit",function(req,res){
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    Admin.firstPageVisit(ip,function(){
+        res.status(200);
+        successMsg.body = "ok";
+        res.send(JSON.stringify(successMsg));
+    })
+});
 
+app.get('/downloadapk', function(req, res){
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+    Admin.apkDownload(ip,function(){
+        var file = __dirname + '/ouresa1.0.9(Test3).apk';
+
+        var filename = path.basename(file);
+        var mimetype = mime.lookup(file);
+
+        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        res.setHeader('Content-type', mimetype);
+
+        var filestream = fs.createReadStream(file);
+        filestream.pipe(res);
+    })
+
+
+});
 
 aclHandler.registerWait(function(acl){
     app.get("/testacl",acl.middleware(),function(req,res){
@@ -563,7 +594,7 @@ aclHandler.registerWait(function(acl){
         var role = req.body.role;
         var pass = req.body.password;
 
-        if(name && (role == dict.STAFF_EDITOR || role == dict.STAFF_INVESTIGATOR) && pass){
+        if(name && (role == dict.STAFF_EDITOR || role == dict.STAFF_INVESTIGATOR || role == dict.STAFF_ORG) && pass){
             Admin.addStaff(req.session.orgid,name,role,pass,function(err,msg,insertid){
                 if(msg == "nameduplicate"){
                     res.status(409);
@@ -804,6 +835,21 @@ aclHandler.registerWait(function(acl){
         });
     });
 
+    app.get("/admin/survey/list",acl.middleware(2),function(req,res){
+        var orgid = req.session.orgid;
+        Staff.getAdminSurveyList(orgid,function(err,ss){
+            if(!ss){
+                ss = [];
+            }
+            logger.logger.log("info","admin get survey list",{
+                editorid:req.session.uid});
+            res.status(200);
+            successMsg.body = ss;
+
+            res.send(JSON.stringify(successMsg));
+        });
+    });
+
     app.delete("/editor/survey/question/delete",acl.middleware(2),function(req,res){
         var qid = req.body.questionid;
 
@@ -990,6 +1036,80 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(errorMsg));
         }
     });
+
+    app.post("/admin/survey/publishtoown",acl.middleware(2),function(req,res){
+        var surveyid = req.body.surveyid;
+        var ownid = req.session.uid;
+        var orgid = req.session.orgid;
+
+        if(surveyid && ObjectID.isValid(surveyid)){
+            Admin.publishSurvey(orgid,surveyid,[ownid],function(err,msg){
+                if(msg == "forbidden"){
+                    res.status(403);
+                    errorMsg.code = "can not operate";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = null;
+                    res.send(JSON.stringify(successMsg));
+                }
+
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.post("/admin/survey/publishtoall",acl.middleware(2),function(req,res){
+        var surveyid = req.body.surveyid;
+        var ownid = req.session.uid;
+        var orgid = req.session.orgid;
+        var broadCastToStaffs = function(orgid,surveyid,staffs){
+            var slist = [];
+            for(var i in staffs){
+                if(!(staffs[i].disable)){
+                    slist.push(staffs[i]._id);
+                }
+            }
+
+            Admin.publishSurvey(orgid,surveyid,slist,function(err,msg){
+                if(msg == "forbidden"){
+                    res.status(403);
+                    errorMsg.code = "can not operate";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = null;
+                    res.send(JSON.stringify(successMsg));
+                }
+
+            })
+        }
+        if(surveyid && ObjectID.isValid(surveyid)){
+            if(req.session.role == dict.STAFF_PERSONAL){
+                Admin.getPersonalList(function(err,staffs){
+                    broadCastToStaffs(orgid,surveyid,staffs);
+                })
+            }
+            else{
+                Admin.getOrgAllUserList(orgid,function(err,staffs){
+                    broadCastToStaffs(orgid,surveyid,staffs);
+                })
+            }
+
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
     app.get("/admin/survey/answer/list/:surveyid",acl.middleware(2),function(req,res){
         var surveyid = req.params.surveyid;
         if(surveyid && ObjectID.isValid(surveyid)){

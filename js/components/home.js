@@ -39,8 +39,14 @@ export var Home = React.createClass({
         }
         else if(loginInfo.role == "admin"){
             personalDisable = "";
+            newsurveyDisable = "";
+            surveyManageDisable = "";
         }
         else if(loginInfo.role == "personal"){
+            newsurveyDisable = "";
+            surveyManageDisable = "";
+        }
+        else if(loginInfo.role == "orgstaff"){
             newsurveyDisable = "";
             surveyManageDisable = "";
         }
@@ -75,7 +81,7 @@ export var Home = React.createClass({
                             </span>
                             </div>
                             <div>
-                                <span>Personal Users</span>
+                                <span>Staffs</span>
                             </div>
                         </div>
                     </button>
@@ -104,7 +110,7 @@ export var Home = React.createClass({
                             </span>
                             </div>
                             <div>
-                                <span>Surveys Management</span>
+                                <span>Surveys</span>
                             </div>
                         </div>
                     </button>

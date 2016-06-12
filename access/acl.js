@@ -23,13 +23,13 @@ mongoPool.acquire(function(err, db){
             ]
         },
         {
-            roles:['admin',dict.STAFF_PERSONAL],
+            roles:['admin',dict.STAFF_PERSONAL,dict.STAFF_ORG],
             allows:[
                 {resources:'/admin/pass/change', permissions:'put'},
                 {resources:'/admin/staff/add',permissions:'post'},
                 {resources:'/admin/staff/resetpass',permissions:'put'},
                 {resources:'/admin/staff/delete',permissions:'delete'},
-                {resources:'/admin/survey',permissions:['put','get','delete']},
+                {resources:'/admin/survey',permissions:['put','get','delete','post']},
                 {resources:'/admin/version',permissions:['post']},
                 {resources:'/admin/ad',permissions:['post']},
                 {resources:'/admin/exportxlsx',permissions:['post']},
@@ -37,20 +37,20 @@ mongoPool.acquire(function(err, db){
             ]
         },
         {
-            roles:[dict.STAFF_EDITOR,dict.STAFF_INVESTIGATOR,dict.STAFF_PERSONAL,'sadmin'],
+            roles:['admin',dict.STAFF_ORG,dict.STAFF_EDITOR,dict.STAFF_INVESTIGATOR,dict.STAFF_PERSONAL,'sadmin'],
             allows:[
                 {resources:'/staff/pass/change',permissions:'put'},
                 {resources:'/staff/upload',permissions:"post"}
             ]
         },
         {
-            roles:[dict.STAFF_EDITOR,dict.STAFF_PERSONAL],
+            roles:['admin',dict.STAFF_EDITOR,dict.STAFF_PERSONAL,dict.STAFF_ORG],
             allows:[
                 {resources:'/editor/survey',permissions:['post','delete','put','get']}
             ]
         },
         {
-            roles:[dict.STAFF_INVESTIGATOR,dict.STAFF_PERSONAL],
+            roles:['admin',dict.STAFF_INVESTIGATOR,dict.STAFF_PERSONAL,dict.STAFF_ORG],
             allows:[
                 {resources:'/investigator/survey',permissions:['get','post']},
                 {resources:'/investigator/feedback',permissions:['post']},

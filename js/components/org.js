@@ -56,12 +56,17 @@ export var Org = React.createClass({
     deleteButtonClick(index){
         var that = this;
         var infunc = function(){
-            SisDispatcher.dispatch({
-                actionType: Constant.DELETEORGADMIN,
-                index:index
-            });
+            that.state.deleteindex = index;
+            $("#deletemodal").modal("show");
         };
         return infunc;
+    },
+    confirmDeleteSurvey(){
+        $("#deletemodal").modal("hide");
+        SisDispatcher.dispatch({
+            actionType: Constant.DELETEORGADMIN,
+            index:this.state.deleteindex
+        });
     },
     componentDidMount (){
         SisDispatcher.dispatch({
@@ -390,6 +395,32 @@ export var Org = React.createClass({
                                 <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
                                 <a type="button"
                                    onClick={this.confirmaddorgadmin}
+                                   className="btn btn-primary" >Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="deletemodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Confirm to delete</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    Are you sure to delete this admin acount?
+                                </h3>
+
+
+
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button"
+                                   onClick={this.confirmDeleteSurvey}
                                    className="btn btn-primary" >Confirm</a>
                             </div>
                         </div>

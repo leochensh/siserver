@@ -14,7 +14,7 @@ export var PersonItem = React.createClass({
 
         return(
             <tr>
-                <td>{id}</td>
+                <td>{parseInt(id)+1}</td>
                 <td>{name}</td>
                 <td>{new Date(ctime).toLocaleString()}</td>
                 <td className="list_btn">

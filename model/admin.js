@@ -10,7 +10,45 @@ module.exports = Admin;
 
 const crypto = require('crypto');
 
+Admin.firstPageVisit = function(ip,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
 
+        }
+        else{
+            db.collection("visit",function(err,collection){
+                var visit = {
+                    ip:ip,
+                    ctime:new Date()
+                };
+                collection.insertOne(visit,function(err,admin){
+                    mongoPool.release(db);
+                    callback(err,"ok");
+                })
+            });
+        }
+    });
+}
+
+Admin.apkDownload = function(ip,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("apkdownload",function(err,collection){
+                var visit = {
+                    ip:ip,
+                    ctime:new Date()
+                };
+                collection.insertOne(visit,function(err,admin){
+                    mongoPool.release(db);
+                    callback(err,"ok");
+                })
+            });
+        }
+    });
+}
 
 Admin.createSuperAdmin = function(passhash,callback){
     mongoPool.acquire(function(err,db){
@@ -385,6 +423,29 @@ Admin.getOrgStaffList = function(orgid,callback){
     });
 }
 
+Admin.getOrgAllUserList = function(orgid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,collection){
+
+                collection.find({orgid:orgid}).sort({ctime:-1}).toArray(function(err,admins){
+                    if(admins){
+                        mongoPool.release(db);
+                        callback(err,admins);
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,[]);
+                    }
+                });
+            });
+        }
+    });
+}
+
 Admin.sadminDisableAdmin = function(adminid,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -567,6 +628,83 @@ Admin.auditSurvey = function(orgid,surveyid,status,callback){
         }
     });
 };
+
+Admin.publishSurvey = function(orgid,surveyid,stafflist,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+                collection.find({_id:ObjectID(surveyid)}).limit(1).next(function(err,survey){
+                    if(survey){
+                        if(survey.orgid != orgid){
+                            callback(err,"forbidden");
+                            mongoPool.release(db);
+                        }
+                        else{
+                            collection.updateOne({_id:ObjectID(surveyid)},
+                                {$set:{status:dict.SURVEYSTATUS_NORMAL,publishtime:new Date()}},
+                                function(err,upres){
+
+                                    db.collection("admins",function(err,admincollection){
+                                        async.each(stafflist,function(staffid,cb){
+                                            console.log("====staffid======"+staffid);
+                                            admincollection.find({_id:ObjectID(staffid)}).limit(1).next(function(err,staff){
+                                                if(staff){
+                                                    console.log("===add to staff====");
+                                                    console.log(staff);
+                                                    if(!staff.surveyList){
+                                                        staff.surveyList = []
+                                                    }
+                                                    var ifExist = false;
+                                                    for(var i in staff.surveyList){
+                                                        if(staff.surveyList[i].surveyid == surveyid){
+                                                            ifExist = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if(!ifExist){
+                                                        staff.surveyList.push({
+                                                            surveyid:surveyid,
+                                                            name:survey.name
+                                                        });
+                                                    }
+
+                                                    admincollection.updateOne({_id:ObjectID(staffid)},
+                                                        {$set:{surveyList:staff.surveyList}},
+                                                        function(err,ures){
+                                                            cb();
+                                                        });
+                                                }
+                                                else{
+                                                    cb();
+                                                }
+                                            });
+                                        },function(err){
+                                            mongoPool.release(db);
+                                            callback(err,"ok");
+                                        })
+                                    })
+
+
+
+                                });
+                        }
+
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound")
+                    }
+                })
+            });
+        }
+    });
+};
+
+
+
 
 Admin.assignSurvey = function(orgid,surveyid,staffid,callback){
     mongoPool.acquire(function(err,db){
