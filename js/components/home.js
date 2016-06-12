@@ -20,6 +20,9 @@ export var Home = React.createClass({
     orgclick(event){
         this.context.router.push("/org");
     },
+    settingClick(){
+        this.context.router.push("/settings");
+    },
     render() {
         var style = {
             marginTop:"30px"
@@ -31,11 +34,13 @@ export var Home = React.createClass({
         var newsurveyDisable = "disabled";
         var surveyManageDisable = "disabled";
         var adsDisable = "disabled";
+        var settingsDisable = "disabled";
 
         if(loginInfo.role == "sadmin"){
             orgDisable = "";
             personalDisable = "";
             adsDisable = "";
+            settingsDisable = "";
         }
         else if(loginInfo.role == "admin"){
             personalDisable = "";
@@ -128,6 +133,20 @@ export var Home = React.createClass({
                             </div>
                             <div>
                                 <span>{"Ads&Client"}</span>
+                            </div>
+                        </div>
+                    </button>
+
+                    <button className="col-md-3 btn btn-default"
+                            disabled={settingsDisable} onClick={this.settingClick}>
+
+                        <div className="fixed-size-square">
+                            <div>
+                            <span className="glyphicon glyphicon-cog" aria-hidden="true">
+                            </span>
+                            </div>
+                            <div>
+                                <span>Settings</span>
                             </div>
                         </div>
                     </button>

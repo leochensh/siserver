@@ -30,6 +30,23 @@ Admin.firstPageVisit = function(ip,callback){
     });
 }
 
+Admin.firstPageVisitCount = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("visit",function(err,collection){
+
+                collection.find().count(function(err,count){
+                    mongoPool.release(db);
+                    callback(err,count);
+                })
+            });
+        }
+    });
+}
+
 Admin.apkDownload = function(ip,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -44,6 +61,22 @@ Admin.apkDownload = function(ip,callback){
                 collection.insertOne(visit,function(err,admin){
                     mongoPool.release(db);
                     callback(err,"ok");
+                })
+            });
+        }
+    });
+}
+
+Admin.apkDownloadCount = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("apkdownload",function(err,collection){
+                collection.find().count(function(err,count){
+                    mongoPool.release(db);
+                    callback(err,count);
                 })
             });
         }

@@ -240,6 +240,21 @@ aclHandler.registerWait(function(acl){
         res.send("ok");
     });
 
+    app.get("/sadmin/visit/count",acl.middleware(1),function(req,res){
+        Admin.firstPageVisitCount(function(err,count){
+            successMsg.body = count;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
+    app.get("/sadmin/downloadapk/count",acl.middleware(1),function(req,res){
+        Admin.apkDownloadCount(function(err,count){
+            successMsg.body = count;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
+
     app.post("/sadmin/org/create",acl.middleware(1),function(req,res){
         var orgname = req.body.name;
 
