@@ -1766,9 +1766,11 @@ aclHandler.registerWait(function(acl){
     //var from = "ouresateam@163.com";
     //var smtpTransport = nodemailer.createTransport('smtps://ouresateam%40163.com:ouresa777@smtp.163.com');
 
-    var from = "leochen.shanghai@gmail.com";
-    var smtpTransport = nodemailer.createTransport('smtps://leochen.shanghai%40gmail.com:Bobo16188@smtp.gmail.com');
+    //var from = "leochen.shanghai@gmail.com";
+    //var smtpTransport = nodemailer.createTransport('smtps://leochen.shanghai%40gmail.com:Bobo16188@smtp.gmail.com');
 
+    var from = "admin@register.ouresa.com"
+    var smtpTransport = nodemailer.createTransport('smtps://postmaster%40register.ouresa.com:0dfe4400ba798ead05bb59328fc765e7@smtp.mailgun.org')
     app.get("/testemail",function(req,res){
 
         //var smtpTransport = nodemailer.createTransport('smtps://leochen.shanghai%40gmail.com:Bobo16188@smtp.gmail.com');

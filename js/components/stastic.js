@@ -12,9 +12,11 @@ export var Stastic = React.createClass({
         return{
             survey:null,
             answerlist:[],
+            originalanswerlist:[],
             detailid:null,
             ifexport:false,
-            exporturl:null
+            exporturl:null,
+            filterList:[]
         }
     },
     contextTypes: {
@@ -308,8 +310,9 @@ export var Stastic = React.createClass({
                         }
                     }
                     that.setState({
-                        answerlist:msg,
+                        originalanswerlist:msg,
                     });
+                    that.filterAnswer();
                     cb();
                 },
                 error: function () {
@@ -324,6 +327,115 @@ export var Stastic = React.createClass({
     componentDidMount (){
         this.fetchAndRefresh();
 
+    },
+    filterAnswer(){
+        var outputList = [];
+        for(var i in this.state.originalanswerlist){
+            var currentAnswer = this.state.originalanswerlist[i];
+            var ifFilter = true;
+            for(var j in this.state.filterList){
+                var currentFilter = this.state.filterList[j];
+                var cfValue = currentFilter.qvalue;
+                if(cfValue!="none"){
+                    var currentQ = this.state.survey.questionlist[cfValue];
+                    var fansweindex = _.findIndex(currentAnswer.answerlist,function(item){
+                        return item.questionid == currentQ._id;
+                    });
+                    if(fansweindex>=0){
+                        var qanswer = currentAnswer.answerlist[fansweindex];
+                        if(currentFilter.checklist.length>0){
+                            if(currentQ.type == Constant.QTYPE_MULTISELECT ||
+                                currentQ.type == Constant.QTYPE_SINGLESELECT ||
+                                currentQ.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+                                currentQ.type == Constant.QTYPE_MULTISELECT_TEXT ||
+                                currentQ.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                                currentQ.type == Constant.QTYPE_SINGLESELECT_TEXT){
+                                var notFound = true;
+                                for(var fai in qanswer.selectindexlist){
+                                    var aiv = qanswer.selectindexlist[fai];
+                                    console.log(aiv);
+                                    console.log(currentFilter.checklist);
+                                    var findindex = _.indexOf(currentFilter.checklist,aiv);
+                                    if(findindex>=0){
+                                        notFound = false;
+                                        break;
+                                    }
+                                }
+                                if(notFound){
+                                    ifFilter = false;
+                                    break;
+                                }
+                            }
+                            else if(currentQ.type == Constant.QTYPE_SCORE){
+                                if(qanswer.scorelist.length>0){
+                                    var findindex = _.indexOf(currentFilter.checklist,qanswer.scorelist[0].score);
+                                    if(findindex<0){
+                                        ifFilter = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            if(ifFilter){
+                outputList.push(currentAnswer);
+            }
+        }
+        this.setState({
+            answerlist:outputList
+        })
+    },
+    addFilter(){
+        var filterList = this.state.filterList;
+        filterList.push({
+            qvalue:"none",
+            checklist:[]
+        });
+
+        this.setState({
+            filterList:filterList
+        });
+
+    },
+    filterqchange(index){
+        var that = this;
+        function handleStype(event){
+            var slist = that.state.filterList;
+            slist[index].qvalue = event.target.value;
+            that.setState({
+                filterList:slist
+            });
+            that.filterAnswer();
+        }
+        return handleStype;
+    },
+    filtercheckchange(index,value){
+        var that = this;
+        value = parseInt(value);
+        function handleStype(event){
+            var ifchecked = event.target.checked;
+            var clist = that.state.filterList[index].checklist;
+            if(ifchecked){
+                var cindex = _.indexOf(clist,value);
+                if(cindex<0){
+                    clist.push(value);
+                }
+            }
+            else{
+                var cindex = _.indexOf(clist,value);
+                if(cindex>=0){
+                    clist.splice(cindex,1)
+                }
+            }
+            that.setState({
+                filterList:that.state.filterList
+            });
+            that.filterAnswer();
+        }
+        return handleStype;
     },
     render(){
         var totalNum = this.state.answerlist.length;
@@ -361,7 +473,102 @@ export var Stastic = React.createClass({
             </div>
 
         );
+        var filterRenderList = [
+
+        ];
         if(this.state.survey){
+            var filterOptionList = [
+                <option className="form-control"
+                        value={"none"}
+                >
+                    None
+                </option>
+            ];
+            for(var qindex in this.state.survey.questionlist){
+                var cq = this.state.survey.questionlist[qindex];
+                filterOptionList.push(
+                    <option className="form-control"
+                            value={qindex}
+                    >
+                        {parseInt(qindex)+1}.
+                        {cq.title}
+
+                    </option>
+                )
+            }
+
+            for(var findex in this.state.filterList){
+                var filterCheckList = [];
+                var qv = this.state.filterList[findex].qvalue;
+                if(qv!="none"){
+                    qv = parseInt(qv);
+                    var sq = this.state.survey.questionlist[qv];
+                    if(sq.type == Constant.QTYPE_SCORE){
+                        var scoreStart = 0;
+                        var scoreEnd = 10;
+                        var scoreStep = 1;
+                        if(sq.scorelist && _.isArray(sq.scorelist)){
+                            scoreStart = parseInt(sq.scorelist[0].start);
+                            scoreEnd = parseInt(sq.scorelist[0].end);
+                            scoreStep = parseInt(sq.scorelist[0].step);
+                        }
+                        for(var scorevalue=scoreStart;scorevalue<=scoreEnd;scorevalue+=scoreStep){
+                            filterCheckList.push(
+                                <div className="checkbox">
+                                    <label>
+                                        <input
+                                            checked={_.indexOf(this.state.filterList[findex].checklist,scorevalue)>=0}
+                                            onChange={this.filtercheckchange(findex,scorevalue)}
+                                            type="checkbox"/>
+                                        {scorevalue}
+                                    </label>
+                                </div>
+                            )
+                        }
+                    }
+                    else if(sq.type == Constant.QTYPE_SINGLESELECT ||
+                            sq.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                            sq.type == Constant.QTYPE_SINGLESELECT_TEXT ||
+                            sq.type == Constant.QTYPE_MULTISELECT ||
+                            sq.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+                            sq.type == Constant.QTYPE_MULTISELECT_TEXT){
+                        var tselectlist = sq.selectlist;
+                        for(var fsindex in tselectlist){
+                            var curs = tselectlist[fsindex];
+                            filterCheckList.push(
+                                <div className="checkbox">
+                                    <label>
+                                        <input
+                                            checked={_.indexOf(this.state.filterList[findex].checklist,parseInt(fsindex))>=0}
+                                            onChange={this.filtercheckchange(findex,fsindex)}
+                                            type="checkbox"/>
+                                        {curs.title}
+                                    </label>
+                                </div>
+                            )
+                        }
+                    }
+                }
+                filterRenderList.push(
+                    <div>
+                        <div className="row">
+                            <div className="col-md-6">
+                                <select className="form-control"
+                                        onChange={this.filterqchange(findex)}
+                                        value={this.state.filterList[findex].qvalue}
+                                >
+                                    {filterOptionList}
+                                </select>
+                            </div>
+                            <div className="col-md-6">
+                                {filterCheckList}
+                            </div>
+                        </div>
+                        <hr/>
+                    </div>
+
+                )
+            }
             for(var qindex in this.state.survey.questionlist){
                 var q = this.state.survey.questionlist[qindex];
                 var slist = [];
@@ -532,7 +739,7 @@ export var Stastic = React.createClass({
             )
         }
         var detailModal = [];
-        if(this.state.detailid){
+        if(this.state.detailid && this.state.answerlist[this.state.detailid]){
             var ca = this.state.answerlist[this.state.detailid];
             detailModal.push(
                 <div className="row">
@@ -676,12 +883,21 @@ export var Stastic = React.createClass({
                 var qtStyle = {
                     display:"none"
                 };
-                if(q.text){
+                if(q.text || q.image){
                     qtStyle = {};
+                }
+                var imgContent = "";
+                if(q.image){
+                    imgContent = <img
+                        src={Constant.BASE_IMAGEURL+q.image}
+                        className="img-rounded"
+                        style={{maxHeight:"100px"}}
+                        alt="Responsive image"/>
                 }
                 sdisList.push(
                     <div style={qtStyle}  className="alert alert-success">
                         {q.text?q.text:""}
+                        {imgContent}
                     </div>
                 )
                 detailModal.push(
@@ -697,14 +913,32 @@ export var Stastic = React.createClass({
                     </div>
                 )
             }
+
+
         }
+
+
+
         return (
             <div className="container">
-
                 <h2>
                     {this.state.survey?this.state.survey.name:""}
                 </h2>
-
+                <div className="panel panel-default">
+                    <div className="panel-heading">
+                        <h3 className="panel-title">Filter</h3>
+                    </div>
+                    <div className="panel-body">
+                        {filterRenderList}
+                    </div>
+                    <div className="panel-footer">
+                        <a className="btn btn-primary"
+                           onClick={this.addFilter}
+                           role="button" data-toggle="collapse">
+                            Add Filter
+                        </a>
+                    </div>
+                </div>
                 <div className="well" >
                     <h3>
                         Total {totalNum} answers. {clientNum} answers from Android Client and {totalNum-clientNum} answers from web anonymous users.
