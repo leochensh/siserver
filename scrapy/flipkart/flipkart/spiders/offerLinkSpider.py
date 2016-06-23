@@ -29,6 +29,15 @@ class brandSpider(Spider):
     def parse(self,response):
         item = brandItem()
         oldurl=response.url
+
+        print "++++++++++++++++"
+        print response.url
+
+        currentBrand = ""
+        m = re.search("%255B%255D%3D(.*)&sid=",response.url)
+        if(m):
+            currentBrand = m.group(1)
+
         infos = []
 
         sel = Selector(response)
@@ -38,7 +47,7 @@ class brandSpider(Spider):
             print dataPid
             href = site.xpath('div[1]/a[1]/@href')[0].extract().strip()
             print href
-            info = {'dataPid':dataPid,'href':href}
+            info = {'dataPid':dataPid,'href':href,'brand':currentBrand}
             infos.append(info)
 
         item['infos'] = infos

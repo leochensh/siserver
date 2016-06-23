@@ -26,6 +26,8 @@ class brandSpider(Spider):
 
     def parse(self,response):
         item = brandItem()
+        print "++++++++++++++++++++++++++++++++"
+        print response.url
         oldurl=response.url
         infos = {
             'rate1':0,
@@ -39,12 +41,15 @@ class brandSpider(Spider):
 
         sel = Selector(response)
 
-        nameLi = sel.xpath('//li[@class="fk-inline-block"]')
-        size = len(nameLi)
-        print size
-        if size>0:
-            name = nameLi[size-1].xpath('strong/text()')[0].extract().strip()
-            infos['name'] = name
+        # nameLi = sel.xpath('//li[@class="fk-inline-block"]')
+        # size = len(nameLi)
+        # print size
+        # if size>0:
+        #     name = nameLi[size-1].xpath('strong/text()')[0].extract().strip()
+        #     infos['name'] = name
+
+        name = sel.css("h1.title::text").extract()[0]
+        infos['name'] = name
 
         priceInfo = []
 
@@ -75,24 +80,24 @@ class brandSpider(Spider):
 
         infos['priceInfo'] = priceInfo
 
-        tableList = sel.xpath('//table[@class="specTable"]')
-        print 'tableList:'+str(len(tableList))
-
-        for table in tableList:
-            key = table.xpath('tr[1]/th/text()')[0].extract().strip()
-            if key == 'Important Note':
-                val = table.xpath('tr[2]/td/text()')[0].extract().strip()
-                infos[key] = val
-            else:
-                trs = table.xpath('tr')
-                tinfo = {}
-                for tr in trs:
-                    tds = tr.xpath('td')
-                    if len(tds)>0:
-                        k1 = tds[0].xpath('text()')[0].extract().strip()
-                        v1 = tds[1].xpath('text()')[0].extract().strip()
-                        tinfo[k1] = v1
-                infos[key] = tinfo
+        # tableList = sel.xpath('//table[@class="specTable"]')
+        # print 'tableList:'+str(len(tableList))
+        #
+        # for table in tableList:
+        #     key = table.xpath('tr[1]/th/text()')[0].extract().strip()
+        #     if key == 'Important Note':
+        #         val = table.xpath('tr[2]/td/text()')[0].extract().strip()
+        #         infos[key] = val
+        #     else:
+        #         trs = table.xpath('tr')
+        #         tinfo = {}
+        #         for tr in trs:
+        #             tds = tr.xpath('td')
+        #             if len(tds)>0:
+        #                 k1 = tds[0].xpath('text()')[0].extract().strip()
+        #                 v1 = tds[1].xpath('text()')[0].extract().strip()
+        #                 tinfo[k1] = v1
+        #         infos[key] = tinfo
 
         fkGiveStar = sel.xpath('//ul[@class="fk-give-star"]')
         if len(fkGiveStar)>0:
