@@ -1233,3 +1233,83 @@ Admin.deleteAnswer = function(answerid,callback){
         }
     });
 };
+
+Admin.getFlipkartData = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("brand",function(err,collection){
+                //var bdataMap = {};
+                collection.find({},{_id:0}).toArray(function(err,brands){
+                    for(var i in brands){
+                        var cb = brands[i];
+                        //bdataMap[cb.brand] = cb;
+                        //bdataMap[cb.brand].modelList = [];
+                        cb.modelList = [];
+
+                    }
+                    db.collection("link",function(err,linkcollection){
+                        async.each(brands,function(brand,secondcallback){
+                            linkcollection.find({brand:brand.brand}).toArray(function(err,links){
+                                db.collection("flipkartData",function(err,flibcollection){
+                                    async.each(links,function(link,cb2){
+                                        if(link.dataPid){
+                                            flibcollection.find({dataPid:link.dataPid},{_id:0,dataPid:0,reviewHref:0}).limit(1).next(function(err,model){
+                                                if(model){
+                                                    //bdataMap[brand.brand].modelList.push(model);
+                                                    //brand.modelList.push(model);
+                                                    var minfo = {
+                                                        reviewNum:model.reviewNum?model.reviewNum:0,
+                                                        rate:model.rate?model.rate:0,
+                                                        name:model.name?model.name:0
+                                                    };
+                                                    var aprice = 0;
+                                                    var pnum = 0;
+                                                    if(model.priceInfo){
+                                                        var ptotal = 0;
+                                                        for(var pindex in model.priceInfo){
+                                                            ptotal+=parseFloat(model.priceInfo[pindex].price);
+                                                            pnum+=1;
+                                                        }
+                                                        if(pnum>0){
+                                                            aprice = parseInt(ptotal/pnum);
+                                                        }
+
+                                                    }
+                                                    minfo.aprice = aprice;
+                                                    var arate = 0;
+                                                    var trate = (model.rate5?model.rate5:0)*5+
+                                                        (model.rate4?model.rate4:0)*4+
+                                                        (model.rate3?model.rate3:0)*3+
+                                                        (model.rate2?model.rate2:0)*2+
+                                                        (model.rate1?model.rate1:0)*1;
+                                                    if(model.rate>0){
+                                                        arate = parseInt(trate/model.rate)
+                                                    }
+                                                    minfo.arate = arate;
+                                                    brand.modelList.push(minfo);
+
+                                                }
+                                                cb2();
+                                            });
+                                        }
+                                        else{
+                                            cb2();
+                                        }
+                                    },function(err){
+                                        secondcallback();
+                                    });
+                                });
+                            })
+                        },function(err){
+                            mongoPool.release(db);
+                            callback(err,brands);
+                        });
+                    });
+                });
+            });
+        }
+    });
+};

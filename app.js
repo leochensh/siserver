@@ -240,6 +240,14 @@ aclHandler.registerWait(function(acl){
         res.send("ok");
     });
 
+    app.get("/sadmin/edata/flipkart",acl.middleware(1),function(req,res){
+        Admin.getFlipkartData(function(err,msg){
+            res.status(200);
+            successMsg.body = msg;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
     app.get("/sadmin/visit/count",acl.middleware(1),function(req,res){
         Admin.firstPageVisitCount(function(err,count){
             successMsg.body = count;

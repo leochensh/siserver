@@ -23,6 +23,9 @@ export var Home = React.createClass({
     settingClick(){
         this.context.router.push("/settings");
     },
+    edataclick(){
+        this.context.router.push("/edata");
+    },
     render() {
         var style = {
             marginTop:"30px"
@@ -35,12 +38,14 @@ export var Home = React.createClass({
         var surveyManageDisable = "disabled";
         var adsDisable = "disabled";
         var settingsDisable = "disabled";
+        var edataDisable = "disabled";
 
         if(loginInfo.role == "sadmin"){
             orgDisable = "";
             personalDisable = "";
             adsDisable = "";
             settingsDisable = "";
+            edataDisable = "";
         }
         else if(loginInfo.role == "admin"){
             personalDisable = "";
@@ -152,6 +157,21 @@ export var Home = React.createClass({
                     </button>
 
 
+                </div>
+                <div className="row">
+                    <button className="col-md-3 col-md-offset-3 btn btn-default"
+                            disabled={edataDisable} onClick={this.edataclick}>
+
+                        <div className="fixed-size-square">
+                            <div>
+                            <span className="glyphicon glyphicon-signal" aria-hidden="true">
+                            </span>
+                            </div>
+                            <div>
+                                <span>{"Edata"}</span>
+                            </div>
+                        </div>
+                    </button>
                 </div>
 
             </div>

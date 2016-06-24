@@ -17,6 +17,7 @@ import {Stastic} from "./components/stastic"
 import {Ads} from "./components/ads"
 import {Org} from "./components/org"
 import {Settings} from "./components/settings"
+import {Edata} from "./components/edata"
 
 var main = document.getElementsByTagName('main')[0];
 
@@ -36,6 +37,7 @@ ReactDom.render(
             <Route path="ads" component={Ads} />
             <Route path="org" component={Org} />
             <Route path="settings" component={Settings} />
+            <Route path="edata" component={Edata} />
         </Route>
     </Router>,
     main

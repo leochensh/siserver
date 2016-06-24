@@ -19,6 +19,7 @@ mongoPool.acquire(function(err, db){
             roles:['sadmin'],
             allows:[
                 {resources:'/testacl', permissions:'get'},
+                {resources:'/edata', permissions:'get'},
                 {resources:"/sadmin",permissions:["post","put","delete","get"]}
             ]
         },

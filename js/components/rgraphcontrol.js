@@ -97,4 +97,4 @@ export var RgraphControl = React.createClass({
             </div>
         )
     }
-})
+});
