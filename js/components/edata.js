@@ -147,6 +147,7 @@ export var Edata = React.createClass({
             options: {
                 labels: labels,
                 shadow: false,
+                gutterLeft:85,
                 colors: ['red'],
                 strokestyle: 'rgba(0,0,0,0)'
             }
