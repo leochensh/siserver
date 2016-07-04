@@ -54,16 +54,21 @@ export var App = React.createClass({
             <div>
                 <nav className="navbar navbar-default navbar-fixed-top">
                     <div className="container-fluid">
-                        <div className="navbar-header">
-                            <a className="navbar-brand">Smartinsight Survey Management System</a>
+                        <div class="navbar-header">
+                            <a style={{padding:0}} className="navbar-brand" href="#">
+                                <img style={{maxHeight:"50px"}} alt="Brand" src="image/logo_244x244.png"/>
+                            </a>
+                            <a style={{fontSize:"40px",fontWeight:"bolder"}} className="navbar-brand" href="#">Ouresa</a>
                         </div>
-                        <div className="collapse navbar-collapse" >
+
+                        <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul className="nav navbar-nav">
                                 <li><a onClick={this.homeclick}>Home</a></li>
                                 <li><a onClick={this.loginclick}>Relogin</a></li>
                             </ul>
 
                         </div>
+
                     </div>
                 </nav>
                 {

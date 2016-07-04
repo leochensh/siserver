@@ -59,8 +59,18 @@ Admin.apkDownload = function(ip,callback){
                     ctime:new Date()
                 };
                 collection.insertOne(visit,function(err,admin){
-                    mongoPool.release(db);
-                    callback(err,"ok");
+                    db.collection("versions",function(err,versioncollection){
+                        versioncollection.find().sort({_id:-1}).limit(1).next(function(err,ver){
+                            if(ver){
+                                mongoPool.release(db);
+                                callback(err,ver);
+                            }
+                            else{
+                                mongoPool.release(db);
+                                callback(err,"notfound");
+                            }
+                        })
+                    });
                 })
             });
         }

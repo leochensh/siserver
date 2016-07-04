@@ -217,17 +217,25 @@ app.get("/firstpagevisit",function(req,res){
 app.get('/downloadapk', function(req, res){
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-    Admin.apkDownload(ip,function(){
-        var file = __dirname + '/ouresa1.0.9(Test3).apk';
+    Admin.apkDownload(ip,function(err,ver){
+        if(ver == "notfound" || !ver.fileurl){
+            res.status(404);
+            errorMsg.code = "organization not found";
+            res.send(JSON.stringify(errorMsg));
+        }
+        else{
+            var file = __dirname +"/uploads/"+ver.fileurl;
 
-        var filename = path.basename(file);
-        var mimetype = mime.lookup(file);
+            var filename = path.basename(file);
+            var mimetype = mime.lookup(file);
 
-        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-        res.setHeader('Content-type', mimetype);
+            res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+            res.setHeader('Content-type', mimetype);
 
-        var filestream = fs.createReadStream(file);
-        filestream.pipe(res);
+            var filestream = fs.createReadStream(file);
+            filestream.pipe(res);
+        }
+
     })
 
 
