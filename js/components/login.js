@@ -196,7 +196,7 @@ export var Login = React.createClass({
                             <img style={{marginTop:"50px",maxWidth:"200px"}} src="image/dfa.png"/>
                         </a>
                         <a className="col-md-offset-1 col-md-2">
-                            <img style={{marginTop:"50px",maxWidth:"200px"}} src="image/1465706923.png"/>
+                            <img style={{marginTop:"50px",maxWidth:"200px"}} src="image/0e549f74a0110310e75ad351b98f403b.png"/>
                         </a>
                     </div>
                 </div>
