@@ -11,6 +11,7 @@ export var Login = React.createClass({
     },
     componentDidMount: function(){
         this.refs.nameInput.getDOMNode().focus();
+        $.get(Constant.BASE_URL+"firstpagevisit");
     },
     getInitialState(){
         return{

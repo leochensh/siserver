@@ -104,7 +104,7 @@ export var Surveylist = React.createClass({
                             <a
                                 type="button"
                                 onClick={this.stastic(i)}
-                                className="btn btn-primary">Stastic</a>
+                                className="btn btn-primary">Statistics</a>
                         </div>
                     </td>
 
@@ -120,7 +120,7 @@ export var Surveylist = React.createClass({
                         <tr>
                             <th><span className="">##</span></th>
                             <th><span className="">Survey Name</span></th>
-                            <th><span className="">Create Time</span></th>
+                            <th><span className="">Time Created</span></th>
                             <th><span className="">Publish Time</span></th>
                             <th><span className="">Status</span></th>
                             <th><span className="">Operations</span></th>

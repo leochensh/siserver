@@ -5,7 +5,7 @@ import _ from "underscore";
 import async from "async"
 
 var surveyData = {
-    surveyname:"new survey",
+    surveyname:"",
     ifSaved:false,
     surveyid:null,
     ifSurveyNameEmpty:false,
@@ -81,11 +81,15 @@ class NewsurveyStore extends Store{
         //alert(test)
         if(payload.actionType == Constant.SURVEYVALUECHANGE){
             surveyData[payload.name] = payload.value;
+            if(payload.name!="ifSurveyNameEmpty" || !payload.value){
+                surveyData["ifSurveyNameEmpty"] = false;
+            }
+
             this.__emitChange();
         }
         else if(payload.actionType == Constant.CLEANSURVEYDATA){
             surveyData = {
-                surveyname:"new survey",
+                surveyname:"",
                 ifSaved:false,
                 surveyid:null,
                 ifSurveyNameEmpty:false,
@@ -151,6 +155,10 @@ class NewsurveyStore extends Store{
                 });
             },function(err){
                 $("#ajaxloading").hide();
+                $("#saveallbutton").popover("show");
+                setTimeout(function(){
+                    $("#saveallbutton").popover("hide");
+                },1500);
             });
         }
         else if(payload.actionType == Constant.EDITSURVEY){

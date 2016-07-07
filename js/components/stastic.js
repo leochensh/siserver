@@ -865,18 +865,28 @@ export var Stastic = React.createClass({
                         }
                     }
                     else if(currentQ.type == Constant.QTYPE_SCORE){
-                        var sfi = _.findIndex(q.scorelist,function(item){
-                            return item.index == 0;
-                        });
-                        if(sfi>=0){
+                        //var sfi = _.findIndex(q.scorelist,function(item){
+                        //    return item.index == 0;
+                        //});
+                        //if(sfi>=0){
+                        //    sdisList.push(
+                        //        <div>
+                        //            <p>
+                        //                <span className="red">{parseInt(q.scorelist[sfi].score)}</span>
+                        //            </p>
+                        //        </div>
+                        //    )
+                        //}
+                        for(var qi in q.scorelist){
                             sdisList.push(
                                 <div>
                                     <p>
-                                        <span className="red">{parseInt(q.scorelist[sfi].score)}</span>
+                                        <span className="red">{parseInt(q.scorelist[qi].score)}</span>
                                     </p>
                                 </div>
                             )
                         }
+
                     }
 
                 }

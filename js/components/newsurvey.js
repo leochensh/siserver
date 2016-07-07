@@ -9,7 +9,7 @@ var Dropzone = require('react-dropzone');
 export var Newsurvey = React.createClass({
     getInitialState(){
         return{
-            surveyname:"new survey",
+            surveyname:"",
             ifSaved:false,
             surveyid:null,
             ifSurveyNameEmpty:false,
@@ -292,6 +292,10 @@ export var Newsurvey = React.createClass({
                     contentType: 'application/x-www-form-urlencoded',
                     success: function (data) {
                         $("#ajaxloading").hide();
+                        $("#surveynameform").popover("show");
+                        setTimeout(function(){
+                            $("#surveynameform").popover("hide");
+                        },1000);
                         var msg = JSON.parse(data);
 
                     },
@@ -341,7 +345,7 @@ export var Newsurvey = React.createClass({
             var newQ = {
                 surveyid:this.props.newsurvey.surveyid,
                 type:qtype,
-                title:"newquestion",
+                title:"",
                 ifSaved:false,
                 selectlist:[],
                 id:null,
@@ -362,6 +366,9 @@ export var Newsurvey = React.createClass({
                 $(window).scrollTop($(document).height());
             },100);
         }
+    },
+    gotop(){
+        $(window).scrollTop(0);
     },
     singleselect(){
         this.addNewQuestion(Constant.QTYPE_SINGLESELECT);
@@ -500,6 +507,57 @@ export var Newsurvey = React.createClass({
         }
 
     },
+    componentDidMount(){
+        $("#suveynameinput").popover({
+            title:"Tip 1",
+            content:"You should input survey name here first.",
+            placement:"bottom",
+            trigger:"manual"
+        });
+
+        $("#surveynamesavebutton").popover({
+            title:"Tip 2",
+            content:"Then you can push this button to save this new survey",
+            placement:"bottom",
+            trigger:"manual"
+        });
+
+        $("#questiontypeselect").popover({
+            title:"Tip 3",
+            content:"After saving survey name, you can select the question type from here. Enjoy it!",
+            placement:"bottom",
+            trigger:"manual"
+        });
+
+        $("#surveynameform").popover({
+            title:"Save indication",
+            content:"Survey name was saved successfully.",
+            placement:"bottom",
+            trigger:"manual"
+        });
+
+        $("#saveallbutton").popover({
+            title:"Save indication",
+            content:"Survey data was saved successfully.",
+            placement:"top",
+            trigger:"manual"
+        })
+    },
+    showtips(){
+        var internal = 3000;
+        $("#suveynameinput").popover("show");
+        setTimeout(function(){
+            $("#suveynameinput").popover("hide");
+            $("#surveynamesavebutton").popover("show");
+            setTimeout(function(){
+                $("#surveynamesavebutton").popover("hide");
+                $("#questiontypeselect").popover("show");
+                setTimeout(function(){
+                    $("#questiontypeselect").popover("hide");
+                },internal);
+            },internal);
+        },internal);
+    },
     render(){
         var emptystyle = {display:"none"};
         if(this.props.newsurvey.ifSurveyNameEmpty){
@@ -543,7 +601,7 @@ export var Newsurvey = React.createClass({
                                 Question Types
                             </a>
                         </li>
-                        <li>
+                        <li id="questiontypeselect">
                             <a onClick={this.singleselect}>
                                 <span className="glyphicon glyphicon-minus" aria-hidden="true"></span>
                                 &nbsp;&nbsp;Single Selection
@@ -598,6 +656,7 @@ export var Newsurvey = React.createClass({
                                             <span style={surveyStatusClassStyle}>{surveyStatusTxt}</span>
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             <a type="button"
+                                               id="saveallbutton"
                                                onClick={this.saveall}
                                                className="btn btn-primary">
                                                 <span className="glyphicon glyphicon-save" aria-hidden="true"></span>
@@ -618,17 +677,33 @@ export var Newsurvey = React.createClass({
                                                 <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                                                 <span>&nbsp;&nbsp;Clean data</span>
                                             </a>
+
+                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                            <a type="button"
+                                               onClick={this.gotop}
+                                               className="btn btn-info">
+                                                <span className="glyphicon glyphicon-hand-up" aria-hidden="true"></span>
+                                                <span>&nbsp;&nbsp;Top</span>
+                                            </a>
+
+                                            &nbsp;&nbsp;
+                                            <a type="button"
+                                               onClick={this.showtips}
+                                               className="btn btn-warning">
+                                                <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                                                <span>&nbsp;&nbsp;Show tips</span>
+                                            </a>
                                         </h3>
                                     </div>
                                 </nav>
 
                                 <form className="form-horizontal">
                                     <div className="form-group">
-                                        <label htmlFor="inputEmail3" className="col-sm-2 control-label">Survey Name</label>
+                                        <label id="surveynameform" htmlFor="suveynameinput" className="col-sm-2 control-label">Survey Name</label>
                                         <div className="col-sm-10">
                                             <input type="text"
                                                    className="form-control"
-                                                   id="inputEmail3"
+                                                   id="suveynameinput"
                                                    value={this.props.newsurvey.surveyname}
                                                    onChange={this.handleChange.bind(this,"surveyname")}
                                                    placeholder="Survey Name"/>
@@ -639,6 +714,7 @@ export var Newsurvey = React.createClass({
                                     <div className="form-group">
                                         <div className="col-sm-offset-2 col-sm-10">
                                             <a className="btn btn-primary"
+                                               id = "surveynamesavebutton"
                                                     onClick={this.savesurvey}>
                                                 Save
                                             </a>

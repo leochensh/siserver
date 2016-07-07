@@ -124,7 +124,7 @@ export var Register = React.createClass({
         var disStyle = this.state.iferror?{}:{display:"none"};
         return (
             <div className="row">
-                <div className="col-md-10 col-md-offset-1">
+                <div className="col-md-8 col-md-offset-2">
                     <div className="divLogin">
                         <form className="form-horizontal">
                             <div className="form-group form-group-lg">
@@ -182,7 +182,7 @@ export var Register = React.createClass({
                                 </div>
                             </div>
                             <div className="form-group form-group-lg">
-                                <label htmlFor="inputPassword4" className="col-sm-2 control-label">Reenter password</label>
+                                <label htmlFor="inputPassword4" className="col-sm-2 control-label">Retype password</label>
                                 <div className="col-sm-10">
                                     <input type="password"
                                            className="form-control"
@@ -197,7 +197,7 @@ export var Register = React.createClass({
                             <div className="form-group form-group-lg">
                                 <div className="col-sm-offset-2 col-sm-2">
                                     <a
-                                        className="btn btn-primary"
+                                        className="btn btn-primary btn-lg"
                                         onClick={this.handleClick}
                                     >Confirm</a>
                                 </div>

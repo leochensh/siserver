@@ -396,6 +396,7 @@ Staff.getStaffSurveyList = function(staffid,callback){
                                     surveycollection.find({_id:ObjectID(item.surveyid)}).limit(1).next(function(err,survey){
                                         if(survey){
                                             item.status = survey.status;
+                                            item.publishtime = survey.publishtime?survey.publishtime:""
                                         }
                                         cb();
                                     })

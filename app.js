@@ -1787,6 +1787,9 @@ aclHandler.registerWait(function(acl){
 
     var from = "admin@register.ouresa.com"
     var smtpTransport = nodemailer.createTransport('smtps://postmaster%40register.ouresa.com:0dfe4400ba798ead05bb59328fc765e7@smtp.mailgun.org')
+
+    //var from = "ouresaadmin@sandbox7ec8af3e18ce44239f48a365be400e76.mailgun.org"
+    //var smtpTransport = nodemailer.createTransport('smtps://postmaster%40sandbox7ec8af3e18ce44239f48a365be400e76.mailgun.org:aa790a31986ac6dc171ddf4dfd1da8bc@smtp.mailgun.org')
     app.get("/testemail",function(req,res){
 
         //var smtpTransport = nodemailer.createTransport('smtps://leochen.shanghai%40gmail.com:Bobo16188@smtp.gmail.com');

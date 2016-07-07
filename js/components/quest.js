@@ -197,16 +197,34 @@ export var Quest = React.createClass({
         });
 
     },
-    scorevalueChange(event){
-        this.state.answer.answerlist[this.state.currentIndex].scorelist = [
-            {
-                index:0,
-                score:event.target.value
+    scorevalueChange(index){
+        var that = this;
+        var innerFunc = function(event){
+            var ascoreList = that.state.answer.answerlist[that.state.currentIndex].scorelist;
+            var findex = _.findIndex(ascoreList,function(item){
+                return item.index == index;
+            });
+
+            if(findex>=0){
+                ascoreList[findex] = {
+                    index:index,
+                    score:event.target.value
+                }
             }
-        ]
-        this.setState({
-            answer:this.state.answer
-        });
+            else{
+                ascoreList.push({
+                    index:index,
+                    score:event.target.value
+                })
+            }
+
+
+            that.setState({
+                answer:that.state.answer
+            });
+        }
+        return innerFunc;
+
     },
     submit(){
         var that = this;
@@ -338,39 +356,47 @@ export var Quest = React.createClass({
             }
             if(currentType == Constant.QTYPE_SCORE){
                 var scorelist = this.state.answer.answerlist[this.state.currentIndex].scorelist;
-                var matchIndex = _.findIndex(scorelist,function(item){
-                    return item.index == 0;
-                });
+
                 var scoreStart = 0;
                 var scoreEnd = 10;
                 var scoreStep = 1;
                 if(currentQ.scorelist && _.isArray(currentQ.scorelist)){
-                    scoreStart = parseInt(currentQ.scorelist[0].start);
-                    scoreEnd = parseInt(currentQ.scorelist[0].end);
-                    scoreStep = parseInt(currentQ.scorelist[0].step);
-                }
-                var scoreValue = scoreStart;
-                if(matchIndex>=0){
-                    scoreValue = scorelist[matchIndex].score;
-                }
-                var oarray = [];
-                var startI = scoreStart;
-                while(startI<=scoreEnd){
-                    oarray.push(
-                        <option value={startI}>{startI}</option>
-                    )
-                    startI+=scoreStep;
+
+
+                    for(var si in currentQ.scorelist){
+                        var matchIndex = _.findIndex(scorelist,function(item){
+                            return item.index == si;
+                        });
+                        scoreStart = parseInt(currentQ.scorelist[si].start);
+                        scoreEnd = parseInt(currentQ.scorelist[si].end);
+                        scoreStep = parseInt(currentQ.scorelist[si].step);
+                        var scoreValue = scoreStart;
+                        if(matchIndex>=0){
+                            scoreValue = scorelist[matchIndex].score;
+                        }
+                        var oarray = [];
+                        var startI = scoreStart;
+                        while(startI<=scoreEnd){
+                            oarray.push(
+                                <option value={startI}>{startI}</option>
+                            )
+                            startI+=scoreStep;
+                        }
+
+                        slist.push(
+                            <select
+                                style={{marginTop:"30px"}}
+                                className="form-control input-lg"
+                                    value={scoreValue}
+                                    onChange={this.scorevalueChange(si)}
+                            >
+                                {oarray}
+                            </select>
+                        )
+                    }
+
                 }
 
-                console.log("here4")
-                slist.push(
-                    <select className="form-control input-lg"
-                            value={scoreValue}
-                            onChange={this.scorevalueChange}
-                        >
-                        {oarray}
-                    </select>
-                )
             }
             var mainPart = (
                 <div className="container">

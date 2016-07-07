@@ -16,14 +16,35 @@ export var Question = React.createClass({
         };
     },
     addselection(){
-        var ls = this.props.qdata.selectlist;
-        ls.push({
-            title:"selection",
-            type:Constant.SELECTTYPE_TEXT
-        });
-        this.informChange({
-            selectlist:ls
-        });
+        if(this.props.qdata.type == Constant.QTYPE_MULTISELECT||
+            this.props.qdata.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT||
+            this.props.qdata.type == Constant.QTYPE_MULTISELECT_TEXT||
+            this.props.qdata.type == Constant.QTYPE_SINGLESELECT||
+            this.props.qdata.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT||
+            this.props.qdata.type == Constant.QTYPE_SINGLESELECT_TEXT){
+            var ls = this.props.qdata.selectlist;
+            ls.push({
+                title:"",
+                type:Constant.SELECTTYPE_TEXT
+            });
+            this.informChange({
+                selectlist:ls
+            });
+        }
+        else if(this.props.qdata.type == Constant.QTYPE_SCORE){
+            var sl = this.props.qdata.scorelist;
+            var slsize = sl.length;
+            sl.push({
+                index:slsize,
+                start:0,
+                end:10,
+                step:1
+            });
+            this.informChange({
+                scorelist:sl
+            });
+        }
+
         //setTimeout(function(){
         //    var objDiv = document.getElementById("scrollright");
         //    objDiv.scrollTop = objDiv.scrollHeight;
@@ -86,50 +107,59 @@ export var Question = React.createClass({
         }
         return handleTC;
     },
-    handleScoreStartChange(event){
-        var scoreStart = parseInt(event.target.value);
-        var scoreEnd = 10;
-        var scoreStep = 1;
-        if(this.props.qdata.scorelist && _.isArray(this.props.qdata.scorelist)){
-            scoreEnd = this.props.qdata.scorelist[0].end;
-            scoreStep = this.props.qdata.scorelist[0].step;
+    handleScoreStartChange(index){
+        var that = this;
+        var innerFunc = function(event){
+            var scoreStart = parseInt(event.target.value);
+            var scoreEnd = that.props.qdata.scorelist[index].end;
+            var scoreStep = that.props.qdata.scorelist[index].step;
+            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep)
         }
-        this.informChange({scorelist:[{
-            index:0,
-            start:scoreStart,
-            end:scoreEnd,
-            step:scoreStep
-        }]});
+        return innerFunc;
+
     },
-    handleScoreEndChange(event){
-        var scoreStart = 0;
-        var scoreEnd = parseInt(event.target.value);
-        var scoreStep = 1;
-        if(this.props.qdata.scorelist && _.isArray(this.props.qdata.scorelist)){
-            scoreStart = this.props.qdata.scorelist[0].start;
-            scoreStep = this.props.qdata.scorelist[0].step;
-        }
-        this.informChange({scorelist:[{
-            index:0,
-            start:scoreStart,
-            end:scoreEnd,
-            step:scoreStep
-        }]})
+    handleScoreEndChange(index){
+        var that = this;
+        var innerFunc = function(event){
+            var scoreStart = that.props.qdata.scorelist[index].start;
+            var scoreEnd = parseInt(event.target.value);
+            var scoreStep = that.props.qdata.scorelist[index].step;
+            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep)
+        };
+        return innerFunc;
     },
-    handleScoreStepChange(event){
-        var scoreStart = 0;
-        var scoreEnd = 10;
-        var scoreStep = parseInt(event.target.value);
+    handleScoreStepChange(index){
+        var that = this;
+        var innerFunc = function(event){
+            var scoreStart = that.props.qdata.scorelist[index].start;
+            var scoreEnd = that.props.qdata.scorelist[index].end;
+            var scoreStep = parseInt(event.target.value);
+            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep)
+        };
+        return innerFunc;
+    },
+    handleScoreChange(index,start,end,step){
+        var sarray = [];
         if(this.props.qdata.scorelist && _.isArray(this.props.qdata.scorelist)){
-            scoreStart = this.props.qdata.scorelist[0].start;
-            scoreEnd = this.props.qdata.scorelist[0].end;
+            sarray = this.props.qdata.scorelist;
+            sarray[index] = {
+                index:index,
+                start:start,
+                end:end,
+                step:step
+            }
         }
-        this.informChange({scorelist:[{
-            index:0,
-            start:scoreStart,
-            end:scoreEnd,
-            step:scoreStep
-        }]})
+        else{
+            sarray = [{
+                index:0,
+                start:start,
+                end:end,
+                step:step
+            }]
+        }
+
+
+        this.informChange({scorelist:sarray})
     },
     informChange(obj){
         if(!obj.ifSaved){
@@ -157,11 +187,17 @@ export var Question = React.createClass({
         return dfunc;
     },
     savequestion(){
-        SisDispatcher.dispatch({
+        if(this.props.qdata.title){
+            SisDispatcher.dispatch({
 
-            actionType: Constant.SAVESINGLEQUESTION,
-            qindex:this.props.index
-        });
+                actionType: Constant.SAVESINGLEQUESTION,
+                qindex:this.props.index
+            });
+        }
+        else{
+            alert("Question title can not be null!")
+        }
+
         //if(this.props.qdata.title &&
         //    (this.props.qdata.selectlist.length>0 || this.props.qdata.type == Constant.QTYPE_DESCRIPTION)){
         //    var q = {
@@ -302,6 +338,7 @@ export var Question = React.createClass({
                                           className="form-control"
                                           id={sid}
                                           value={s.title}
+                                          placeholder="Selection Title"
                                           onChange={this.selectTitleChange(i)}
                                 >
                                 </textarea>
@@ -375,14 +412,50 @@ export var Question = React.createClass({
         var scoreStart = 0;
         var scoreEnd = 10;
         var scoreStep = 1;
+        var scoreHtml = []
         if(this.props.qdata.type == Constant.QTYPE_SCORE){
             ifDisplayScoreBeginEndStepStyle = {};
             //console.log(this.props.qdata.scorelist);
             if(this.props.qdata.scorelist && _.isArray(this.props.qdata.scorelist)){
+                var scoreArray = this.props.qdata.scorelist;
+                for(var sai in scoreArray){
+                    var si = scoreArray[sai];
+                    var sstart = parseInt(si.start);
+                    var send = parseInt(si.end);
+                    var sstep = parseInt(si.step);
 
-                scoreStart = parseInt(this.props.qdata.scorelist[0].start);
-                scoreEnd = parseInt(this.props.qdata.scorelist[0].end);
-                scoreStep = parseInt(this.props.qdata.scorelist[0].step);
+                    scoreHtml.push(<div>
+                        <label className="col-sm-2 control-label">Score Start</label>
+                        <div className="col-sm-2">
+                            <input type="number" className="form-control"
+                                   value={sstart}
+                                   onChange={this.handleScoreStartChange(sai)}
+                            >
+                            </input>
+                        </div>
+                        <label className="col-sm-2 control-label">Score End</label>
+                        <div className="col-sm-2">
+                            <input type="number" className="form-control"
+                                   value={send}
+                                   onChange={this.handleScoreEndChange(sai)}
+                            >
+                            </input>
+                        </div>
+                        <label className="col-sm-2 control-label">Score Step</label>
+                        <div className="col-sm-2">
+                            <input type="number" className="form-control"
+                                   value={sstep}
+                                   onChange={this.handleScoreStepChange(sai)}
+                            >
+                            </input>
+                        </div>
+                    </div>);
+
+                }
+            }
+            else{
+                console.log("here")
+                this.handleScoreChange(0,scoreStart,scoreEnd,scoreStep);
             }
         }
 
@@ -416,6 +489,7 @@ export var Question = React.createClass({
                                           className="form-control"
                                           id={qid}
                                           value={this.props.qdata.title}
+                                          placeholder="Question Title"
                                           onChange={this.handleChange.bind(this,"title")}>
                                 </textarea>
                             </div>
@@ -445,30 +519,7 @@ export var Question = React.createClass({
                             </div>
                         </div>
                         <div className="form-group" style={ifDisplayScoreBeginEndStepStyle}>
-                            <label className="col-sm-2 control-label">Score Start</label>
-                            <div className="col-sm-2">
-                                <input type="number" className="form-control"
-                                        value={scoreStart}
-                                        onChange={this.handleScoreStartChange}
-                                    >
-                                </input>
-                            </div>
-                            <label className="col-sm-2 control-label">Score End</label>
-                            <div className="col-sm-2">
-                                <input type="number" className="form-control"
-                                        value={scoreEnd}
-                                        onChange={this.handleScoreEndChange}
-                                    >
-                                </input>
-                            </div>
-                            <label className="col-sm-2 control-label">Score Step</label>
-                            <div className="col-sm-2">
-                                <input type="number" className="form-control"
-                                        value={scoreStep}
-                                        onChange={this.handleScoreStepChange}
-                                    >
-                                </input>
-                            </div>
+                            {scoreHtml}
                         </div>
 
                         {slist}
@@ -482,7 +533,7 @@ export var Question = React.createClass({
                             onClick={this.addselection}
                             className="btn btn-primary">
                         <span className="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                        <span>&nbsp;&nbsp;Add new selection item </span>
+                        <span>&nbsp;&nbsp;Add new item </span>
                     </a>
                     &nbsp;&nbsp;
                     <a type="button"

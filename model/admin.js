@@ -1134,7 +1134,7 @@ Admin.generateVerifiedCode = function(email,callback){
         }
         else{
             db.collection("emailverified",function(err,collection){
-                var randStr = randomstring.generate(10);
+                var randStr = randomstring.generate(6);
 
                 collection.find({email:email}).limit(1).next(function(err,vericode){
                     if(vericode){
