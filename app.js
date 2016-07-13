@@ -11,6 +11,7 @@ var upload = multer({ dest: 'uploads/' });
 var XLSX = require('xlsx');
 var  path = require('path');
 var nodemailer= require('nodemailer');
+var avconv = require("avconv")
 
 var mime = require('mime');
 
@@ -1923,7 +1924,7 @@ aclHandler.registerWait(function(acl){
         var email = req.body.email;
 
         console.log(name);
-        
+
         if(name && pass && email){
             var orgname = "__personal"+name;
             if(orgname){
@@ -2056,6 +2057,80 @@ aclHandler.registerWait(function(acl){
             errorMsg.code = "wrong";
             res.send(JSON.stringify(errorMsg));
         }
+    });
+
+    function sendAudioFile(file,res){
+        var filename = path.basename(file);
+        var mimetype = mime.lookup(file);
+
+        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        res.setHeader('Content-type', mimetype);
+
+        var filestream = fs.createReadStream(file);
+        filestream.pipe(res);
+    }
+
+
+    function isFileExist(fname){
+        try{
+            var fstat = fs.lstatSync(fname);
+            return fstat.isFile()
+        }
+        catch(e){
+            return false;
+        }
+    }
+
+    app.get("/getmp3/:fname",function(req,res){
+        var fname = req.params.fname;
+
+        if(fname){
+            var array = fname.split(".");
+            if(array.length == 2){
+                var ext = array[array.length-1];
+                if(ext == "amr"){
+                    if(isFileExist("uploads/"+fname)){
+                        var fmp3 = "uploads/"+array[0]+".mp3";
+                        if(isFileExist(fmp3)){
+                            sendAudioFile(fmp3,res)
+                        }
+                        else{
+                            var parameters = ["-i","uploads/"+fname,fmp3];
+                            var stream = avconv(parameters);
+                            stream.on('exit', function() {
+                                sendAudioFile(fmp3,res)
+                            })
+                        }
+
+
+                    }
+                    else{
+                        res.status(406);
+                        errorMsg.code = "wrong";
+                        res.send(JSON.stringify(errorMsg));
+                    }
+
+                }
+                else{
+                    res.status(406);
+                    errorMsg.code = "wrong";
+                    res.send(JSON.stringify(errorMsg));
+                }
+            }
+            else{
+                res.status(406);
+                errorMsg.code = "wrong";
+                res.send(JSON.stringify(errorMsg));
+            }
+
+
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
     });
 
 });

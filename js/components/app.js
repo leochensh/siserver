@@ -39,7 +39,7 @@ export var App = React.createClass({
 
     },
     loginclick(){
-        this.context.router.push("/login");
+        this.context.router.push("/frontpage");
     },
     _onChange() {
         var loginInfo = loginStore.getLoginInfo();
@@ -56,15 +56,16 @@ export var App = React.createClass({
                     <div className="container-fluid">
                         <div class="navbar-header">
                             <a style={{padding:0}} className="navbar-brand" href="#">
-                                <img style={{maxHeight:"50px"}} alt="Brand" src="image/logo_244x244.png"/>
+                                <img style={{maxHeight:"50px"}} alt="Brand" src="image/logo_244px.png"/>
                             </a>
                             <a style={{fontSize:"40px",fontWeight:"bolder"}} className="navbar-brand" href="#">Ouresa</a>
                         </div>
 
                         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul className="nav navbar-nav">
-                                <li><a onClick={this.homeclick}>Home</a></li>
-                                <li><a onClick={this.loginclick}>Relogin</a></li>
+
+                                <li><a onClick={this.loginclick}>Home</a></li>
+                                <li><a onClick={this.homeclick}>Entries</a></li>
                             </ul>
 
                         </div>

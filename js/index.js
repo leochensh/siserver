@@ -18,6 +18,7 @@ import {Ads} from "./components/ads"
 import {Org} from "./components/org"
 import {Settings} from "./components/settings"
 import {Edata} from "./components/edata"
+import {Frontpage} from "./components/frontpage"
 
 var main = document.getElementsByTagName('main')[0];
 
@@ -25,7 +26,8 @@ var main = document.getElementsByTagName('main')[0];
 ReactDom.render(
     <Router history={hashHistory}>
         <Route path='/' component={App}>
-            <IndexRoute component={Login}/>
+            <IndexRoute component={Frontpage}/>
+            <Route path="frontpage" component={Frontpage} />
             <Route path="login" component={Login} />
             <Route path="register" component={Register} />
             <Route path="home" component={Home} />

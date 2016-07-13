@@ -854,12 +854,20 @@ export var Stastic = React.createClass({
                                 var seindex = _.findIndex(q.selectextra,function(item){
                                     return item.index == sindex;
                                 })
-                                if(seindex>=0 && q.selectextra[seindex].text){
-                                    sdisList.push(
-                                        <div className="alert alert-success">
-                                            {q.selectextra[seindex].text}
-                                        </div>
-                                    )
+                                if(seindex>=0){
+                                    if(q.selectextra[seindex].text){
+                                        sdisList.push(
+                                            <div className="alert alert-success">
+                                                {q.selectextra[seindex].text}
+                                            </div>
+                                        )
+                                    }
+                                    if(q.selectextra[seindex].audio){
+                                        sdisList.push(
+                                            <audio src={Constant.BASE_URL+"getmp3/"+q.selectextra[seindex].audio} controls />
+                                        )
+                                    }
+
                                 }
                             }
                         }
@@ -904,10 +912,18 @@ export var Stastic = React.createClass({
                         style={{maxHeight:"100px"}}
                         alt="Responsive image"/>
                 }
+
+                var audioContent = ""
+                if(q.audio){
+                    audioContent = <audio src={Constant.BASE_URL+"getmp3/"+q.audio} controls />;
+
+                }
                 sdisList.push(
                     <div style={qtStyle}  className="alert alert-success">
                         {q.text?q.text:""}
                         {imgContent}
+                        <br/>
+                        {audioContent}
                     </div>
                 )
                 detailModal.push(

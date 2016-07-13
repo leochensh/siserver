@@ -186,28 +186,11 @@ export var Login = React.createClass({
         var disStyle = this.state.iferror?{}:{display:"none"};
         var fbdisstyle = this.state.iffberror?{}:{display:"none"};
         return (
-        <div className="row" style={{minHeight:"1200px",background:"url(image/AssocEngagementSurvey-graphic.jpg) no-repeat",backgroundSize:"cover"}}>
-            <div className="col-md-8" style={{padding:"0px"}}>
-                <div className="jumbotron"  style={{padding:"50px",height:"600px"}}>
-                    <h1>Ouresa</h1>
-                    <h3>Ouresa is a online-survey system. You can download the Android App to try it.</h3>
-                    <div className="row">
-                        <a className="col-md-2"
-                           href={Constant.BASE_URL+"downloadapk"}>
-                            <img style={{marginTop:"50px",maxWidth:"200px"}} src="image/dfa.png"/>
-                        </a>
-                        <a className="col-md-offset-1 col-md-2">
-                            <img style={{marginTop:"50px",maxWidth:"200px"}} src="image/0e549f74a0110310e75ad351b98f403b.png"/>
-                        </a>
-                    </div>
-                </div>
+        <div className="row">
 
-            </div>
-            <div className="col-md-4" style={{padding:"0px"}}>
-                <div className="panel panel-default" style={{height:"600px",backgroundColor:"#eee"}}>
-                    <div className="panel-heading">
-                        <h3 className="panel-title">Admin Login</h3>
-                    </div>
+            <div className="col-md-6 col-md-offset-3">
+                <div className="panel panel-default" style={{marginTop:"30px"}}>
+
                     <div className="panel-body" style={{backgroundColor:"#eee"}}>
                         <form className="form-horizontal">
                             <div className="form-group form-group-lg">
