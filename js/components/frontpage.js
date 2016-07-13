@@ -10,7 +10,6 @@ export var Frontpage = React.createClass({
         router: React.PropTypes.object.isRequired
     },
     componentDidMount: function(){
-        this.refs.nameInput.getDOMNode().focus();
         $.get(Constant.BASE_URL+"firstpagevisit");
     },
     getInitialState(){
