@@ -1409,7 +1409,7 @@ aclHandler.registerWait(function(acl){
                 var ext = farray[farray.length-1];
                 if(ext == "amr"){
                     if(isFileExist("uploads/"+dfilename)){
-                        var fmp3 = "uploads/"+farray[0]+".ogg";
+                        var fmp3 = "uploads/"+farray[0]+".mp3";
                         if(isFileExist(fmp3)){
 
                         }
@@ -2101,7 +2101,7 @@ aclHandler.registerWait(function(acl){
                 var ext = array[array.length-1];
                 if(ext == "amr"){
                     if(isFileExist("uploads/"+fname)){
-                        var fmp3 = "uploads/"+array[0]+".ogg";
+                        var fmp3 = "uploads/"+array[0]+".mp3";
                         if(isFileExist(fmp3)){
                             sendAudioFile(fmp3,res)
                         }
@@ -2109,7 +2109,7 @@ aclHandler.registerWait(function(acl){
                             var parameters = ["-i","uploads/"+fname,fmp3];
                             var stream = avconv(parameters);
                             stream.on('exit', function() {
-                                res.redirect("/uploads/fmp3")
+                                sendAudioFile(fmp3,res)
                             })
                         }
 
