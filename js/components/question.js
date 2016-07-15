@@ -290,12 +290,54 @@ export var Question = React.createClass({
 
         var typestr = Constant.QTYPE_NAME_MAP[this.props.qdata.type];
 
-        var typeOptions = [];
-        for(var tkey in Constant.QTYPE_NAME_MAP){
-            typeOptions.push(<option value={tkey}>
-                {Constant.QTYPE_NAME_MAP[tkey]}
-            </option>)
-        }
+        var typeOptions = [
+            <optgroup label="Single Selection">
+                <option value="singleselect">
+                    {Constant.QTYPE_NAME_MAP["singleselect"]}
+                </option>
+                <option value="singleselect_text">
+                    {Constant.QTYPE_NAME_MAP["singleselect_text"]}
+                </option>
+                <option value="singleselect_record_text">
+                    {Constant.QTYPE_NAME_MAP["singleselect_record_text"]}
+                </option>
+            </optgroup>,
+            <optgroup label="Multiple Selection">
+                <option value="multiselect">
+                    {Constant.QTYPE_NAME_MAP["multiselect"]}
+                </option>
+                <option value="multiselect_text">
+                    {Constant.QTYPE_NAME_MAP["multiselect_text"]}
+                </option>
+                <option value="multiselect_record_text">
+                    {Constant.QTYPE_NAME_MAP["multiselect_record_text"]}
+                </option>
+            </optgroup>,
+            <optgroup label="Subjective">
+                <option value="description">
+                    {Constant.QTYPE_NAME_MAP["description"]}
+                </option>
+                <option value="description_record_text">
+                    {Constant.QTYPE_NAME_MAP["description_record_text"]}
+                </option>
+                <option value="description_image_text">
+                    {Constant.QTYPE_NAME_MAP["description_image_text"]}
+                </option>
+            </optgroup>,
+            <optgroup label="Others">
+                <option value="sequence">
+                    {Constant.QTYPE_NAME_MAP["sequence"]}
+                </option>
+                <option value="score">
+                    {Constant.QTYPE_NAME_MAP["score"]}
+                </option>
+            </optgroup>
+        ];
+        //for(var tkey in Constant.QTYPE_NAME_MAP){
+        //    typeOptions.push(<option value={tkey}>
+        //        {Constant.QTYPE_NAME_MAP[tkey]}
+        //    </option>)
+        //}
 
         var slist = [];
         for(var i in this.props.qdata.selectlist){

@@ -2090,7 +2090,7 @@ aclHandler.registerWait(function(acl){
                 var ext = array[array.length-1];
                 if(ext == "amr"){
                     if(isFileExist("uploads/"+fname)){
-                        var fmp3 = "uploads/"+array[0]+".mp3";
+                        var fmp3 = "uploads/"+array[0]+".ogg";
                         if(isFileExist(fmp3)){
                             sendAudioFile(fmp3,res)
                         }
