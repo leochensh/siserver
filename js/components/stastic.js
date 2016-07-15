@@ -863,8 +863,11 @@ export var Stastic = React.createClass({
                                         )
                                     }
                                     if(q.selectextra[seindex].audio){
+                                        var amrfile = q.selectextra[seindex].audio;
+                                        var aarray = amrfile.split(".")
+                                        var dfile = aarray[0]+".ogg"
                                         sdisList.push(
-                                            <audio src={Constant.BASE_URL+"getmp3/"+q.selectextra[seindex].audio} controls />
+                                            <audio src={Constant.BASE_IMAGEURL+dfile} controls />
                                         )
                                     }
 

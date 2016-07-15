@@ -1404,12 +1404,23 @@ aclHandler.registerWait(function(acl){
                 res.send("filename error")
             }
             else{
+                var dfilename = req.file.filename;
+                var farray = dfilename.split(".");
+                var ext = farray[farray.length-1];
+                if(ext == "amr"){
+                    if(isFileExist("uploads/"+dfilename)){
+                        var fmp3 = "uploads/"+farray[0]+".ogg";
+                        if(isFileExist(fmp3)){
 
+                        }
+                        else{
+                            var parameters = ["-i","uploads/"+dfilename,fmp3];
+                            var stream = avconv(parameters);
+                        }
+                    }
+                }
                 successMsg.body = req.file.filename;
-
                 res.send(JSON.stringify(successMsg));
-
-
             }
         });
 
