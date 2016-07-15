@@ -2098,7 +2098,7 @@ aclHandler.registerWait(function(acl){
                             var parameters = ["-i","uploads/"+fname,fmp3];
                             var stream = avconv(parameters);
                             stream.on('exit', function() {
-                                sendAudioFile(fmp3,res)
+                                res.redirect("/uploads/fmp3")
                             })
                         }
 
