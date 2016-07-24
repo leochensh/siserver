@@ -3,7 +3,10 @@ import React from 'react';
 import crypto from "crypto"
 import {Constant} from "../constant"
 import {SisDispatcher} from "../dispatcher";
-
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
 export var Register = React.createClass({
     contextTypes: {
         router: React.PropTypes.object.isRequired
@@ -16,7 +19,9 @@ export var Register = React.createClass({
             password:"",
             repassword:"",
             iferror:false,
-            errorstr:""
+            errorstr:"",
+            capcha:"",
+            newcapcha:1
         }
     },
     handleChange(name,event){
@@ -25,35 +30,81 @@ export var Register = React.createClass({
         newstate.iferror = false;
         this.setState(newstate);
     },
+    capchaClick(){
+        this.setState({
+            "newcapcha":this.state.newcapcha+1
+        })
+    },
     getVerifiedCode(){
-        if(this.state.email){
+        if(!this.state.capcha){
+            this.setState({
+                errorstr:"Please input capcha code first.",
+                iferror:true
+            })
+        }
+        else{
             $("#ajaxloading").show();
-            var that =this;
+            var that = this;
             $.ajax({
-                url: Constant.BASE_URL+"sendverifiedcode",
+                url: Constant.BASE_URL+"checkcapcha",
                 data: $.param({
-                    email:that.state.email
+                    capchacode:that.state.capcha
                 }),
                 type: 'POST',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function (data) {
 
-                    var msg = JSON.parse(data);
                     $("#ajaxloading").hide();
-                    that.setState({
-                        iferror:true,
-                        errorstr:"A email containing verified code already was send to your email. Please check your inbox or spam folder."
-                    })
+                    alert("suc");
+                    if(that.state.email && validateEmail(that.state.email)){
+                        $("#ajaxloading").show();
+                        $.ajax({
+                            url: Constant.BASE_URL+"sendverifiedcode",
+                            data: $.param({
+                                email:that.state.email,
+                                capchacode:that.state.capcha
+                            }),
+                            type: 'POST',
+                            contentType: 'application/x-www-form-urlencoded',
+                            success: function (data) {
+
+                                var msg = JSON.parse(data);
+                                $("#ajaxloading").hide();
+                                that.setState({
+                                    iferror:true,
+                                    errorstr:"A email containing verified code already was send to your email. Please check your inbox or spam folder."
+                                })
+                            },
+                            error:function(){
+                                $("#ajaxloading").hide();
+                                that.setState({
+                                    iferror:true,
+                                    errorstr:"Internal server error. Please try again later or contact administrator."
+                                });
+                            }
+                        });
+                    }
+                    else{
+                        that.setState({
+                            iferror:true,
+                            errorstr:"You should input a valid email address to receive verified code."
+                        })
+                    }
                 },
                 error:function(){
                     $("#ajaxloading").hide();
-                    that.setState({
-                        iferror:true,
-                        errorstr:"Internal server error. Please try again later or contact administrator."
-                    });
+                },
+                statusCode:{
+                    404:function(){
+                        that.setState({
+                            iferror:true,
+                            errorstr:"Capcha code error."});
+                    }
                 }
             });
+
         }
+
     },
     gotoLogin(){
         $("#loginmodal").modal("hide");
@@ -127,6 +178,21 @@ export var Register = React.createClass({
                 <div className="col-md-8 col-md-offset-2">
                     <div className="divLogin">
                         <form className="form-horizontal">
+                            <div className="form-group form-group-lg">
+                                <label className="col-sm-2 control-label">Capcha</label>
+                                <div className="col-sm-7">
+                                    <input type="text"
+                                           className="form-control"
+                                           id="inputcapcha"
+                                           placeholder="Capcha"
+                                           value={this.state.capcha}
+                                           onChange={this.handleChange.bind(this,"capcha")}
+                                    />
+                                </div>
+                                <div className="col-sm-3">
+                                    <img onClick={this.capchaClick} src={Constant.BASE_URL+"getcapcha"+"?"+this.state.newcapcha} />
+                                </div>
+                            </div>
                             <div className="form-group form-group-lg">
                                 <label htmlFor="inputEmail4" className="col-sm-2 control-label">Email</label>
                                 <div className="col-sm-7">

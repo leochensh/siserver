@@ -5,6 +5,7 @@ var async = require("async")
 var ObjectID=require('mongodb').ObjectID;
 var _ = require("underscore");
 var randomstring = require("randomstring");
+var ccap = require('ccap');
 
 module.exports = Admin;
 
@@ -1319,6 +1320,74 @@ Admin.getFlipkartData = function(callback){
                         });
                     });
                 });
+            });
+        }
+    });
+};
+
+Admin.getCpacha = function(cid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("capcha",function(err,collection){
+                var newCap = ccap();
+                var ary = newCap.get();
+                console.log("generate code is "+ary[0])
+                if(cid){
+                    collection.find({_id:ObjectID(cid)}).limit(1).next(function(err,capcha){
+                        if(capcha){
+                            collection.updateOne({_id:ObjectID(cid)},{$set:{value:ary[0]}},function(err,msg){
+                                mongoPool.release(db);
+                                callback(err,cid,ary[1]);
+                            })
+
+
+                        }else{
+                            collection.insertOne({value:ary[0]},function(err,newc){
+                                mongoPool.release(db);
+                                callback(err,newc.insertedId.toString(),ary[1])
+                            })
+                        }
+
+                    })
+                }
+                else{
+                    collection.insertOne({value:ary[0]},function(err,newc){
+                        mongoPool.release(db);
+                        callback(err,newc.insertedId.toString(),ary[1])
+                    })
+                }
+
+
+            });
+        }
+    });
+};
+
+Admin.checkCapcha = function(code,cid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("capcha",function(err,collection){
+                console.log("id is "+cid)
+                collection.find({_id:ObjectID(cid),value:code.toUpperCase()}).limit(1).next(function(err,capcha){
+                    if(capcha){
+                        mongoPool.release(db);
+                        callback(err,capcha);
+
+                    }else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+
+                })
+
+
+
             });
         }
     });

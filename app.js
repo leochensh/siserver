@@ -11,7 +11,9 @@ var upload = multer({ dest: 'uploads/' });
 var XLSX = require('xlsx');
 var  path = require('path');
 var nodemailer= require('nodemailer');
-var avconv = require("avconv")
+var avconv = require("avconv");
+
+
 
 var mime = require('mime');
 
@@ -213,6 +215,40 @@ app.get("/firstpagevisit",function(req,res){
         successMsg.body = "ok";
         res.send(JSON.stringify(successMsg));
     })
+});
+
+app.get("/getcapcha",function(req,res){
+    var cid = null;
+    if(req.session.captchaid){
+        cid = req.session.captchaid;
+    }
+    Admin.getCpacha(cid,function(err,newcid,buf){
+        req.session.captchaid = newcid;
+        res.end(buf);
+    })
+});
+
+app.post("/checkcapcha",function(req,res){
+    var ccode = req.body.capchacode;
+    if(ccode && req.session.captchaid){
+        Admin.checkCapcha(ccode,req.session.captchaid,function(err,msg){
+            if(msg == "notfound"){
+                res.status(404);
+                errorMsg.code = "not found";
+                res.send(JSON.stringify(errorMsg));
+            }
+            else{
+                res.status(200);
+                successMsg.body = "success";
+                res.send(JSON.stringify(successMsg));
+            }
+        })
+    }
+    else{
+        res.status(404);
+        errorMsg.code = "not found";
+        res.send(JSON.stringify(errorMsg));
+    }
 });
 
 app.get('/downloadapk', function(req, res){
@@ -1831,30 +1867,41 @@ aclHandler.registerWait(function(acl){
 
     app.post("/sendverifiedcode",function(req,res){
         var email = req.body.email;
+        var ccode = req.body.capchacode;
 
-        if(email){
-            Admin.generateVerifiedCode(email,function(err,msg){
-                var mailOptions = {
-                    from: from,
-                    to: email,
-                    subject: "Account Verified Code",
-                    text: "Your Ouresa account verified code is "+msg+". Please input it into register form."
-                };
-                smtpTransport.sendMail(mailOptions, function(error, response){
-                    if(error){
-                        console.log(error);
-                        res.status(500);
-                        errorMsg.code = "wrong";
-                        res.send(JSON.stringify(errorMsg));
-                    }else{
-                        console.log("ok");
-                        res.status(200);
-                        successMsg.body = "ok";
+        if(email && ccode){
+            Admin.checkCapcha(ccode,req.session.captchaid,function(err,msg){
+                if(msg!="notfound"){
+                    Admin.generateVerifiedCode(email,function(err,msg){
+                        var mailOptions = {
+                            from: from,
+                            to: email,
+                            subject: "Account Verified Code",
+                            text: "Your Ouresa account verified code is "+msg+". Please input it into register form."
+                        };
+                        smtpTransport.sendMail(mailOptions, function(error, response){
+                            if(error){
+                                console.log(error);
+                                res.status(500);
+                                errorMsg.code = "wrong";
+                                res.send(JSON.stringify(errorMsg));
+                            }else{
+                                console.log("ok");
+                                res.status(200);
+                                successMsg.body = "ok";
 
-                        res.send(JSON.stringify(successMsg));
-                    }
-                });
+                                res.send(JSON.stringify(successMsg));
+                            }
+                        });
+                    })
+                }
+                else{
+                    res.status(406);
+                    errorMsg.code = "wrong";
+                    res.send(JSON.stringify(errorMsg));
+                }
             })
+
         }
         else{
             res.status(406);
