@@ -197,6 +197,45 @@ export var Quest = React.createClass({
         });
 
     },
+    sortClick(index,slength){
+        var that  = this;
+
+        var innerFunc = function(event){
+            console.log(index);
+            var sortlist = that.state.answer.answerlist[that.state.currentIndex].sortlist;
+            var nextSort = 1;
+            if(sortlist.length>0){
+                for(var si =0;si<=slength-1;si++){
+                    var f2 = _.findIndex(sortlist,function(item){
+                        return item.sort == si+1;
+                    })
+                    if(f2<0){
+                        nextSort = si+1;
+                        break;
+                    }
+                }
+            }
+
+            var findex = _.findIndex(sortlist,function(item){
+                return item.index == index;
+            });
+
+            if(findex>=0){
+                sortlist.splice(index,1)
+            }
+            else{
+                sortlist.push({
+                    index:index,
+                    sort:nextSort
+                })
+            }
+            that.setState({
+                answer:that.state.answer
+            });
+
+        }
+        return innerFunc;
+    },
     scorevalueChange(index){
         var that = this;
         var innerFunc = function(event){
@@ -392,6 +431,39 @@ export var Quest = React.createClass({
                             >
                                 {oarray}
                             </select>
+                        )
+                    }
+
+                }
+
+            }
+            if(currentType == Constant.QTYPE_SEQUENCE){
+                var sortlist = this.state.answer.answerlist[this.state.currentIndex].sortlist;
+                if(currentQ.selectlist && _.isArray(currentQ.selectlist)){
+
+
+                    for(var si in currentQ.selectlist){
+                        var matchIndex = _.findIndex(sortlist,function(item){
+                            return item.index == si;
+                        });
+                        var sortvalue = null;
+                        if(matchIndex>=0){
+                            sortvalue = sortlist[matchIndex].sort;
+                        }
+
+
+                        slist.push(
+                            <div className="row">
+                                <a onClick={this.sortClick(si,currentQ.selectlist.length)} className="col-md-10">
+                                    <div className="alert alert-info" role="alert">
+                                        {currentQ.selectlist[si].title}
+                                    </div>
+                                </a>
+                                <div className="col-md-2">
+                                    {sortvalue?<span className="blue">{parseInt(sortvalue)}</span>:""}
+                                </div>
+
+                            </div>
                         )
                     }
 

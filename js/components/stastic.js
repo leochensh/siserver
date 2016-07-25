@@ -896,6 +896,21 @@ export var Stastic = React.createClass({
                         }
 
                     }
+                    else if(currentQ.type == Constant.QTYPE_SEQUENCE){
+                        var slist = q.sortlist;
+                        var sorted = _.sortBy(slist,function(item){
+                            return item.sort
+                        })
+                        for(var qi in sorted){
+                            sdisList.push(
+                                <div>
+                                    <p>
+                                        <span className="blue">{parseInt(sorted[qi].index)+1}</span>
+                                    </p>
+                                </div>
+                            )
+                        }
+                    }
 
                 }
                 var qtStyle = {
