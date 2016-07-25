@@ -221,7 +221,7 @@ export var Quest = React.createClass({
             });
 
             if(findex>=0){
-                sortlist.splice(index,1)
+                sortlist.splice(findex,1)
             }
             else{
                 sortlist.push({
