@@ -42,8 +42,8 @@ export var Frontpage = React.createClass({
                                         color:"#fff",
                                         textShadow:"0 -1px 1px rgba(0,0,0,0.8)",
                                         display:"block"}}>
-                        <h1>Ouresa</h1>
-                        <h3>Ouresa is a online-survey system. You can download the Android App to try it.</h3>
+                        <h1>Survey Details,  Insight Future</h1>
+                        <h3>You can scan QR code via mobile phone or press download buttun to experience android version right now.</h3>
                         <p style={{marginTop:"30px"}}>
                             <button type="button" onClick={this.handleLoginClick} className="btn btn-primary btn-lg" style={{marginRight:"15px"}}>Login</button>
                             <button type="button" onClick={this.handleRegisterClick} className="btn btn-default btn-lg">Register</button>
