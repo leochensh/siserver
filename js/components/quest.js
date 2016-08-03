@@ -471,7 +471,7 @@ export var Quest = React.createClass({
 
             }
             var mainPart = (
-                <div className="container">
+                <div className="container" >
                     <div className="progress">
                         <div className="progress-bar" role="progressbar" aria-valuenow="53.2" aria-valuemin="0" aria-valuemax="100" style={{width: percent*100+"%"}}>
                             {this.state.currentIndex+1} of {Qlist.length}
@@ -520,7 +520,7 @@ export var Quest = React.createClass({
                     </div>)
             }
             return (
-                <div className="jumbotron ">
+                <div className="jumbotron " style={{minHeight:"800px",padding:"80px"}}>
                     {mainPart}
                 </div>
             )

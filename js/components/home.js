@@ -1,4 +1,6 @@
 import React from 'react';
+import {SisDispatcher} from "../dispatcher";
+import {Constant} from "../constant";
 
 export var Home = React.createClass({
     contextTypes: {
@@ -8,6 +10,9 @@ export var Home = React.createClass({
         this.context.router.push("/personal");
     },
     newsurvey(event){
+        SisDispatcher.dispatch({
+            actionType: Constant.CLEANSURVEYDATA
+        });
         this.context.router.push("/newsurvey");
     },
     surveymanage(event){

@@ -283,6 +283,9 @@ export var Question = React.createClass({
         this.props.dhandle();
 
     },
+    questionUp(){
+        this.props.uphandle();
+    },
     render(){
         //alert(JSON.stringify(this.props))
         var colorClass = this.props.qdata.ifSaved?"blue":"red";
@@ -502,6 +505,18 @@ export var Question = React.createClass({
         }
 
 
+        var upArrowClass = "btn btn-default";
+        var downArrowClass = "btn btn-default";
+
+        if(this.props.index == 0){
+            upArrowClass = "btn btn-default disabled";
+        }
+
+        if(this.props.index == this.props.qlist.length-1){
+            downArrowClass = "btn btn-default disabled";
+        }
+
+
 
 
         return(
@@ -512,13 +527,22 @@ export var Question = React.createClass({
                             <span className={colorClass}>{parseInt(this.props.index)+1}</span>
                         </div>
 
-                        <form className="col-md-8 form-inline">
+                        <form className="col-md-6 form-inline">
                             <select className="form-control"
                                     onChange={this.handleChange.bind(this,"type")}
                                     value={this.props.qdata.type}>
                                 {typeOptions}
                             </select>
                         </form>
+                        <div className="col-md-2">
+                            <a className={upArrowClass}  role="button" onClick={this.questionUp}>
+                                <span className="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                            </a>
+                            <a className={downArrowClass}  role="button">
+                                <span className="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                            </a>
+
+                        </div>
                     </div>
 
                 </div>

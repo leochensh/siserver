@@ -34,7 +34,7 @@ export var Login = React.createClass({
         this.setState(newstate);
     },
     keypress(event){
-        event.stopPropagation();
+        //event.stopPropagation();
         if(event.key == "Enter"){
             this.handleClick(event);
         }
@@ -209,6 +209,8 @@ export var Login = React.createClass({
                                 <label htmlFor="inputPassword3" className="col-sm-2 control-label">Password</label>
                                 <div className="col-sm-10">
                                     <input type="password"
+                                           ref="nameInput"
+                                           onKeyPress={this.keypress}
                                            className="form-control"
                                            id="inputPassword3"
                                            placeholder="Password"
@@ -226,31 +228,32 @@ export var Login = React.createClass({
                                     </div>
                                 </div>
                             </div>
-                            <div className="form-group form-group-lg">
 
-
-                                <div className="col-sm-offset-2 col-sm-2">
-                                    <button
-                                        ref="nameInput"
-                                        className="btn btn-primary"
-                                        onClick={this.handleClick}
-                                    >Log in</button>
-                                </div>
-                                <div className="col-sm-offset-1 col-sm-2">
-                                    <button
-                                        className="btn btn-default"
-                                        onClick={this.handleRegisterClick}
-                                    >Register</button>
-                                </div>
-
-                                <div className="col-sm-offset-1 col-sm-2">
-                                    <FacebookLogin
-                                        appId="1820455008188736"
-                                        autoLoad={false}
-                                        callback={this.responseFacebook} />
-                                </div>
-                            </div>
                         </form>
+                        <div>
+
+
+                            <div className="col-sm-offset-2 col-sm-2">
+                                <a
+
+                                    className="btn btn-primary"
+                                    onClick={this.handleClick}
+                                >Log in</a>
+                            </div>
+                            <div className="col-sm-offset-1 col-sm-2">
+                                <a
+                                    className="btn btn-default"
+                                    onClick={this.handleRegisterClick}
+                                >Register</a>
+                            </div>
+
+                            <div className="col-sm-offset-1 col-sm-2">
+                                <FacebookLogin
+                                    appId="1820455008188736"
+                                    autoLoad={false}
+                                    callback={this.responseFacebook} />
+                            </div>
+                        </div>
                         <div className="alert alert-danger loginalert" role="alert" style={disStyle}>
                             Username/Password error
                         </div>

@@ -35,14 +35,14 @@ export var Frontpage = React.createClass({
         var disStyle = this.state.iferror?{}:{display:"none"};
         var fbdisstyle = this.state.iffberror?{}:{display:"none"};
         return (
-            <div className="row"  style={{background:"#789928",minHeight:"500px"}}>
+            <div className="row"  style={{background:"#789928",minHeight:"700px",padding:"100px"}}>
                 <div className="col-md-8">
                     <div className="jumbotron"  style={{background:"#789928",
                                         textAlign:"center",
                                         color:"#fff",
                                         textShadow:"0 -1px 1px rgba(0,0,0,0.8)",
                                         display:"block"}}>
-                        <h1>Survey Details,  Insight Future</h1>
+                        <h1 style={{fontSize:"50px"}}>Survey Details,  Insight Future</h1>
                         <h3>You can scan QR code via mobile phone or press download buttun to experience android version right now.</h3>
                         <p style={{marginTop:"30px"}}>
                             <button type="button" onClick={this.handleLoginClick} className="btn btn-primary btn-lg" style={{marginRight:"15px"}}>Login</button>

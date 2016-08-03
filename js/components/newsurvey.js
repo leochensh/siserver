@@ -402,6 +402,21 @@ export var Newsurvey = React.createClass({
         }
         return qhanle;
     },
+    questionSequenceUp(index){
+        var that =this;
+        var qhanle = function(qdata){
+            var temp = that.props.newsurvey.qlist[index-1];
+            that.props.newsurvey.qlist[index-1] = that.props.newsurvey.qlist[index];
+            that.props.newsurvey.qlist[index] = temp;
+            SisDispatcher.dispatch({
+                actionType: Constant.SURVEYVALUECHANGE,
+                name:"qlist",
+                value:that.props.newsurvey.qlist
+            });
+
+        }
+        return qhanle;
+    },
     questiondeleteinform(index){
         var that = this;
         var dhandler = function(){
@@ -544,7 +559,7 @@ export var Newsurvey = React.createClass({
         })
     },
     showtips(){
-        var internal = 3000;
+        var internal = 5000;
         $("#suveynameinput").popover("show");
         setTimeout(function(){
             $("#suveynameinput").popover("hide");
@@ -570,6 +585,7 @@ export var Newsurvey = React.createClass({
                 index={i}
                 qdata={q}
                 dhandle={this.questiondeleteinform(i)}
+                uphandle={this.questionSequenceUp(i)}
                 qlist={this.props.newsurvey.qlist}
                 qhandle={this.questionchange(i)}></Question>);
         }

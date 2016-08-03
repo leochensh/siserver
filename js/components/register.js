@@ -21,7 +21,9 @@ export var Register = React.createClass({
             iferror:false,
             errorstr:"",
             capcha:"",
-            newcapcha:1
+            newcapcha:1,
+            ifemailsend:false,
+            secondcount:60
         }
     },
     handleChange(name,event){
@@ -45,6 +47,21 @@ export var Register = React.createClass({
         else{
             $("#ajaxloading").show();
             var that = this;
+            this.setState({
+                ifemailsend:true
+            });
+            var intervalId = setInterval(function(){
+                that.setState({
+                    secondcount:parseInt(that.state.secondcount)-10
+                })
+            },10000);
+            setTimeout(function(){
+                clearInterval(intervalId);
+                that.setState({
+                    ifemailsend:false,
+                    secondcount:60
+                })
+            },60000);
             $.ajax({
                 url: Constant.BASE_URL+"checkcapcha",
                 data: $.param({
@@ -55,7 +72,6 @@ export var Register = React.createClass({
                 success: function (data) {
 
                     $("#ajaxloading").hide();
-                    alert("suc");
                     if(that.state.email && validateEmail(that.state.email)){
                         $("#ajaxloading").show();
                         $.ajax({
@@ -93,6 +109,11 @@ export var Register = React.createClass({
                 },
                 error:function(){
                     $("#ajaxloading").hide();
+                    clearInterval(intervalId);
+                    that.setState({
+                        ifemailsend:false,
+                        secondcount:60
+                    })
                 },
                 statusCode:{
                     404:function(){
@@ -173,6 +194,12 @@ export var Register = React.createClass({
     },
     render() {
         var disStyle = this.state.iferror?{}:{display:"none"};
+        var emailCheckButtonClass = "btn btn-default";
+        var emailButtonText = "Get verified code";
+        if(this.state.ifemailsend){
+            emailCheckButtonClass = "btn btn-default disabled"
+            emailButtonText = "Resend email after "+this.state.secondcount + " seconds"
+        }
         return (
             <div className="row">
                 <div className="col-md-8 col-md-offset-2">
@@ -206,9 +233,9 @@ export var Register = React.createClass({
                                 </div>
                                 <div className="col-sm-1">
                                     <a
-                                        className="btn btn-default"
+                                        className={emailCheckButtonClass}
                                         onClick={this.getVerifiedCode}
-                                    >Get verified code</a>
+                                    >{emailButtonText}</a>
                                 </div>
                             </div>
                             <div className="form-group form-group-lg">

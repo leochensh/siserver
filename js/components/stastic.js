@@ -595,7 +595,14 @@ export var Stastic = React.createClass({
                                     return memo+1;
                                 }
                                 else{
-                                    return memo;
+                                    sfi = _.indexOf(alist[qfi].selectindexlist,j+"");
+                                    if(sfi>=0){
+                                        return memo+1;
+                                    }
+                                    else{
+                                        return memo;
+                                    }
+
                                 }
                             }
                             else{
@@ -911,48 +918,49 @@ export var Stastic = React.createClass({
                             )
                         }
                     }
+                    var qtStyle = {
+                        display:"none"
+                    };
+                    if(q.text || q.image){
+                        qtStyle = {};
+                    }
+                    var imgContent = "";
+                    if(q.image){
+                        imgContent = <img
+                            src={Constant.BASE_IMAGEURL+q.image}
+                            className="img-rounded"
+                            style={{maxHeight:"100px"}}
+                            alt="Responsive image"/>
+                    }
 
-                }
-                var qtStyle = {
-                    display:"none"
-                };
-                if(q.text || q.image){
-                    qtStyle = {};
-                }
-                var imgContent = "";
-                if(q.image){
-                    imgContent = <img
-                        src={Constant.BASE_IMAGEURL+q.image}
-                        className="img-rounded"
-                        style={{maxHeight:"100px"}}
-                        alt="Responsive image"/>
-                }
+                    var audioContent = ""
+                    if(q.audio){
+                        audioContent = <audio src={Constant.BASE_URL+"getmp3/"+q.audio} controls />;
 
-                var audioContent = ""
-                if(q.audio){
-                    audioContent = <audio src={Constant.BASE_URL+"getmp3/"+q.audio} controls />;
-
-                }
-                sdisList.push(
-                    <div style={qtStyle}  className="alert alert-success">
-                        {q.text?q.text:""}
-                        {imgContent}
-                        <br/>
-                        {audioContent}
-                    </div>
-                )
-                detailModal.push(
-                    <div className="panel panel-default">
-                        <div className="panel-heading">
-                            <span className="green">{parseInt(i)+1}</span>
-                            <span>&nbsp;&nbsp;{currentQ.title?currentQ.title:""}</span>
-                            <span>&nbsp;&nbsp;Type: {Constant.QTYPE_NAME_MAP[currentQ.type]}</span>
+                    }
+                    sdisList.push(
+                        <div style={qtStyle}  className="alert alert-success">
+                            {q.text?q.text:""}
+                            {imgContent}
+                            <br/>
+                            {audioContent}
                         </div>
-                        <div className="panel-body">
-                            {sdisList}
+                    )
+                    detailModal.push(
+                        <div className="panel panel-default">
+                            <div className="panel-heading">
+                                <span className="green">{parseInt(i)+1}</span>
+                                <span>&nbsp;&nbsp;{currentQ.title?currentQ.title:""}</span>
+                                <span>&nbsp;&nbsp;Type: {Constant.QTYPE_NAME_MAP[currentQ.type]}</span>
+                            </div>
+                            <div className="panel-body">
+                                {sdisList}
+                            </div>
                         </div>
-                    </div>
-                )
+                    )
+
+                }
+
             }
 
 
