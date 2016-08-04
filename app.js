@@ -1977,9 +1977,9 @@ aclHandler.registerWait(function(acl){
     });
 
     app.post("/addmobilepersonal",function(req,res){
-        var name = req.body.name;
+        var name = req.body.username;
         var pass = req.body.password;
-        var email = req.body.email;
+        var email = req.body.Email;
 
         console.log(name);
 
