@@ -25,7 +25,7 @@ export var Stastic = React.createClass({
     exportxlsx(){
         $("#ajaxloading").show();
         var qout = [];
-        var firstQ = [ "No.","Interviewer","Visit Date",
+        var firstQ = [ "No.","duration","Interviewer","Visit Date",
                        "Country","City","Customer","Male","Female"];
 
         for(var qindex in this.state.survey.questionlist){
@@ -76,6 +76,15 @@ export var Stastic = React.createClass({
             var customer = "";
             var male = "";
             var female = "";
+            var duration = "";
+
+            if(currentA.begintime && currentA.endtime){
+                var stime = new Date(currentA.begintime);
+                var etime = new Date(currentA.endtime);
+                if(stime && etime){
+                    duration = (etime-stime)/(1000*60);
+                }
+            }
 
             var aNameList = currentA.name.split("_");
             if(aNameList[2]){
@@ -97,7 +106,7 @@ export var Stastic = React.createClass({
                 }
             }
 
-            firstQ = [(parseInt(aindex)+1),currentA.investigatorname?currentA.investigatorname:"",
+            firstQ = [(parseInt(aindex)+1),duration,currentA.investigatorname?currentA.investigatorname:"",
                       dstring,country,city,customer,male,female];
 
 
