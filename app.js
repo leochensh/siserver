@@ -74,7 +74,7 @@ app.use('/uploads',serveStatic(__dirname + '/uploads'));
 app.use('/public',serveStatic(__dirname + '/public'));
 //app.use(multer({dest:"./static/"}));
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '4MB'}));
 
 
 app.use(session({
