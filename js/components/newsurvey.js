@@ -45,6 +45,12 @@ export var Newsurvey = React.createClass({
             value:event.target.value
         });
     },
+    surveyNameChange(event){
+        SisDispatcher.dispatch({
+            actionType:Constant.SURVEYNAMECHANGE,
+            value:event.target.value
+        })
+    },
     cleanall(){
         $("#cleanall").modal("show");
     },
@@ -353,12 +359,11 @@ export var Newsurvey = React.createClass({
                 precedentindex : -1,
                 precedentselectindex : -1
             };
-            var cqlist = this.props.newsurvey.qlist;
-            cqlist.push(newQ);
+            //var cqlist = this.props.newsurvey.qlist;
+            //cqlist.push(newQ);
             SisDispatcher.dispatch({
-                actionType: Constant.SURVEYVALUECHANGE,
-                name:"qlist",
-                value:cqlist
+                actionType: Constant.SURVEYADDNEWQUESTION,
+                value:newQ
             });
             setTimeout(function(){
                 //var objDiv = document.getElementById("scrollright");
@@ -394,25 +399,35 @@ export var Newsurvey = React.createClass({
                 cq[key] = qdata[key];
             }
             SisDispatcher.dispatch({
-                actionType: Constant.SURVEYVALUECHANGE,
-                name:"qlist",
-                value:that.props.newsurvey.qlist
+                actionType: Constant.SURVEYQUESTIONEDIT,
+                value:index
             });
 
-        }
+        };
         return qhanle;
     },
     questionSequenceUp(index){
         var that =this;
         var qhanle = function(qdata){
-            var temp = that.props.newsurvey.qlist[index-1];
-            that.props.newsurvey.qlist[index-1] = that.props.newsurvey.qlist[index];
-            that.props.newsurvey.qlist[index] = temp;
+
             SisDispatcher.dispatch({
-                actionType: Constant.SURVEYVALUECHANGE,
-                name:"qlist",
-                value:that.props.newsurvey.qlist
-            });
+                actionType:Constant.SURVEYQUESTIONSEQUENCECHANGE,
+                direction:"up",
+                index:index
+            })
+
+        }
+        return qhanle;
+    },
+    questionSequenceDown(index){
+        var that =this;
+        var qhanle = function(qdata){
+
+            SisDispatcher.dispatch({
+                actionType:Constant.SURVEYQUESTIONSEQUENCECHANGE,
+                direction:"down",
+                index:index
+            })
 
         }
         return qhanle;
@@ -420,12 +435,11 @@ export var Newsurvey = React.createClass({
     questiondeleteinform(index){
         var that = this;
         var dhandler = function(){
-            var qlist = that.props.newsurvey.qlist;
-            qlist.splice(index,1);
+            //var qlist = that.props.newsurvey.qlist;
+            //qlist.splice(index,1);
             SisDispatcher.dispatch({
-                actionType: Constant.SURVEYVALUECHANGE,
-                name:"qlist",
-                value:qlist
+                actionType: Constant.SURVEYQUESTIONDELETE,
+                value:index
             });
 
         };
@@ -578,6 +592,14 @@ export var Newsurvey = React.createClass({
         if(this.props.newsurvey.ifSurveyNameEmpty){
             emptystyle = {}
         }
+
+        var saveButtonStype = {};
+        if(this.props.newsurvey.ifSaved){
+            saveButtonStype = {
+                display:"none"
+            }
+        }
+
         var questionList = [];
         for(var i in this.props.newsurvey.qlist){
             var q = this.props.newsurvey.qlist[i];
@@ -586,6 +608,7 @@ export var Newsurvey = React.createClass({
                 qdata={q}
                 dhandle={this.questiondeleteinform(i)}
                 uphandle={this.questionSequenceUp(i)}
+                downhandle={this.questionSequenceDown(i)}
                 qlist={this.props.newsurvey.qlist}
                 qhandle={this.questionchange(i)}></Question>);
         }
@@ -670,14 +693,7 @@ export var Newsurvey = React.createClass({
                                         <h3> {this.props.newsurvey.surveyname}
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             <span style={surveyStatusClassStyle}>{surveyStatusTxt}</span>
-                                            &nbsp;&nbsp;&nbsp;&nbsp;
-                                            <a type="button"
-                                               id="saveallbutton"
-                                               onClick={this.saveall}
-                                               className="btn btn-primary">
-                                                <span className="glyphicon glyphicon-save" aria-hidden="true"></span>
-                                                <span>&nbsp;&nbsp;Save all</span>
-                                            </a>
+
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             <a type="button"
                                                     disabled={ifDisablePublish}
@@ -707,7 +723,7 @@ export var Newsurvey = React.createClass({
                                                onClick={this.showtips}
                                                className="btn btn-warning">
                                                 <span className="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
-                                                <span>&nbsp;&nbsp;Show tips</span>
+                                                <span>&nbsp;&nbsp;How to use?</span>
                                             </a>
                                         </h3>
                                     </div>
@@ -721,14 +737,14 @@ export var Newsurvey = React.createClass({
                                                    className="form-control"
                                                    id="suveynameinput"
                                                    value={this.props.newsurvey.surveyname}
-                                                   onChange={this.handleChange.bind(this,"surveyname")}
+                                                   onChange={this.surveyNameChange}
                                                    placeholder="Survey Name"/>
                                         </div>
 
                                     </div>
 
                                     <div className="form-group">
-                                        <div className="col-sm-offset-2 col-sm-10">
+                                        <div className="col-sm-offset-2 col-sm-10" style={saveButtonStype}>
                                             <a className="btn btn-primary"
                                                id = "surveynamesavebutton"
                                                     onClick={this.savesurvey}>

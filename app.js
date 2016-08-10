@@ -946,6 +946,36 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+    app.put("/editor/survey/question/sequencechange",acl.middleware(2),function(req,res){
+        var surveyid = req.body.surveyid;
+        var questionid = req.body.questionid;
+        var direction = req.body.direction;
+
+        if(surveyid && questionid && direction){
+            Staff.changeQuestionSequence(surveyid,questionid,direction,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff change question sequence",{
+                        id:surveyid,
+                        questionid:questionid});
+                    res.status(200);
+                    successMsg.body = null;
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
     app.put("/editor/survey/rfp",acl.middleware(2),function(req,res){
         var surveyid = req.body.surveyid;
         console.log("haha")
@@ -2223,36 +2253,36 @@ function checkSurveyData(data){
         data.type!=dict.QTYPE_SINGLESELECT_TEXT)){
         return false;
     }
-    else if(!data.title){
-        return false;
-    }
-    else if((data.type == dict.QTYPE_MULTISELECT ||
-        data.type == dict.QTYPE_SEQUENCE ||
-        data.type == dict.QTYPE_SINGLESELECT ||
-        data.type == dict.QTYPE_SCORE) &&
-        !_.isArray(data.selectlist)){
-        return false;
-    }
-    else if(data.type == dict.QTYPE_MULTISELECT ||
-        data.type == dict.QTYPE_SEQUENCE ||
-        data.type == dict.QTYPE_SINGLESELECT ||
-        data.type == dict.QTYPE_SCORE){
-        for(var i in data.selectlist){
-            var q = data.selectlist[i];
-            if(q.type!=dict.SELECTTYPE_AUDIO &&
-                q.type!=dict.SELECTTYPE_DESCRIPTION &&
-                q.type!=dict.SELECTTYPE_IMAGE &&
-                q.type!=dict.SELECTTYPE_TEXT &&
-                q.type!=dict.SELECTTYPE_VIDEO){
-                return false;
-            }
-        }
-    }
-    else if(data.precederid){
-        if(!data.precederselectindex){
-            return false;
-        }
-    }
+    //else if(!data.title){
+    //    return false;
+    //}
+    //else if((data.type == dict.QTYPE_MULTISELECT ||
+    //    data.type == dict.QTYPE_SEQUENCE ||
+    //    data.type == dict.QTYPE_SINGLESELECT ||
+    //    data.type == dict.QTYPE_SCORE) &&
+    //    !_.isArray(data.selectlist)){
+    //    return false;
+    //}
+    //else if(data.type == dict.QTYPE_MULTISELECT ||
+    //    data.type == dict.QTYPE_SEQUENCE ||
+    //    data.type == dict.QTYPE_SINGLESELECT ||
+    //    data.type == dict.QTYPE_SCORE){
+    //    for(var i in data.selectlist){
+    //        var q = data.selectlist[i];
+    //        if(q.type!=dict.SELECTTYPE_AUDIO &&
+    //            q.type!=dict.SELECTTYPE_DESCRIPTION &&
+    //            q.type!=dict.SELECTTYPE_IMAGE &&
+    //            q.type!=dict.SELECTTYPE_TEXT &&
+    //            q.type!=dict.SELECTTYPE_VIDEO){
+    //            return false;
+    //        }
+    //    }
+    //}
+    //else if(data.precederid){
+    //    if(!data.precederselectindex){
+    //        return false;
+    //    }
+    //}
 
     return true;
 

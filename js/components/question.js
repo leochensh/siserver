@@ -12,7 +12,8 @@ export var Question = React.createClass({
             title:"newquestion",
             ifSaved:false,
             selectlist:[],
-            id:null
+            id:null,
+            deleteindex:null
         };
     },
     addselection(){
@@ -178,12 +179,54 @@ export var Question = React.createClass({
     deleteselection(index){
         var that = this;
         var dfunc = function(){
-            var slist = that.props.qdata.selectlist;
-            slist.splice(index,1);
-            that.informChange({
+
+            $("#deleteindexmodal").modal("show");
+            that.state.deleteindex = index;
+
+
+        };
+        return dfunc;
+    },
+    confirmDeleteSelection(){
+        var slist = this.props.qdata.selectlist;
+        if(this.state.deleteindex){
+            slist.splice(this.state.deleteindex,1);
+            this.informChange({
                 selectlist:slist
             })
         }
+        $("#deleteindexmodal").modal("hide");
+
+    },
+    selectionUp(index){
+        var that = this;
+        var dfunc = function(){
+            var slist = that.props.qdata.selectlist;
+            if(index!=0){
+                var temp = slist[index-1];
+                slist[index-1] = slist[index];
+                slist[index] = temp;
+            }
+            that.informChange({
+                selectlist:slist
+            })
+        };
+        return dfunc;
+    },
+    selectionDown(index){
+        var that = this;
+        var dfunc = function(){
+            var slist = that.props.qdata.selectlist;
+            if(index!=slist.length-1){
+                var intindex = parseInt(index);
+                var temp = slist[intindex+1];
+                slist[intindex+1] = slist[intindex];
+                slist[intindex] = temp;
+            }
+            that.informChange({
+                selectlist:slist
+            })
+        };
         return dfunc;
     },
     savequestion(){
@@ -198,93 +241,21 @@ export var Question = React.createClass({
             alert("Question title can not be null!")
         }
 
-        //if(this.props.qdata.title &&
-        //    (this.props.qdata.selectlist.length>0 || this.props.qdata.type == Constant.QTYPE_DESCRIPTION)){
-        //    var q = {
-        //        title:this.props.qdata.title,
-        //        surveyid:this.props.qdata.surveyid,
-        //        type:this.props.qdata.type,
-        //        selectlist:this.props.qdata.selectlist
-        //    };
-        //    //alert(JSON.stringify(this.props.qdata));
-        //    $("#ajaxloading").show();
-        //    var that = this;
-        //    if(this.props.qdata.id){
-        //        q.questionid = this.props.qdata.id;
-        //        $.ajax({
-        //            url: Constant.BASE_URL+"editor/survey/question/edit",
-        //            data: JSON.stringify(q),
-        //            contentType: 'application/json; charset=utf-8',
-        //            type: 'PUT',
-        //            success: function(data){
-        //                $("#ajaxloading").hide();
-        //                that.informChange({
-        //                    ifSaved:true,
-        //                });
-        //            },
-        //            error:function(jxr,scode){
-        //                $("#ajaxloading").hide();
-        //            }
-        //        });
-        //    }
-        //    else{
-        //        $.ajax({
-        //            url: Constant.BASE_URL+"editor/survey/question/add",
-        //            data: JSON.stringify(q),
-        //            contentType: 'application/json; charset=utf-8',
-        //            type: 'POST',
-        //            success: function(data){
-        //                $("#ajaxloading").hide();
-        //                that.informChange({
-        //                    ifSaved:true,
-        //                    id:JSON.parse(data).body
-        //                });
-        //            },
-        //            error:function(jxr,scode){
-        //                $("#ajaxloading").hide();
-        //            }
-        //        });
-        //    }
-        //
-        //}
-        //else{
-        //    alert("Question data is incomplete to save.")
-        //}
+
     },
     deletequestion(){
-        if(this.props.qdata.id){
-            $("#ajaxloading").show();
-            var that = this;
-            $.ajax({
-                url: Constant.BASE_URL+"editor/survey/question/delete",
-                data: $.param({
-                    questionid:that.props.qdata.id
-                }),
-                type: 'DELETE',
-                contentType: 'application/x-www-form-urlencoded',
-                success: function (data) {
-                    $("#ajaxloading").hide();
-                    var msg = JSON.parse(data);
-                },
-                error:function(jxr,scode){
-                    $("#ajaxloading").hide();
-                },
-                statusCode:{
-                    406:function(){
-                    },
-                    500:function(){
-                        that.context.router.push("/login");
-                    },
-                    409:function(){
-                    }
-                }
-            });
-        }
+        //this.props.dhandle();
+        $("#deletemodal").modal("show");
+    },
+    confirmDeleteQuestion(){
         this.props.dhandle();
-
+        $("#deletemodal").modal("hide");
     },
     questionUp(){
         this.props.uphandle();
+    },
+    questionDown(){
+        this.props.downhandle();
     },
     render(){
         //alert(JSON.stringify(this.props))
@@ -362,16 +333,46 @@ export var Question = React.createClass({
             if(s.type == Constant.SELECTTYPE_IMAGE){
                 ifDropShow = {};
             }
+
+            var upSelArrowClass = "btn btn-default";
+            var downSelArrowClass = "btn btn-default";
+
+            if(i == 0){
+                upSelArrowClass = "btn btn-default disabled";
+            }
+
+            if(i == this.props.qdata.selectlist.length-1){
+                downSelArrowClass = "btn btn-default disabled";
+            }
+
             slist.push(
                 <div className="panel panel-info">
                     <div className="panel-heading">
-                        Selection&nbsp;&nbsp;<span className="grey">{parseInt(i)+1}</span>
-                        <a type="button"
-                                onClick={this.deleteselection(i)}
-                                className="btn btn-danger right">
-                            <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                            <span>&nbsp;&nbsp;Delete</span>
-                        </a>
+                        <div className="row">
+                            <div className="col-md-2">
+                                Selection&nbsp;&nbsp;<span className="grey">{parseInt(i)+1}</span>
+                            </div>
+
+                            <div className="col-md-2 col-md-offset-1">
+                                <a type="button"
+                                   onClick={this.deleteselection(i)}
+                                   className="btn btn-danger right">
+                                    <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                                    <span>&nbsp;&nbsp;Delete</span>
+                                </a>
+                            </div>
+                            <div className="col-md-2 col-md-offset-5">
+                                <a className={upSelArrowClass}  role="button" onClick={this.selectionUp(i)}>
+                                    <span className="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                </a>
+                                <a className={downSelArrowClass}  role="button" onClick={this.selectionDown(i)}>
+                                    <span className="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+                                </a>
+
+                            </div>
+                        </div>
+
+
                     </div>
                     <div className="panel-body">
                         <div className="form-group">
@@ -538,7 +539,7 @@ export var Question = React.createClass({
                             <a className={upArrowClass}  role="button" onClick={this.questionUp}>
                                 <span className="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
                             </a>
-                            <a className={downArrowClass}  role="button">
+                            <a className={downArrowClass}  role="button" onClick={this.questionDown}>
                                 <span className="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
                             </a>
 
@@ -602,12 +603,6 @@ export var Question = React.createClass({
                         <span>&nbsp;&nbsp;Add new item </span>
                     </a>
                     &nbsp;&nbsp;
-                    <a type="button"
-                            onClick={this.savequestion}
-                            className="btn btn-info">
-                        <span className="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span>
-                        <span>&nbsp;&nbsp;Save question</span>
-                    </a>
                     &nbsp;&nbsp;
                     <a type="button"
                             onClick={this.deletequestion}
@@ -616,6 +611,51 @@ export var Question = React.createClass({
                         <span>&nbsp;&nbsp;Delete question</span>
                     </a>
                 </div>
+
+                <div className="modal fade" id="deletemodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Confirm to delete</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    Are you sure to delete this question?
+                                </h3>
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button"
+                                   onClick={this.confirmDeleteQuestion}
+                                   className="btn btn-primary" >Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="deleteindexmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Confirm to delete</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    Are you sure to delete this question selection?
+                                </h3>
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button"
+                                   onClick={this.confirmDeleteSelection}
+                                   className="btn btn-primary" >Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         )

@@ -3,13 +3,9 @@ import grequests
 import time
 import json
 
-urlHeader = "http://localhost:8080"
-investigatorName = "Tina"
-investigatorPassword = "123456"
 
-
-readNum = 100
-writeNum =  50
+readNum = 500 #1000
+writeNum =  200 #400
 # readTestUrl = "http://www.ouresa.com/si/public/#/quest/571047bf2b23546f13c3c323"
 # writeTestUrl = "http://www.ouresa.com/si/anonymous/survey/answer/add"
 

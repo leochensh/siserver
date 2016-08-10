@@ -2,7 +2,7 @@ var mongoPool = require("../db");
 var Staff = {};
 var dict = require("../dict");
 var async = require("async")
-
+var _ = require("underscore");
 var ObjectID=require('mongodb').ObjectID;
 
 module.exports = Staff;
@@ -239,6 +239,55 @@ Staff.editQuestion = function(orgid,questiondata,callback){
                     }
                     else{
                         console.log("not find survey"+questiondata.surveyid);
+                        mongoPool.release(db);
+                        callback(err,"notfound")
+                    }
+                })
+
+            });
+        }
+    });
+};
+
+Staff.changeQuestionSequence = function(sid,qid,direction,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,surveycollection){
+
+                surveycollection.find({_id:ObjectID(sid)}).limit(1).next(function(err,survey){
+                    if(survey){
+                        var qlist = survey.questionlist;
+                        console.log(qlist);
+                        var findex = _.findIndex(qlist,function(item){
+                            return qid==item.toString()
+                        })
+                        if(findex>=0){
+                            if(direction == "up" && findex!=0){
+                                var temp = qlist[findex-1];
+                                qlist[findex-1] = qlist[findex];
+                                qlist[findex] = temp;
+                            }
+                            else if(direction == "down" && findex != qlist.length-1){
+                                var temp = qlist[findex+1];
+                                qlist[findex+1] = qlist[findex];
+                                qlist[findex] = temp;
+                            }
+                            surveycollection.updateOne({_id:ObjectID(sid)},
+                                {$set:{"questionlist":qlist}},function(err,upes){
+                                    mongoPool.release(db);
+                                    callback(err,upes);
+                                });
+                        }
+                        else{
+                            console.log("sequence not found" + sid +","+qid)
+                            callback(err,survey);
+                        }
+                    }
+                    else{
+                        console.log("not find survey"+sid);
                         mongoPool.release(db);
                         callback(err,"notfound")
                     }

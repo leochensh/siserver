@@ -129,9 +129,6 @@ class NewsurveyStore extends Store{
             },function(){
                 $("#ajaxloading").hide();
             });
-
-
-
         }
         else if(payload.actionType == Constant.SAVEALLQUESTION){
             async.forEachOfSeries(surveyData.qlist,function(v,i,cb){
@@ -222,6 +219,166 @@ class NewsurveyStore extends Store{
 
             }
 
+        }
+        else if(payload.actionType == Constant.SURVEYNAMECHANGE){
+            var value = payload.value;
+            if(surveyData.ifSaved){
+                $("#ajaxloading").show();
+                var that = this;
+                $.ajax({
+                    url: Constant.BASE_URL+"editor/survey/edit",
+                    data: $.param({
+                        name:value,
+                        id:surveyData.surveyid
+                    }),
+                    type: 'PUT',
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function (data) {
+                        $("#ajaxloading").hide();
+                        $("#surveynameform").popover("show");
+                        setTimeout(function(){
+                            $("#surveynameform").popover("hide");
+                        },1000);
+                        var msg = JSON.parse(data);
+                        surveyData.surveyname = value;
+                        SisDispatcher.dispatch({
+                            actionType: Constant.CAUSECHANGE,
+                        });
+
+                    },
+                    error:function(jxr,scode){
+                        $("#ajaxloading").hide();
+                    },
+                    statusCode:{
+                        406:function(){
+
+                        },
+                        500:function(){
+                            that.context.router.push("/login");
+                        },
+                        409:function(){
+
+                        }
+                    }
+                });
+            }
+            else{
+                surveyData.surveyname = value;
+                this.__emitChange();
+            }
+        }
+        else if(payload.actionType == Constant.SURVEYADDNEWQUESTION){
+            var q = payload.value;
+            surveyData.qlist.push(q);
+            saveQuestion(q,null,function(data){
+                $("#ajaxloading").hide();
+                q.ifSaved = true;
+                q.id = JSON.parse(data).body;
+                SisDispatcher.dispatch({
+                    actionType: Constant.CAUSECHANGE,
+                });
+            },null,function(){
+                $("#ajaxloading").hide();
+            });
+        }
+        else if(payload.actionType == Constant.SURVEYQUESTIONEDIT){
+            var qindex = payload.value;
+            var currentQ = surveyData.qlist[qindex];
+
+            saveQuestion(currentQ,function(data){
+                $("#ajaxloading").hide();
+                currentQ.ifSaved = true;
+                SisDispatcher.dispatch({
+                    actionType: Constant.CAUSECHANGE,
+                });
+            },null,function(){
+                $("#ajaxloading").hide();
+            },null);
+        }
+        else if(payload.actionType == Constant.SURVEYQUESTIONDELETE){
+            var qindex = payload.value;
+
+
+            $("#ajaxloading").show();
+            var that = this;
+            $.ajax({
+                url: Constant.BASE_URL+"editor/survey/question/delete",
+                data: $.param({
+                    questionid:surveyData.qlist[qindex].id
+                }),
+                type: 'DELETE',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#ajaxloading").hide();
+                    var msg = JSON.parse(data);
+                    surveyData.qlist.splice(qindex,1);
+                    SisDispatcher.dispatch({
+                        actionType: Constant.CAUSECHANGE,
+                    });
+                },
+                error:function(jxr,scode){
+                    $("#ajaxloading").hide();
+                },
+                statusCode:{
+                    406:function(){
+                    },
+                    500:function(){
+                        that.context.router.push("/login");
+                    },
+                    409:function(){
+                    }
+                }
+            });
+        }
+        else if(payload.actionType == Constant.SURVEYQUESTIONSEQUENCECHANGE){
+            var qindex = payload.index;
+            var direction = payload.direction;
+
+            $("#ajaxloading").show();
+            var that = this;
+            $.ajax({
+                url: Constant.BASE_URL+"editor/survey/question/sequencechange",
+                data: $.param({
+                    surveyid:surveyData.surveyid,
+                    questionid:surveyData.qlist[qindex].id,
+                    direction:direction
+                }),
+                type: 'PUT',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#ajaxloading").hide();
+                    var msg = JSON.parse(data);
+
+                    if(direction == "up" && qindex!=0){
+                        var temp = surveyData.qlist[qindex-1];
+                        surveyData.qlist[qindex-1] = surveyData.qlist[qindex];
+                        surveyData.qlist[qindex] = temp;
+                    }
+                    else if(direction == "down" && qindex != surveyData.qlist.length-1){
+                        var nextIndex = parseInt(qindex);
+                        var temp = surveyData.qlist[nextIndex+1];
+                        surveyData.qlist[nextIndex+1] = surveyData.qlist[nextIndex];
+                        surveyData.qlist[nextIndex] = temp;
+                    }
+
+
+                    SisDispatcher.dispatch({
+                        actionType: Constant.CAUSECHANGE,
+                    });
+                },
+                error:function(jxr,scode){
+                    $("#ajaxloading").hide();
+                },
+                statusCode:{
+                    406:function(){
+                    },
+                    500:function(){
+                        that.context.router.push("/login");
+                    },
+                    409:function(){
+                    }
+                }
+            });
         }
     }
 }
