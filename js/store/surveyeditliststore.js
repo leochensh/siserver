@@ -47,6 +47,38 @@ class EditSurveyList extends Store{
                     }
                 });
             }
+            else if(payload.role == 'sadmin'){
+                $.ajax({
+                    url: Constant.BASE_URL+"sadmin/survey/list",
+
+                    type: 'GET',
+                    success: function (data) {
+                        //alert(data);
+                        $("#ajaxloading").hide();
+                        var msg = JSON.parse(data).body;
+                        editSurveyList = msg;
+                        SisDispatcher.dispatch({
+                            actionType: Constant.FORCEEDITORSURVEYCHANGE,
+                        });
+                    },
+                    error:function(){
+                        $("#ajaxloading").hide();
+                    },
+                    statusCode:{
+                        406:function(){
+
+                        },
+                        500:function(){
+                            SisDispatcher.dispatch({
+                                actionType: Constant.ERROR500
+                            });
+                        },
+                        409:function(){
+
+                        }
+                    }
+                });
+            }
             else{
                 $.ajax({
                     url: Constant.BASE_URL+"editor/survey/list",
@@ -100,6 +132,78 @@ class EditSurveyList extends Store{
                     editSurveyList.splice(index,1);
                     SisDispatcher.dispatch({
                         actionType: Constant.FORCEEDITORSURVEYCHANGE
+                    });
+                },
+                error:function(jxr,scode){
+                    $("#ajaxloading").hide();
+                },
+                statusCode:{
+                    406:function(){
+
+                    },
+                    500:function(){
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500
+                        });
+                    },
+                    409:function(){
+
+                    }
+                }
+            });
+        }
+        else if(payload.actionType == Constant.AUDITSURVEY){
+            var index = payload.index;
+            $("#ajaxloading").show();
+            $.ajax({
+                url: Constant.BASE_URL+"sadmin/survey/audit",
+                data: $.param({
+                    surveyid:editSurveyList[index]._id
+                }),
+                type: 'PUT',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#ajaxloading").hide();
+                    var msg = JSON.parse(data);
+                    SisDispatcher.dispatch({
+                        actionType: Constant.GETSURVEYEDITLIST,
+                        role:payload.role
+                    });
+                },
+                error:function(jxr,scode){
+                    $("#ajaxloading").hide();
+                },
+                statusCode:{
+                    406:function(){
+
+                    },
+                    500:function(){
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500
+                        });
+                    },
+                    409:function(){
+
+                    }
+                }
+            });
+        }
+        else if(payload.actionType == Constant.WITHDRAWSURVEY){
+            var index = payload.index;
+            $("#ajaxloading").show();
+            $.ajax({
+                url: Constant.BASE_URL+"admin/survey/withdraw",
+                data: $.param({
+                    surveyid:editSurveyList[index]._id
+                }),
+                type: 'PUT',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#ajaxloading").hide();
+                    var msg = JSON.parse(data);
+                    SisDispatcher.dispatch({
+                        actionType: Constant.GETSURVEYEDITLIST,
+                        role:payload.role
                     });
                 },
                 error:function(jxr,scode){

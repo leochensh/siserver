@@ -903,6 +903,18 @@ aclHandler.registerWait(function(acl){
         });
     });
 
+    app.get("/sadmin/survey/list",acl.middleware(1),function(req,res){
+        Staff.getSAdminSurveyList(function(err,ss){
+
+            logger.logger.log("info","admin get survey list",{
+                editorid:req.session.uid});
+            res.status(200);
+            successMsg.body = ss;
+
+            res.send(JSON.stringify(successMsg));
+        });
+    });
+
     app.get("/admin/survey/list",acl.middleware(2),function(req,res){
         var orgid = req.session.orgid;
         Staff.getAdminSurveyList(orgid,function(err,ss){
@@ -1138,13 +1150,14 @@ aclHandler.registerWait(function(acl){
     app.post("/admin/survey/publishtoown",acl.middleware(2),function(req,res){
         var surveyid = req.body.surveyid;
         var ownid = req.session.uid;
-        var orgid = req.session.orgid;
+        var role = req.session.role;
+        //var orgid = req.session.orgid;
 
-        if(surveyid && ObjectID.isValid(surveyid)){
-            Admin.publishSurvey(orgid,surveyid,[ownid],function(err,msg){
+        if(surveyid && ObjectID.isValid(surveyid) && ObjectID.isValid(ownid)){
+            Admin.publishSurveyToOwn(surveyid,ownid,role,function(err,msg){
                 if(msg == "forbidden"){
                     res.status(403);
-                    errorMsg.code = "can not operate";
+                    errorMsg.code = "forbidden";
                     res.send(JSON.stringify(errorMsg));
                 }
                 else{
@@ -1162,22 +1175,17 @@ aclHandler.registerWait(function(acl){
         }
     });
 
-    app.post("/admin/survey/publishtoall",acl.middleware(2),function(req,res){
+    app.put("/admin/survey/withdraw",acl.middleware(2),function(req,res){
         var surveyid = req.body.surveyid;
         var ownid = req.session.uid;
-        var orgid = req.session.orgid;
-        var broadCastToStaffs = function(orgid,surveyid,staffs){
-            var slist = [];
-            for(var i in staffs){
-                if(!(staffs[i].disable)){
-                    slist.push(staffs[i]._id);
-                }
-            }
+        var role = req.session.role;
+        //var orgid = req.session.orgid;
 
-            Admin.publishSurvey(orgid,surveyid,slist,function(err,msg){
+        if(surveyid && ObjectID.isValid(surveyid) && ObjectID.isValid(ownid)){
+            Admin.withdrawPublishSurvey(surveyid,ownid,role,function(err,msg){
                 if(msg == "forbidden"){
                     res.status(403);
-                    errorMsg.code = "can not operate";
+                    errorMsg.code = "forbidden";
                     res.send(JSON.stringify(errorMsg));
                 }
                 else{
@@ -1188,24 +1196,114 @@ aclHandler.registerWait(function(acl){
 
             })
         }
-        if(surveyid && ObjectID.isValid(surveyid)){
-            if(req.session.role == dict.STAFF_PERSONAL){
-                Admin.getPersonalList(function(err,staffs){
-                    broadCastToStaffs(orgid,surveyid,staffs);
-                })
-            }
-            else{
-                Admin.getOrgAllUserList(orgid,function(err,staffs){
-                    broadCastToStaffs(orgid,surveyid,staffs);
-                })
-            }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
 
+    app.get("/admin/temporychangesurvey",function(req,res){  //临时接口，用于将已发布问卷转为publishtoall
+        Admin.temproryChangeSurvey(function(err,msg){
+            res.status(200);
+            successMsg.body = null;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
+
+
+
+    app.put("/sadmin/survey/audit",acl.middleware(1),function(req,res){
+        var surveyid = req.body.surveyid;
+        if(surveyid && ObjectID.isValid(surveyid)){
+            Admin.sadminAuditSurvey(surveyid,function(err,msg){
+                if(msg == "forbidden"){
+                    res.status(403);
+                    errorMsg.code = "forbidden";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = null;
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
         }
         else{
             res.status(406);
             errorMsg.code = "wrong";
             res.send(JSON.stringify(errorMsg));
         }
+    });
+
+    app.post("/admin/survey/publishtoall",acl.middleware(2),function(req,res){
+        var surveyid = req.body.surveyid;
+        var ownid = req.session.uid;
+        var role = req.session.role;
+
+        if(surveyid && ObjectID.isValid(surveyid) && ObjectID.isValid(ownid)){
+            Admin.publishSurveyToAll(surveyid,ownid,role,function(err,msg){
+                if(msg == "forbidden"){
+                    res.status(403);
+                    errorMsg.code = "forbidden";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = null;
+                    res.send(JSON.stringify(successMsg));
+                }
+
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+
+        //var orgid = req.session.orgid;
+        //var broadCastToStaffs = function(orgid,surveyid,staffs){
+        //    var slist = [];
+        //    for(var i in staffs){
+        //        if(!(staffs[i].disable)){
+        //            slist.push(staffs[i]._id);
+        //        }
+        //    }
+        //
+        //    Admin.publishSurvey(orgid,surveyid,slist,function(err,msg){
+        //        if(msg == "forbidden"){
+        //            res.status(403);
+        //            errorMsg.code = "can not operate";
+        //            res.send(JSON.stringify(errorMsg));
+        //        }
+        //        else{
+        //            res.status(200);
+        //            successMsg.body = null;
+        //            res.send(JSON.stringify(successMsg));
+        //        }
+        //
+        //    })
+        //}
+        //if(surveyid && ObjectID.isValid(surveyid)){
+        //    if(req.session.role == dict.STAFF_PERSONAL){
+        //        Admin.getPersonalList(function(err,staffs){
+        //            broadCastToStaffs(orgid,surveyid,staffs);
+        //        })
+        //    }
+        //    else{
+        //        Admin.getOrgAllUserList(orgid,function(err,staffs){
+        //            broadCastToStaffs(orgid,surveyid,staffs);
+        //        })
+        //    }
+        //
+        //}
+        //else{
+        //    res.status(406);
+        //    errorMsg.code = "wrong";
+        //    res.send(JSON.stringify(errorMsg));
+        //}
     });
 
     app.get("/admin/survey/answer/list/:surveyid",function(req,res){
@@ -1224,12 +1322,12 @@ aclHandler.registerWait(function(acl){
 
 
     });
-    app.get("/removerepeatassign",function(req,res){ //临时接口，用于去除问卷分配的重复
-        Admin.removeAssginRepeat(function(err,msg){
-            successMsg.body = null;
-            res.send(JSON.stringify(successMsg));
-        })
-    });
+    //app.get("/removerepeatassign",function(req,res){ //临时接口，用于去除问卷分配的重复
+    //    Admin.removeAssginRepeat(function(err,msg){
+    //        successMsg.body = null;
+    //        res.send(JSON.stringify(successMsg));
+    //    })
+    //});
 
     app.get('/investigator/survey/list',acl.middleware(2),function(req,res){
         Staff.getStaffSurveyList(req.session.uid,function(err,msg){
@@ -1873,11 +1971,26 @@ aclHandler.registerWait(function(acl){
     //var from = "leochen.shanghai@gmail.com";
     //var smtpTransport = nodemailer.createTransport('smtps://leochen.shanghai%40gmail.com:Bobo16188@smtp.gmail.com');
 
-    var from = "admin@register.ouresa.com"
-    var smtpTransport = nodemailer.createTransport('smtps://postmaster%40register.ouresa.com:0dfe4400ba798ead05bb59328fc765e7@smtp.mailgun.org')
+    //var from = "admin@register.ouresa.com"
+    //var smtpTransport = nodemailer.createTransport('smtps://postmaster%40register.ouresa.com:0dfe4400ba798ead05bb59328fc765e7@smtp.mailgun.org')
 
     //var from = "ouresaadmin@sandbox7ec8af3e18ce44239f48a365be400e76.mailgun.org"
     //var smtpTransport = nodemailer.createTransport('smtps://postmaster%40sandbox7ec8af3e18ce44239f48a365be400e76.mailgun.org:aa790a31986ac6dc171ddf4dfd1da8bc@smtp.mailgun.org')
+
+    var from = "ouresa.pp@transsion.com"
+    //var smtpTransport = nodemailer.createTransport('smtps://ouresa.pp%40transsion.com:ouresaPP666@smtp.qiye.163.com')
+
+    var smtpTransport = nodemailer.createTransport({
+            host: 'smtp.qiye.163.com',
+            port: 465,
+            auth: {
+                user: "ouresa.pp@transsion.com",
+                pass: 'ouresaPP666'
+            },
+            tls: {rejectUnauthorized: false},
+            debug:true
+        }
+    );
     app.get("/testemail",function(req,res){
 
         //var smtpTransport = nodemailer.createTransport('smtps://leochen.shanghai%40gmail.com:Bobo16188@smtp.gmail.com');

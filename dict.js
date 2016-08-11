@@ -13,6 +13,9 @@ module.exports = {
     SURVEYSTATUS_NORMAL:"surveynormal",
     SURVEYSTATUS_DISABLE:"surveydisable",
 
+    SURVEYPUBLISHSTATUS_PRIVATEPERSONAL:"surveypublishstatusprivatepersonal",
+    SURVEYPUBLISHSTATUS_PUBLICPERSONAL:"surveypublishstatuspublicpersonal",
+
     QTYPE_SINGLESELECT:"singleselect",//单选题
     QTYPE_SINGLESELECT_TEXT:"singleselect_text",//单选文本题
     QTYPE_SINGLESELECT_RECORD_TEXT:"singleselect_record_text",//单选录音文本题

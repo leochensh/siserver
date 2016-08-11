@@ -163,9 +163,7 @@ export var Question = React.createClass({
         this.informChange({scorelist:sarray})
     },
     informChange(obj){
-        if(!obj.ifSaved){
-            obj.ifSaved = false;
-        }
+
         this.props.qhandle(obj);
         //this.setState(obj);
         //var that = this;
@@ -259,7 +257,8 @@ export var Question = React.createClass({
     },
     render(){
         //alert(JSON.stringify(this.props))
-        var colorClass = this.props.qdata.ifSaved?"blue":"red";
+        //var colorClass = this.props.qdata.ifSaved?"blue":"red";
+        var colorClass = "blue";
         var qid = "questionname"+this.props.index;
 
         var typestr = Constant.QTYPE_NAME_MAP[this.props.qdata.type];

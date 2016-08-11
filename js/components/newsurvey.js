@@ -68,7 +68,7 @@ export var Newsurvey = React.createClass({
         $("#cleanall").modal("hide");
     },
     publishsurvey(){
-        if(this.props.newsurvey.surveystatus!=Constant.SURVEYSTATUS_NORMAL && this.props.newsurvey.surveyid){
+        if(this.props.newsurvey.surveystatus!=Constant.SURVEYSTATUS_NORMAL &&this.props.newsurvey.surveystatus!=Constant.SURVEYSTATUS_PROPOSE &&this.props.newsurvey.surveyid){
             $("#publishsurvey").modal("show");
         }
     },
@@ -558,19 +558,19 @@ export var Newsurvey = React.createClass({
             trigger:"manual"
         });
 
-        $("#surveynameform").popover({
-            title:"Save indication",
-            content:"Survey name was saved successfully.",
-            placement:"bottom",
-            trigger:"manual"
-        });
-
-        $("#saveallbutton").popover({
-            title:"Save indication",
-            content:"Survey data was saved successfully.",
-            placement:"top",
-            trigger:"manual"
-        })
+        //$("#surveynameform").popover({
+        //    title:"Save indication",
+        //    content:"Survey name was saved successfully.",
+        //    placement:"bottom",
+        //    trigger:"manual"
+        //});
+        //
+        //$("#saveallbutton").popover({
+        //    title:"Save indication",
+        //    content:"Survey data was saved successfully.",
+        //    placement:"top",
+        //    trigger:"manual"
+        //})
     },
     showtips(){
         var internal = 5000;
@@ -618,7 +618,8 @@ export var Newsurvey = React.createClass({
             fontSize:"10px"
         };
         var ifDisablePublish = "";
-        if(this.props.newsurvey.surveystatus==Constant.SURVEYSTATUS_NORMAL){
+        if(this.props.newsurvey.surveystatus==Constant.SURVEYSTATUS_NORMAL &&
+            this.props.newsurvey.surveystatus==Constant.SURVEYSTATUS_PROPOSE){
             surveyStatusTxt = "Published";
             ifDisablePublish = "disabled";
             surveyStatusClassStyle = {

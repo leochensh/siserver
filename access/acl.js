@@ -24,7 +24,7 @@ mongoPool.acquire(function(err, db){
             ]
         },
         {
-            roles:['admin',dict.STAFF_PERSONAL,dict.STAFF_ORG],
+            roles:['admin',dict.STAFF_PERSONAL,dict.STAFF_ORG,'sadmin'],
             allows:[
                 {resources:'/admin/pass/change', permissions:'put'},
                 {resources:'/admin/staff/add',permissions:'post'},
@@ -45,7 +45,7 @@ mongoPool.acquire(function(err, db){
             ]
         },
         {
-            roles:['admin',dict.STAFF_EDITOR,dict.STAFF_PERSONAL,dict.STAFF_ORG],
+            roles:['admin',dict.STAFF_EDITOR,dict.STAFF_PERSONAL,dict.STAFF_ORG,'sadmin'],
             allows:[
                 {resources:'/editor/survey',permissions:['post','delete','put','get']}
             ]

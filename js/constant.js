@@ -19,6 +19,8 @@ export var Constant = {
     GETSURVEYEDITLIST:"getsurveyeditlist",
     FORCEEDITORSURVEYCHANGE:"forceeditorsurveychange",
     DELETESURVEY:"deletesurvey",
+    AUDITSURVEY:"auditsurvey",
+    WITHDRAWSURVEY:"withdrawsurvey",
     EDITSURVEY:"editsurvey",
     SURVEYNAMECHANGE:"surveynamechange",
     SURVEYADDNEWQUESTION:"surveyaddnewquestion",
@@ -86,7 +88,11 @@ export var Constant = {
     SURVEYSTATUS_REJECT:"surveyreject",
     SURVEYSTATUS_NORMAL:"surveynormal",
 
+    SURVEYPUBLISHSTATUS_PRIVATEPERSONAL:"surveypublishstatusprivatepersonal",
+    SURVEYPUBLISHSTATUS_PUBLICPERSONAL:"surveypublishstatuspublicpersonal",
+
     SURVEYSTATUSMAP:{
+        "surveypropose":"Wait for audit",
         "surveyedit":"Edit",
         "surveynormal":"Published"
     },

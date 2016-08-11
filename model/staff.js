@@ -128,6 +128,25 @@ Staff.getAdminSurveyList = function(orgid,callback){
     });
 };
 
+Staff.getSAdminSurveyList = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+
+                collection.find({},{orgid:0,questionlist:0,editorid:0})
+                    .sort({ctime:-1}).toArray(function(err,surveys){
+                    mongoPool.release(db);
+                    callback(err,surveys);
+                });
+            });
+        }
+    });
+};
+
+
 Staff.editSurvey = function(name,surveyid,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -433,40 +452,58 @@ Staff.getStaffSurveyList = function(staffid,callback){
 
         }
         else{
-            db.collection("admins",function(err,collection){
-                collection.find({_id:ObjectID(staffid)}).limit(1).next(function(err,staff){
-                    if(staff){
+            db.collection("surveys",function(err,scollection){
+                scollection.find({"$or":[{
+                    status:dict.SURVEYSTATUS_NORMAL,
+                    publishstatus:dict.SURVEYPUBLISHSTATUS_PRIVATEPERSONAL,
+                    editorid:staffid
 
-                        var returnList = [];
-                        if(staff.surveyList){
-                            returnList = staff.surveyList;
-                            async.each(returnList,function(item,cb){
-                                db.collection("surveys",function(err,surveycollection){
-                                    surveycollection.find({_id:ObjectID(item.surveyid)}).limit(1).next(function(err,survey){
-                                        if(survey){
-                                            item.status = survey.status;
-                                            item.publishtime = survey.publishtime?survey.publishtime:""
-                                        }
-                                        cb();
-                                    })
-                                });
-                            },function(err){
-                                mongoPool.release(db);
-                                callback(err,returnList);
-                            });
-                        }
-                        else{
-                            mongoPool.release(db);
-                            callback(err,returnList);
-                        }
-
-                    }
-                    else{
-                        mongoPool.release(db);
-                        callback(err,"notfound")
-                    }
-                })
+                },{
+                    status:dict.SURVEYSTATUS_NORMAL,
+                    publishstatus:dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL
+                }]},{
+                    orgid:0,questionlist:0,editorid:0
+                }).sort({ctime:-1}).toArray(function(err,surveys){
+                    mongoPool.release(db);
+                    callback(err,surveys);
+                });
             });
+
+
+            //db.collection("admins",function(err,collection){
+            //    collection.find({_id:ObjectID(staffid)}).limit(1).next(function(err,staff){
+            //        if(staff){
+            //
+            //            var returnList = [];
+            //            if(staff.surveyList){
+            //                returnList = staff.surveyList;
+            //                async.each(returnList,function(item,cb){
+            //                    db.collection("surveys",function(err,surveycollection){
+            //                        surveycollection.find({_id:ObjectID(item.surveyid)}).limit(1).next(function(err,survey){
+            //                            if(survey){
+            //                                item.status = survey.status;
+            //                                item.publishtime = survey.publishtime?survey.publishtime:""
+            //                            }
+            //                            cb();
+            //                        })
+            //                    });
+            //                },function(err){
+            //                    mongoPool.release(db);
+            //                    callback(err,returnList);
+            //                });
+            //            }
+            //            else{
+            //                mongoPool.release(db);
+            //                callback(err,returnList);
+            //            }
+            //
+            //        }
+            //        else{
+            //            mongoPool.release(db);
+            //            callback(err,"notfound")
+            //        }
+            //    })
+            //});
         }
     });
 };

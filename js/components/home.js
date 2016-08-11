@@ -51,6 +51,7 @@ export var Home = React.createClass({
             adsDisable = "";
             settingsDisable = "";
             edataDisable = "";
+            surveyManageDisable = "";
         }
         else if(loginInfo.role == "admin"){
             personalDisable = "";

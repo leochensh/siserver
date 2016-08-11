@@ -11,7 +11,74 @@ var surveyData = {
     ifSurveyNameEmpty:false,
     surveystatus:Constant.SURVEYSTATUS_EDIT,
     qlist:[]
+};
+
+var opArray = [];
+
+var opInterval = 1500;
+
+var addToProc = function(op){
+    var findex = _.findIndex(opArray,function(it){
+        if(op.type == "namechange"){
+            return it.type == op.type;
+        }
+        else if(op.type == "questionchange"){
+            return it.type == op.type && it.index == op.index;
+        }
+
+    });
+    if(findex<0){
+        opArray.push(op);
+    }
 }
+
+var opProc = function(){
+    for(var index in opArray){
+        var co = opArray[index];
+        if(co.type == "namechange"){
+
+            opArray.splice(index,1);
+            $("#ajaxloading").show();
+            $.ajax({
+                url: Constant.BASE_URL+"editor/survey/edit",
+                data: $.param({
+                    name:surveyData.surveyname,
+                    id:surveyData.surveyid
+                }),
+                type: 'PUT',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#ajaxloading").hide();
+                    $("#surveynameform").popover("show");
+
+                    var msg = JSON.parse(data);
+
+                },
+                error:function(jxr,scode){
+                    $("#ajaxloading").hide();
+                },
+                statusCode:{
+                    406:function(){
+
+                    },
+                    500:function(){
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500,
+                        });
+                    },
+                    409:function(){
+
+                    }
+                }
+            });
+        }
+        else if(co.type == "questionchange"){
+            opArray.splice(index,1);
+            saveQuestion(surveyData.qlist[co.index],function(){},function(){},function(){},function(){});
+        }
+
+    }
+};
 
 function saveQuestion(qd,suceditcallback,sucnewcallback,faileditcallback,failnewcallback){
     if(true){
@@ -41,10 +108,13 @@ function saveQuestion(qd,suceditcallback,sucnewcallback,faileditcallback,failnew
                 contentType: 'application/json; charset=utf-8',
                 type: 'PUT',
                 success: function(data){
+                    $("#ajaxloading").hide();
                     suceditcallback(data);
+
 
                 },
                 error:function(jxr,scode){
+                    $("#ajaxloading").hide();
                     faileditcallback();
 
                 }
@@ -57,10 +127,12 @@ function saveQuestion(qd,suceditcallback,sucnewcallback,faileditcallback,failnew
                 contentType: 'application/json; charset=utf-8',
                 type: 'POST',
                 success: function(data){
+                    $("#ajaxloading").hide();
                     sucnewcallback(data);
 
                 },
                 error:function(jxr,scode){
+                    $("#ajaxloading").hide();
                     failnewcallback();
                 }
             });
@@ -222,50 +294,63 @@ class NewsurveyStore extends Store{
         }
         else if(payload.actionType == Constant.SURVEYNAMECHANGE){
             var value = payload.value;
+
+            surveyData.surveyname = value;
+            this.__emitChange();
             if(surveyData.ifSaved){
-                $("#ajaxloading").show();
-                var that = this;
-                $.ajax({
-                    url: Constant.BASE_URL+"editor/survey/edit",
-                    data: $.param({
-                        name:value,
-                        id:surveyData.surveyid
-                    }),
-                    type: 'PUT',
-                    contentType: 'application/x-www-form-urlencoded',
-                    success: function (data) {
-                        $("#ajaxloading").hide();
-                        $("#surveynameform").popover("show");
-                        setTimeout(function(){
-                            $("#surveynameform").popover("hide");
-                        },1000);
-                        var msg = JSON.parse(data);
-                        surveyData.surveyname = value;
-                        SisDispatcher.dispatch({
-                            actionType: Constant.CAUSECHANGE,
-                        });
-
-                    },
-                    error:function(jxr,scode){
-                        $("#ajaxloading").hide();
-                    },
-                    statusCode:{
-                        406:function(){
-
-                        },
-                        500:function(){
-                            that.context.router.push("/login");
-                        },
-                        409:function(){
-
-                        }
-                    }
+                addToProc({
+                    type:"namechange"
                 });
+
+                setTimeout(function(){
+                    opProc();
+                },opInterval);
             }
-            else{
-                surveyData.surveyname = value;
-                this.__emitChange();
-            }
+
+
+            //if(surveyData.ifSaved){
+            //    $("#ajaxloading").show();
+            //    var that = this;
+            //    $.ajax({
+            //        url: Constant.BASE_URL+"editor/survey/edit",
+            //        data: $.param({
+            //            name:value,
+            //            id:surveyData.surveyid
+            //        }),
+            //        type: 'PUT',
+            //        contentType: 'application/x-www-form-urlencoded',
+            //        success: function (data) {
+            //            $("#ajaxloading").hide();
+            //            $("#surveynameform").popover("show");
+            //            setTimeout(function(){
+            //                $("#surveynameform").popover("hide");
+            //            },1000);
+            //            var msg = JSON.parse(data);
+            //            surveyData.surveyname = value;
+            //            SisDispatcher.dispatch({
+            //                actionType: Constant.CAUSECHANGE,
+            //            });
+            //        },
+            //        error:function(jxr,scode){
+            //            $("#ajaxloading").hide();
+            //        },
+            //        statusCode:{
+            //            406:function(){
+            //
+            //            },
+            //            500:function(){
+            //                that.context.router.push("/login");
+            //            },
+            //            409:function(){
+            //
+            //            }
+            //        }
+            //    });
+            //}
+            //else{
+            //    surveyData.surveyname = value;
+            //    this.__emitChange();
+            //}
         }
         else if(payload.actionType == Constant.SURVEYADDNEWQUESTION){
             var q = payload.value;
@@ -283,17 +368,25 @@ class NewsurveyStore extends Store{
         }
         else if(payload.actionType == Constant.SURVEYQUESTIONEDIT){
             var qindex = payload.value;
-            var currentQ = surveyData.qlist[qindex];
+            //var currentQ = surveyData.qlist[qindex];
+            this.__emitChange();
+            addToProc({
+                type:"questionchange",
+                index:qindex
+            });
 
-            saveQuestion(currentQ,function(data){
-                $("#ajaxloading").hide();
-                currentQ.ifSaved = true;
-                SisDispatcher.dispatch({
-                    actionType: Constant.CAUSECHANGE,
-                });
-            },null,function(){
-                $("#ajaxloading").hide();
-            },null);
+            setTimeout(function(){
+                opProc();
+            },opInterval);
+            //saveQuestion(currentQ,function(data){
+            //    $("#ajaxloading").hide();
+            //    currentQ.ifSaved = true;
+            //    SisDispatcher.dispatch({
+            //        actionType: Constant.CAUSECHANGE,
+            //    });
+            //},null,function(){
+            //    $("#ajaxloading").hide();
+            //},null);
         }
         else if(payload.actionType == Constant.SURVEYQUESTIONDELETE){
             var qindex = payload.value;
@@ -323,7 +416,9 @@ class NewsurveyStore extends Store{
                     406:function(){
                     },
                     500:function(){
-                        that.context.router.push("/login");
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500,
+                        });
                     },
                     409:function(){
                     }
@@ -357,8 +452,8 @@ class NewsurveyStore extends Store{
                     else if(direction == "down" && qindex != surveyData.qlist.length-1){
                         var nextIndex = parseInt(qindex);
                         var temp = surveyData.qlist[nextIndex+1];
-                        surveyData.qlist[nextIndex+1] = surveyData.qlist[nextIndex];
-                        surveyData.qlist[nextIndex] = temp;
+                        surveyData.qlist[nex+1] = surveyData.qlist[qindex];
+                        surveyData.qlist[qindex] = temp;
                     }
 
 
@@ -373,7 +468,9 @@ class NewsurveyStore extends Store{
                     406:function(){
                     },
                     500:function(){
-                        that.context.router.push("/login");
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500,
+                        });
                     },
                     409:function(){
                     }

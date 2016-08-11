@@ -49,7 +49,6 @@ export var App = React.createClass({
         this.setState({a:1});
     },
     render() {
-        console.log(versionStore.getAll())
         return (
             <div>
                 <nav className="navbar navbar-default navbar-fixed-top">
