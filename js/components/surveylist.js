@@ -13,15 +13,48 @@ export var Surveylist = React.createClass({
             catoption:"all",
             auditindex:null,
             withdrawindex:null,
-            filtertext:""
+            filtertext:"",
+            currentpage:0,
+            pagesize:10
         }
     },
     contextTypes: {
         router: React.PropTypes.object.isRequired
     },
+    leftpageclick(){
+        if(this.state.currentpage!=0){
+            this.setState({
+                currentpage:this.state.currentpage-1
+            })
+        }
+    },
+    rightpageclick(maxpn){
+        var that = this;
+        var infun = function(){
+            if(that.state.currentpage!=maxpn-1){
+                that.setState({
+                    currentpage:that.state.currentpage+1
+                })
+            }
+        };
+        return infun;
+
+    },
+    pnumclick(num){
+        var that = this;
+        var infun = function(){
+            if(that.state.currentpage!=num){
+                that.setState({
+                    currentpage:num
+                })
+            }
+        };
+        return infun;
+    },
     filterChange(event){
         this.setState({
-            filtertext:event.target.value
+            filtertext:event.target.value,
+            currentpage:0
         });
     },
     componentDidMount (){
@@ -116,7 +149,8 @@ export var Surveylist = React.createClass({
     },
     catChange(event){
         this.setState({
-            catoption:event.target.value
+            catoption:event.target.value,
+            currentpage:0
         })
     },
     render(){
@@ -136,6 +170,51 @@ export var Surveylist = React.createClass({
                 return item.name.indexOf(that.state.filtertext)>=0
             });
         }
+
+        var startPos = this.state.currentpage*this.state.pagesize;
+        var stopPos = Math.min(startPos+this.state.pagesize,selist.length);
+
+        var maxPageNum = Math.ceil(selist.length/this.state.pagesize);
+
+        selist = selist.slice(startPos,stopPos);
+
+        var leftButtonClass = "";
+        if(this.state.currentpage == 0){
+            leftButtonClass = "disabled";
+        }
+
+        var rightButtonClass = "";
+        if(this.state.currentpage == maxPageNum-1){
+            rightButtonClass = "disabled";
+        }
+
+        var pageButtonGrp = [];
+        pageButtonGrp.push(<li className={leftButtonClass}>
+            <a aria-label="Previous" onClick={this.leftpageclick}>
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>);
+
+        for(var pn = 0;pn<=maxPageNum-1;pn++){
+            var currentPageButtonCls = "";
+            if(this.state.currentpage == pn){
+                currentPageButtonCls = "active";
+            }
+            pageButtonGrp.push(<li className={currentPageButtonCls}>
+                <a onClick={this.pnumclick(pn)}>
+                    {parseInt(pn)+1}
+
+                </a>
+            </li>);
+
+        }
+
+        pageButtonGrp.push(<li className={rightButtonClass}>
+            <a aria-label="Next" onClick={this.rightpageclick(maxPageNum)}>
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>);
+
 
         for(var i in selist){
             var stext = Constant.SURVEYSTATUSMAP[selist[i].status];
@@ -191,7 +270,7 @@ export var Surveylist = React.createClass({
             }
             mlist.push(
                 <tr key={"slist"+i} className={trclass}>
-                    <td>{i}</td>
+                    <td>{parseInt(startPos)+parseInt(i)+1}</td>
                     <td>{selist[i].name}</td>
                     <td>{new Date(selist[i].ctime).toLocaleString()}</td>
                     <td>{pdate}</td>
@@ -256,6 +335,14 @@ export var Surveylist = React.createClass({
 
                             </tbody>
                         </table>
+                    </div>
+                    <div className="panel-footer">
+                        <nav aria-label="Page navigation">
+                            <ul className="pagination">
+                                {pageButtonGrp}
+                            </ul>
+                        </nav>
+
                     </div>
 
                 </div>
