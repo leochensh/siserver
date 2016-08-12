@@ -13,7 +13,8 @@ export var Question = React.createClass({
             ifSaved:false,
             selectlist:[],
             id:null,
-            deleteindex:null
+            deleteindex:null,
+            deletescoreindex:null
         };
     },
     addselection(){
@@ -114,7 +115,8 @@ export var Question = React.createClass({
             var scoreStart = parseInt(event.target.value);
             var scoreEnd = that.props.qdata.scorelist[index].end;
             var scoreStep = that.props.qdata.scorelist[index].step;
-            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep)
+            var scoretitle = that.props.qdata.scorelist[index].title?that.props.qdata.scorelist[index].title:"";
+            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep,scoretitle);
         }
         return innerFunc;
 
@@ -125,7 +127,8 @@ export var Question = React.createClass({
             var scoreStart = that.props.qdata.scorelist[index].start;
             var scoreEnd = parseInt(event.target.value);
             var scoreStep = that.props.qdata.scorelist[index].step;
-            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep)
+            var scoretitle = that.props.qdata.scorelist[index].title?that.props.qdata.scorelist[index].title:"";
+            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep,scoretitle);
         };
         return innerFunc;
     },
@@ -135,11 +138,42 @@ export var Question = React.createClass({
             var scoreStart = that.props.qdata.scorelist[index].start;
             var scoreEnd = that.props.qdata.scorelist[index].end;
             var scoreStep = parseInt(event.target.value);
-            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep)
+            var scoretitle = that.props.qdata.scorelist[index].title?that.props.qdata.scorelist[index].title:"";
+            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep,scoretitle)
         };
         return innerFunc;
     },
-    handleScoreChange(index,start,end,step){
+
+    handleScoreTitleChange(index){
+        var that = this;
+        var innerFunc = function(event){
+            var scoreStart = that.props.qdata.scorelist[index].start;
+            var scoreEnd = that.props.qdata.scorelist[index].end;
+            var scoreStep = that.props.qdata.scorelist[index].step;
+            var scoretitle = event.target.value;
+            that.handleScoreChange(index,scoreStart,scoreEnd,scoreStep,scoretitle)
+        };
+        return innerFunc;
+    },
+    deletescoreitem(index){
+        var that = this;
+        var innerFunc = function(event){
+            that.state.deletescoreindex = index;
+            $("#deletescoremodal").modal("show");
+        };
+        return innerFunc;
+    },
+    confirmDeleteScore(){
+        var slist = this.props.qdata.scorelist;
+        if(this.state.deletescoreindex){
+            slist.splice(this.state.deletescoreindex,1);
+            this.informChange({
+                scorelist:slist
+            })
+        }
+        $("#deletescoremodal").modal("hide");
+    },
+    handleScoreChange(index,start,end,step,title){
         var sarray = [];
         if(this.props.qdata.scorelist && _.isArray(this.props.qdata.scorelist)){
             sarray = this.props.qdata.scorelist;
@@ -147,7 +181,8 @@ export var Question = React.createClass({
                 index:index,
                 start:start,
                 end:end,
-                step:step
+                step:step,
+                title:title
             }
         }
         else{
@@ -155,7 +190,8 @@ export var Question = React.createClass({
                 index:0,
                 start:start,
                 end:end,
-                step:step
+                step:step,
+                tittle:title
             }]
         }
 
@@ -468,32 +504,57 @@ export var Question = React.createClass({
                     var sstart = parseInt(si.start);
                     var send = parseInt(si.end);
                     var sstep = parseInt(si.step);
+                    var stitle = si.title?si.title:"";
 
-                    scoreHtml.push(<div>
-                        <label className="col-sm-2 control-label">Score Start</label>
-                        <div className="col-sm-2">
-                            <input type="number" className="form-control"
-                                   value={sstart}
-                                   onChange={this.handleScoreStartChange(sai)}
-                            >
-                            </input>
+                    scoreHtml.push(<div  className="panel panel-default">
+                        <div className="panel-heading">
+                            <div className="row">
+                                <div className="col-sm-2">
+                                    <input type="text"
+                                           className="form-control"
+                                           value={stitle}
+                                           onChange={this.handleScoreTitleChange(sai)}
+                                           placeholder="Score title"/>
+                                </div>
+                                <div className="col-sm-2 col-sm-offset-2">
+                                    <a type="button"
+                                       onClick={this.deletescoreitem(sai)}
+                                       className="btn btn-danger">
+                                        <span className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                                        <span>&nbsp;&nbsp;Delete score item</span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        <label className="col-sm-2 control-label">Score End</label>
-                        <div className="col-sm-2">
-                            <input type="number" className="form-control"
-                                   value={send}
-                                   onChange={this.handleScoreEndChange(sai)}
-                            >
-                            </input>
+                        <div className="panel-body">
+                            <div className="row">
+                                <label className="col-sm-2 control-label">Score Start</label>
+                                <div className="col-sm-2">
+                                    <input type="number" className="form-control"
+                                           value={sstart}
+                                           onChange={this.handleScoreStartChange(sai)}
+                                    >
+                                    </input>
+                                </div>
+                                <label className="col-sm-2 control-label">Score End</label>
+                                <div className="col-sm-2">
+                                    <input type="number" className="form-control"
+                                           value={send}
+                                           onChange={this.handleScoreEndChange(sai)}
+                                    >
+                                    </input>
+                                </div>
+                                <label className="col-sm-2 control-label">Score Step</label>
+                                <div className="col-sm-2">
+                                    <input type="number" className="form-control"
+                                           value={sstep}
+                                           onChange={this.handleScoreStepChange(sai)}
+                                    >
+                                    </input>
+                                </div>
+                            </div>
                         </div>
-                        <label className="col-sm-2 control-label">Score Step</label>
-                        <div className="col-sm-2">
-                            <input type="number" className="form-control"
-                                   value={sstep}
-                                   onChange={this.handleScoreStepChange(sai)}
-                            >
-                            </input>
-                        </div>
+
                     </div>);
 
                 }
@@ -649,6 +710,28 @@ export var Question = React.createClass({
                                 <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
                                 <a type="button"
                                    onClick={this.confirmDeleteSelection}
+                                   className="btn btn-primary" >Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="deletescoremodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Confirm to delete</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    Are you sure to delete this score item?
+                                </h3>
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button"
+                                   onClick={this.confirmDeleteScore}
                                    className="btn btn-primary" >Confirm</a>
                             </div>
                         </div>

@@ -128,6 +128,8 @@ function saveQuestion(qd,suceditcallback,sucnewcallback,faileditcallback,failnew
                 type: 'POST',
                 success: function(data){
                     $("#ajaxloading").hide();
+                    qd.ifSaved = true;
+                    qd.id = JSON.parse(data).body;
                     sucnewcallback(data);
 
                 },
@@ -355,16 +357,27 @@ class NewsurveyStore extends Store{
         else if(payload.actionType == Constant.SURVEYADDNEWQUESTION){
             var q = payload.value;
             surveyData.qlist.push(q);
-            saveQuestion(q,null,function(data){
-                $("#ajaxloading").hide();
-                q.ifSaved = true;
-                q.id = JSON.parse(data).body;
-                SisDispatcher.dispatch({
-                    actionType: Constant.CAUSECHANGE,
-                });
-            },null,function(){
-                $("#ajaxloading").hide();
+            this.__emitChange();
+
+            addToProc({
+                type:"questionchange",
+                index:surveyData.qlist.length-1
             });
+
+            setTimeout(function(){
+                opProc();
+            },opInterval);
+
+            //saveQuestion(q,null,function(data){
+            //    $("#ajaxloading").hide();
+            //    q.ifSaved = true;
+            //    q.id = JSON.parse(data).body;
+            //    SisDispatcher.dispatch({
+            //        actionType: Constant.CAUSECHANGE,
+            //    });
+            //},null,function(){
+            //    $("#ajaxloading").hide();
+            //});
         }
         else if(payload.actionType == Constant.SURVEYQUESTIONEDIT){
             var qindex = payload.value;
