@@ -464,6 +464,9 @@ Staff.getStaffSurveyList = function(staffid,callback){
                 }]},{
                     orgid:0,questionlist:0,editorid:0
                 }).sort({ctime:-1}).toArray(function(err,surveys){
+                    for(var i in surveys){
+                        surveys[i].surveyid = surveys[i]._id;
+                    }
                     mongoPool.release(db);
                     callback(err,surveys);
                 });
