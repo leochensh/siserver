@@ -194,7 +194,7 @@ class EditSurveyList extends Store{
             $.ajax({
                 url: Constant.BASE_URL+"admin/survey/withdraw",
                 data: $.param({
-                    surveyid:editSurveyList[index]._id
+                    surveyid:index
                 }),
                 type: 'PUT',
                 contentType: 'application/x-www-form-urlencoded',
