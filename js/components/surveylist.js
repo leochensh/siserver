@@ -122,7 +122,7 @@ export var Surveylist = React.createClass({
         var inFunc = function(){
             SisDispatcher.dispatch({
                 actionType: Constant.EDITSURVEY,
-                id:that.props.surveyeditlist[index]._id
+                id:index
             });
             that.context.router.push("/newsurvey");
         };
@@ -132,7 +132,7 @@ export var Surveylist = React.createClass({
         var that = this;
         var inFunc = function(){
             that.setState({
-                surveyurl:Constant.BASE_FULL+"quest/"+that.props.surveyeditlist[index]._id
+                surveyurl:Constant.BASE_FULL+"quest/"+index
             });
             //that.context.router.push("/quest/"+that.props.surveyeditlist[index]._id);
             $("#sharemodal").modal("show");
@@ -143,7 +143,7 @@ export var Surveylist = React.createClass({
     stastic(index){
         var that = this;
         var inFunc = function(){
-            that.context.router.push("/stastic/"+that.props.surveyeditlist[index]._id);
+            that.context.router.push("/stastic/"+index);
         };
         return inFunc;
     },
@@ -234,7 +234,7 @@ export var Surveylist = React.createClass({
             if(selist[i].status != Constant.SURVEYSTATUS_NORMAL && selist[i].status != Constant.SURVEYSTATUS_PROPOSE){
                 buttonGrp.push(<a
                     type="button"
-                    onClick={this.deleteButtonClick(i)}
+                    onClick={this.deleteButtonClick(selist[i]._id)}
                     className="btn btn-danger">Delete</a>);
             }
             if(this.props.loginInfo.role == "sadmin" ||
@@ -242,30 +242,30 @@ export var Surveylist = React.createClass({
                 selist[i].status != Constant.SURVEYSTATUS_PROPOSE)){
                 buttonGrp.push(<a
                     type="button"
-                    onClick={this.editButtonClick(i)}
+                    onClick={this.editButtonClick(selist[i]._id)}
                     className="btn btn-primary">Edit</a>);
             }
             if(selist[i].status == Constant.SURVEYSTATUS_NORMAL){
                 buttonGrp.push(<a
                     type="button"
-                    onClick={this.shareItClick(i)}
+                    onClick={this.shareItClick(selist[i]._id)}
                     className="btn btn-primary">Share it</a>);
                 buttonGrp.push(<a
                     type="button"
-                    onClick={this.stastic(i)}
+                    onClick={this.stastic(selist[i]._id)}
                     className="btn btn-primary">Statistics</a>);
             }
             if(this.props.loginInfo.role == "sadmin" &&
                 (selist[i].status == Constant.SURVEYSTATUS_PROPOSE)){
                 buttonGrp.push(<a
                     type="button"
-                    onClick={this.auditButtonClick(i)}
+                    onClick={this.auditButtonClick(selist[i]._id)}
                     className="btn btn-primary">Audit</a>);
             }
             if(selist[i].status == Constant.SURVEYSTATUS_NORMAL || selist[i].status == Constant.SURVEYSTATUS_PROPOSE){
                 buttonGrp.push(<a
                     type="button"
-                    onClick={this.withdrawButtonClick(i)}
+                    onClick={this.withdrawButtonClick(selist[i]._id)}
                     className="btn btn-primary">Withdraw</a>);
             }
             mlist.push(

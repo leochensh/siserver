@@ -129,6 +129,14 @@ export var Stastic = React.createClass({
                         var slist = calist[qfi].selectindexlist;
                         for(var sindex in slist){
                             tempList[slist[sindex]] = 1;
+                            if(calist[qfi].selectextra && calist[qfi].selectextra.length>0){
+                                var seindex = _.findIndex(calist[qfi].selectextra,function(item){
+                                    return item.index == slist[sindex];
+                                })
+                                if(seindex>=0 && calist[qfi].selectextra[seindex].text){
+                                    tempList[slist[sindex]] = calist[qfi].selectextra[seindex].text;
+                                }
+                            }
                         }
                     }
                     for(var tindex in tempList){
@@ -958,7 +966,7 @@ export var Stastic = React.createClass({
                     detailModal.push(
                         <div className="panel panel-default">
                             <div className="panel-heading">
-                                <span className="green">{parseInt(i)+1}</span>
+                                <span className="green">{parseInt(qsindex)+1}</span>
                                 <span>&nbsp;&nbsp;{currentQ.title?currentQ.title:""}</span>
                                 <span>&nbsp;&nbsp;Type: {Constant.QTYPE_NAME_MAP[currentQ.type]}</span>
                             </div>

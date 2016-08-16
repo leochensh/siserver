@@ -122,7 +122,7 @@ class EditSurveyList extends Store{
             $.ajax({
                 url: Constant.BASE_URL+"editor/survey/delete",
                 data: $.param({
-                    surveyid:editSurveyList[index]._id
+                    surveyid:index
                 }),
                 type: 'DELETE',
                 contentType: 'application/x-www-form-urlencoded',
@@ -158,7 +158,7 @@ class EditSurveyList extends Store{
             $.ajax({
                 url: Constant.BASE_URL+"sadmin/survey/audit",
                 data: $.param({
-                    surveyid:editSurveyList[index]._id
+                    surveyid:index
                 }),
                 type: 'PUT',
                 contentType: 'application/x-www-form-urlencoded',
