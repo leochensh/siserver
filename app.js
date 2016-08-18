@@ -915,6 +915,32 @@ aclHandler.registerWait(function(acl){
         });
     });
 
+
+    app.post("/sadmin/survey/totemplate",acl.middleware(1),function(req,res){
+
+        var surveyid = req.body.surveyid;
+        var templatename = req.body.templatename;
+
+        if(surveyid && ObjectID.isValid(surveyid) && templatename){
+            Staff.generateTemplatefromSurvey(surveyid,templatename,function(err,msg){
+
+                logger.logger.log("info","admin generate template",{
+                    editorid:req.session.uid});
+                res.status(200);
+                successMsg.body = ss;
+
+                res.send(JSON.stringify(successMsg));
+            });
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+
+    });
+
     app.get("/admin/survey/list",acl.middleware(2),function(req,res){
         var orgid = req.session.orgid;
         Staff.getAdminSurveyList(orgid,function(err,ss){
@@ -1432,15 +1458,22 @@ aclHandler.registerWait(function(acl){
         if(surveyid && ObjectID.isValid(surveyid) && investigatorid &&
             ObjectID.isValid(investigatorid) && req.body.answerlist){
             Staff.saveAnswers(req.body,investigatorid,function(err,msg){
-                logger.logger.log("info","staff send survey answer",{
-                    staffid:req.session.uid,
-                    surveyid:surveyid,
-                    answerid:msg
-                });
-                res.status(200);
-                successMsg.body = msg;
+                if(msg=="duplicate"){
+                    res.status(409);
+                    errorMsg.code = "duplicate";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","staff send survey answer",{
+                        staffid:req.session.uid,
+                        surveyid:surveyid,
+                        answerid:msg
+                    });
+                    res.status(200);
+                    successMsg.body = msg;
+                    res.send(JSON.stringify(successMsg));
+                }
 
-                res.send(JSON.stringify(successMsg));
             })
         }
         else{

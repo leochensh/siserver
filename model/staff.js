@@ -100,7 +100,7 @@ Staff.getEditorSurveyList = function(editorid,callback){
         else{
             db.collection("surveys",function(err,collection){
 
-                collection.find({editorid:editorid},{orgid:0,questionlist:0,editorid:0})
+                collection.find({editorid:editorid,type:dict.TYPE_SURVEY},{orgid:0,questionlist:0,editorid:0})
                     .sort({ctime:-1}).toArray(function(err,surveys){
                         mongoPool.release(db);
                         callback(err,surveys);
@@ -118,7 +118,7 @@ Staff.getAdminSurveyList = function(orgid,callback){
         else{
             db.collection("surveys",function(err,collection){
 
-                collection.find({orgid:orgid},{orgid:0,questionlist:0,editorid:0})
+                collection.find({orgid:orgid,type:dict.TYPE_SURVEY},{orgid:0,questionlist:0,editorid:0})
                     .sort({ctime:-1}).toArray(function(err,surveys){
                     mongoPool.release(db);
                     callback(err,surveys);
@@ -136,7 +136,7 @@ Staff.getSAdminSurveyList = function(callback){
         else{
             db.collection("surveys",function(err,collection){
 
-                collection.find({},{orgid:0,questionlist:0,editorid:0})
+                collection.find({type:dict.TYPE_SURVEY},{orgid:0,questionlist:0,editorid:0})
                     .sort({ctime:-1}).toArray(function(err,surveys){
                     mongoPool.release(db);
                     callback(err,surveys);
@@ -456,11 +456,13 @@ Staff.getStaffSurveyList = function(staffid,callback){
                 scollection.find({"$or":[{
                     status:dict.SURVEYSTATUS_NORMAL,
                     publishstatus:dict.SURVEYPUBLISHSTATUS_PRIVATEPERSONAL,
-                    editorid:staffid
+                    editorid:staffid,
+                    type:dict.TYPE_SURVEY
 
                 },{
                     status:dict.SURVEYSTATUS_NORMAL,
-                    publishstatus:dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL
+                    publishstatus:dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL,
+                    type:dict.TYPE_SURVEY
                 }]},{
                     orgid:0,questionlist:0,editorid:0
                 }).sort({ctime:-1}).toArray(function(err,surveys){
@@ -615,16 +617,27 @@ Staff.saveAnswers = function(answerdata,staffid,callback){
 
         }
         else{
-            db.collection("answers",function(err,collection){
-                answerdata.ctime = new Date();
-                if(staffid){
-                    answerdata.investigatorid = staffid;
-                }
 
-                collection.insertOne(answerdata,function(err,res){
-                    mongoPool.release(db);
-                    callback(err,res.insertedId);
-                })
+            db.collection("answers",function(err,collection){
+                collection.find({name:answerdata.name}).limit(1).next(function(err,ans){
+                    if(ans){
+                        mongoPool.release(db);
+                        callback(err,"duplicate");
+                    }
+                    else{
+                        answerdata.ctime = new Date();
+                        if(staffid){
+                            answerdata.investigatorid = staffid;
+                        }
+
+                        collection.insertOne(answerdata,function(err,res){
+                            mongoPool.release(db);
+                            callback(err,res.insertedId);
+                        })
+                    }
+                });
+
+
             });
         }
     });
@@ -764,6 +777,19 @@ Staff.getAdInfo = function(orgid,callback){
                         mongoPool.release(db);
                         callback(err,ads);
                     })
+            });
+        }
+    });
+};
+
+Staff.generateTemplatefromSurvey = function(surveyid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+                mongoPool.release(db);
             });
         }
     });
