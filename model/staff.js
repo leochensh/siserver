@@ -619,7 +619,10 @@ Staff.saveAnswers = function(answerdata,staffid,callback){
         else{
 
             db.collection("answers",function(err,collection){
-                collection.find({name:answerdata.name}).limit(1).next(function(err,ans){
+                collection.find({name:answerdata.name,
+                    surveyid:answerdata.surveyid,
+                    begintime:answerdata.begintime,
+                    endtime:answerdata.endtime}).limit(1).next(function(err,ans){
                     if(ans){
                         mongoPool.release(db);
                         callback(err,"duplicate");
