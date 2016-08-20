@@ -224,6 +224,44 @@ class EditSurveyList extends Store{
                 }
             });
         }
+        else if(payload.actionType == Constant.SURVEYTOTEMPLATE){
+            var surveyid = payload.surveyid;
+            var templatename = payload.templatename;
+            $("#ajaxloading").show();
+            $.ajax({
+                url: Constant.BASE_URL+"sadmin/survey/totemplate",
+                data: $.param({
+                    surveyid:surveyid,
+                    templatename:templatename
+                }),
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#ajaxloading").hide();
+                    var msg = JSON.parse(data);
+                    SisDispatcher.dispatch({
+                        actionType: Constant.GETSURVEYEDITLIST,
+                        role:payload.role
+                    });
+                },
+                error:function(jxr,scode){
+                    $("#ajaxloading").hide();
+                },
+                statusCode:{
+                    406:function(){
+
+                    },
+                    500:function(){
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500
+                        });
+                    },
+                    409:function(){
+
+                    }
+                }
+            });
+        }
     }
 }
 

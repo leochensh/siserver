@@ -92,6 +92,33 @@ Staff.createSurvey = function(orgid,uid,name,type,callback){
     });
 };
 
+var getEditorListName = function(surveylist,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,collection){
+                async.map(surveylist,function(surv,cb){
+                    console.log(surv)
+                    collection.find({_id:ObjectID(surv.editorid)}).limit(1).next(function(err,admin){
+                        if(admin){
+                            surv.editorname = admin.name;
+                            cb(null,surv);
+                        }
+                        else{
+                            cb("notfound",null);
+                        }
+                    })
+                },function(err,survs){
+                    mongoPool.release(db);
+                    callback(survs);
+                })
+            });
+        }
+    });
+};
+
 Staff.getEditorSurveyList = function(editorid,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -100,10 +127,13 @@ Staff.getEditorSurveyList = function(editorid,callback){
         else{
             db.collection("surveys",function(err,collection){
 
-                collection.find({editorid:editorid,type:dict.TYPE_SURVEY},{orgid:0,questionlist:0,editorid:0})
+                collection.find({editorid:editorid,type:dict.TYPE_SURVEY},{orgid:0,questionlist:0})
                     .sort({ctime:-1}).toArray(function(err,surveys){
                         mongoPool.release(db);
-                        callback(err,surveys);
+                        getEditorListName(surveys,function(newsurveys){
+                            callback(err,newsurveys);
+                        })
+
                     });
             });
         }
@@ -118,10 +148,13 @@ Staff.getAdminSurveyList = function(orgid,callback){
         else{
             db.collection("surveys",function(err,collection){
 
-                collection.find({orgid:orgid,type:dict.TYPE_SURVEY},{orgid:0,questionlist:0,editorid:0})
+                collection.find({orgid:orgid,type:dict.TYPE_SURVEY},{orgid:0,questionlist:0})
                     .sort({ctime:-1}).toArray(function(err,surveys){
                     mongoPool.release(db);
-                    callback(err,surveys);
+                    console.log("get e name");
+                    getEditorListName(surveys,function(newsurveys){
+                        callback(err,newsurveys);
+                    });
                 });
             });
         }
@@ -136,7 +169,27 @@ Staff.getSAdminSurveyList = function(callback){
         else{
             db.collection("surveys",function(err,collection){
 
-                collection.find({type:dict.TYPE_SURVEY},{orgid:0,questionlist:0,editorid:0})
+                collection.find({type:dict.TYPE_SURVEY},{orgid:0,questionlist:0})
+                    .sort({ctime:-1}).toArray(function(err,surveys){
+                    mongoPool.release(db);
+                    getEditorListName(surveys,function(newsurveys){
+                        callback(err,newsurveys);
+                    });
+                });
+            });
+        }
+    });
+};
+
+Staff.getTemplateList = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+
+                collection.find({type:dict.TYPE_TEMPLATE},{orgid:0,questionlist:0})
                     .sort({ctime:-1}).toArray(function(err,surveys){
                     mongoPool.release(db);
                     callback(err,surveys);
@@ -226,8 +279,8 @@ Staff.editQuestion = function(orgid,questiondata,callback){
 
                 surveycollection.find({_id:ObjectID(questiondata.surveyid)}).limit(1).next(function(err,survey){
                     if(survey){
-                        if(survey.orgid != orgid){
-                            mongoPool.release(db);f
+                        if(false){
+                            mongoPool.release(db);
                             callback(err,"forbidden");
 
                         }
@@ -785,13 +838,87 @@ Staff.getAdInfo = function(orgid,callback){
     });
 };
 
-Staff.generateTemplatefromSurvey = function(surveyid,callback){
+Staff.generateTemplatefromSurvey = function(surveyid,templatename,callback){
     mongoPool.acquire(function(err,db){
         if(err){
 
         }
         else{
             db.collection("surveys",function(err,collection){
+                collection.find({_id:ObjectID(surveyid),type:dict.TYPE_SURVEY},
+                    {_id:0,name:0,editorid:0,type:0,status:0,ctime:0,publishstatus:0,publishtime:0}).limit(1).next(function(err,sur){
+                    if(sur){
+                        collection.insertOne({
+                            name:templatename
+                        },function(err,insresult){
+                            var tempid = insresult.insertedId;
+                            async.map(sur.questionlist,function(qu,cb){
+                                Staff.cloneQuestion(qu,tempid,function(err,nqid){
+                                    if(nqid!="notfound"){
+                                        cb(null,nqid);
+                                    }
+                                    else{
+                                        cb("notfound",null);
+                                    }
+
+                                });
+                            },function(err,arrays){
+
+                                if(err){
+                                    mongoPool.release(db);
+                                    console.log("BIG PROBLEM");
+                                    callback(err,"notfound");
+                                }
+                                else{
+                                    collection.updateOne({_id:tempid},{$set:{
+                                        ctime:new Date(),
+                                        type:dict.TYPE_TEMPLATE,
+                                        questionlist:arrays,
+                                        fromsurveyid:surveyid
+                                    }},function(err,msg){
+                                        console.log("completed survey to template");
+                                        mongoPool.release(db);
+                                        callback(err,tempid);
+                                    })
+                                }
+                            })
+                        });
+
+
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                });
+            });
+        }
+    });
+};
+
+Staff.cloneQuestion = function(qid,tempid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("questions",function(err,collection){
+                collection.find({_id:qid},{_id:0,surveyid:0,ctime:0}).limit(1).next(function(err,oq){
+                    if(oq){
+                        console.log("clone question "+qid.toString());
+                        oq.surveyid = tempid;
+                        oq.ctime = new Date();
+                        collection.insertOne(oq,function(err,insresult){
+                            var nqid = insresult.insertedId;
+                            mongoPool.release(db);
+                            callback(err,nqid);
+                        });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
                 mongoPool.release(db);
             });
         }

@@ -21,6 +21,7 @@ export var Constant = {
     DELETESURVEY:"deletesurvey",
     AUDITSURVEY:"auditsurvey",
     WITHDRAWSURVEY:"withdrawsurvey",
+    SURVEYTOTEMPLATE:"surveytotemplate",
     EDITSURVEY:"editsurvey",
     SURVEYNAMECHANGE:"surveynamechange",
     SURVEYADDNEWQUESTION:"surveyaddnewquestion",
@@ -101,10 +102,13 @@ export var Constant = {
     PLATFORMTYPE_IOS:"ios",
     PLATFORMTYPE_WEB:"web",
 
-    BASE_FULL:"http://www.ouresa.com/si/public/#/",
-    BASE_URL:"/si/",
-    BASE_IMAGEURL:"/si/uploads/"
-    //BASE_FULL:"http://localhost:8080/public/#/",
-    //BASE_URL:"/",
-    //BASE_IMAGEURL:"/uploads/"
+    TYPE_SURVEY:"survey",
+    TYPE_TEMPLATE:"template",
+
+    //BASE_FULL:"http://www.ouresa.com/si/public/#/",
+    //BASE_URL:"/si/",
+    //BASE_IMAGEURL:"/si/uploads/"
+    BASE_FULL:"http://localhost:8080/public/#/",
+    BASE_URL:"/",
+    BASE_IMAGEURL:"/uploads/"
 };

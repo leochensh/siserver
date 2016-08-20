@@ -890,29 +890,36 @@ aclHandler.registerWait(function(acl){
 
     app.get("/editor/survey/list",acl.middleware(2),function(req,res){
         var editorid = req.session.uid;
-        Staff.getEditorSurveyList(editorid,function(err,ss){
-            if(!ss){
-                ss = [];
-            }
-            logger.logger.log("info","editor get survey list",{
-                editorid:req.session.uid});
-            res.status(200);
-            successMsg.body = ss;
+        Staff.getTemplateList(function(err,templates){
+            Staff.getEditorSurveyList(editorid,function(err,ss){
+                if(!ss){
+                    ss = [];
+                }
+                logger.logger.log("info","editor get survey list",{
+                    editorid:req.session.uid});
+                res.status(200);
+                successMsg.body = _.union(templates,ss);
 
-            res.send(JSON.stringify(successMsg));
-        });
+                res.send(JSON.stringify(successMsg));
+            });
+        })
+
     });
 
     app.get("/sadmin/survey/list",acl.middleware(1),function(req,res){
-        Staff.getSAdminSurveyList(function(err,ss){
+        Staff.getTemplateList(function(err,templates){
+            Staff.getSAdminSurveyList(function(err,ss){
 
-            logger.logger.log("info","admin get survey list",{
-                editorid:req.session.uid});
-            res.status(200);
-            successMsg.body = ss;
+                logger.logger.log("info","admin get survey list",{
+                    editorid:req.session.uid});
+                res.status(200);
+                successMsg.body = _.union(templates,ss);
 
-            res.send(JSON.stringify(successMsg));
-        });
+                res.send(JSON.stringify(successMsg));
+            });
+        })
+
+
     });
 
 
@@ -926,10 +933,18 @@ aclHandler.registerWait(function(acl){
 
                 logger.logger.log("info","admin generate template",{
                     editorid:req.session.uid});
-                res.status(200);
-                successMsg.body = ss;
 
-                res.send(JSON.stringify(successMsg));
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "survey not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = msg;
+
+                    res.send(JSON.stringify(successMsg));
+                }
             });
         }
         else{

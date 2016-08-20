@@ -10,7 +10,8 @@ var surveyData = {
     surveyid:null,
     ifSurveyNameEmpty:false,
     surveystatus:Constant.SURVEYSTATUS_EDIT,
-    qlist:[]
+    qlist:[],
+    type:""
 };
 
 var opArray = [];
@@ -265,7 +266,8 @@ class NewsurveyStore extends Store{
                     surveyid:survey._id,
                     ifSurveyNameEmpty:false,
                     surveystatus:survey.status,
-                    qlist:[]
+                    qlist:[],
+                    type:survey.type
                 }
                 var nqlist = survey.questionlist;
                 for(var i in nqlist){

@@ -15,7 +15,9 @@ export var Surveylist = React.createClass({
             withdrawindex:null,
             filtertext:"",
             currentpage:0,
-            pagesize:10
+            pagesize:10,
+            templatename:"",
+            templatefromid:null
         }
     },
     contextTypes: {
@@ -140,6 +142,43 @@ export var Surveylist = React.createClass({
         return inFunc;
 
     },
+    totemButtonClick(sid){
+        var that = this;
+        var inFunc = function(){
+            var slist = that.props.surveyeditlist;
+            var survey = _.find(slist,function(item){
+                return item._id == sid;
+            });
+
+            if(survey){
+                that.setState({
+                    templatename:survey.name,
+                    templatefromid:sid
+                });
+                $("#createtemplate").modal("show");
+            }
+        };
+        return inFunc;
+
+
+
+    },
+    templatenamechange(event){
+        this.setState({
+            templatename:event.target.value
+        });
+    },
+    confirmtemplatefromsurvey(){
+        if(this.state.templatename && this.state.templatefromid){
+            $("#createtemplate").modal("hide");
+            SisDispatcher.dispatch({
+                actionType: Constant.SURVEYTOTEMPLATE,
+                surveyid:this.state.templatefromid,
+                templatename:this.state.templatename,
+                role:this.props.loginInfo.role
+            });
+        }
+    },
     stastic(index){
         var that = this;
         var inFunc = function(){
@@ -167,7 +206,8 @@ export var Surveylist = React.createClass({
         });
         if(this.state.filtertext && this.state.filtertext.length>0){
             selist = _.filter(selist,function(item){
-                return item.name.indexOf(that.state.filtertext)>=0
+                return item.name.indexOf(that.state.filtertext)>=0 ||
+                    (item.editorname && item.editorname.indexOf(that.state.filtertext)>=0)
             });
         }
 
@@ -225,53 +265,88 @@ export var Surveylist = React.createClass({
             else if(selist[i].status == Constant.SURVEYSTATUS_EDIT){
                 trclass = "warning"
             }
+            else if(selist[i].type == Constant.TYPE_TEMPLATE){
+                trclass = "info";
+            }
             var pdate = "";
             if(selist[i].publishtime){
                 pdate = new Date(selist[i].publishtime).toLocaleString();
             }
+
+
             var buttonGrp = [];
 
-            if(selist[i].status != Constant.SURVEYSTATUS_NORMAL && selist[i].status != Constant.SURVEYSTATUS_PROPOSE){
-                buttonGrp.push(<a
-                    type="button"
-                    onClick={this.deleteButtonClick(selist[i]._id)}
-                    className="btn btn-danger">Delete</a>);
-            }
-            if(this.props.loginInfo.role == "sadmin" ||
-                (selist[i].status != Constant.SURVEYSTATUS_NORMAL &&
-                selist[i].status != Constant.SURVEYSTATUS_PROPOSE)){
-                buttonGrp.push(<a
-                    type="button"
-                    onClick={this.editButtonClick(selist[i]._id)}
-                    className="btn btn-primary">Edit</a>);
-            }
-            if(selist[i].status == Constant.SURVEYSTATUS_NORMAL){
-                buttonGrp.push(<a
-                    type="button"
-                    onClick={this.shareItClick(selist[i]._id)}
-                    className="btn btn-primary">Share it</a>);
+            if(selist[i].type!=Constant.TYPE_TEMPLATE){
+                if(selist[i].status != Constant.SURVEYSTATUS_NORMAL && selist[i].status != Constant.SURVEYSTATUS_PROPOSE){
+                    buttonGrp.push(<a
+                        type="button"
+                        onClick={this.deleteButtonClick(selist[i]._id)}
+                        className="btn btn-danger">Delete</a>);
+                }
+                if(this.props.loginInfo.role == "sadmin" ||
+                    (selist[i].status != Constant.SURVEYSTATUS_NORMAL &&
+                    selist[i].status != Constant.SURVEYSTATUS_PROPOSE)){
+                    buttonGrp.push(<a
+                        type="button"
+                        onClick={this.editButtonClick(selist[i]._id)}
+                        className="btn btn-primary">Edit</a>);
+                }
+                if(selist[i].status == Constant.SURVEYSTATUS_NORMAL){
+                    buttonGrp.push(<a
+                        type="button"
+                        onClick={this.shareItClick(selist[i]._id)}
+                        className="btn btn-primary">Share it</a>);
+
+                }
+                if(this.props.loginInfo.role == "sadmin" &&
+                    (selist[i].status == Constant.SURVEYSTATUS_PROPOSE)){
+                    buttonGrp.push(<a
+                        type="button"
+                        onClick={this.auditButtonClick(selist[i]._id)}
+                        className="btn btn-primary">Audit</a>);
+                }
+                if(selist[i].status == Constant.SURVEYSTATUS_NORMAL || selist[i].status == Constant.SURVEYSTATUS_PROPOSE){
+                    buttonGrp.push(<a
+                        type="button"
+                        onClick={this.withdrawButtonClick(selist[i]._id)}
+                        className="btn btn-primary">Withdraw</a>);
+                }
+
+                if(this.props.loginInfo.role == "sadmin" &&
+                    (selist[i].status == Constant.SURVEYSTATUS_NORMAL)){
+                    buttonGrp.push(<a
+                        type="button"
+                        onClick={this.totemButtonClick(selist[i]._id)}
+                        className="btn btn-primary">Generate template</a>);
+                }
+
                 buttonGrp.push(<a
                     type="button"
                     onClick={this.stastic(selist[i]._id)}
                     className="btn btn-primary">Statistics</a>);
             }
-            if(this.props.loginInfo.role == "sadmin" &&
-                (selist[i].status == Constant.SURVEYSTATUS_PROPOSE)){
-                buttonGrp.push(<a
-                    type="button"
-                    onClick={this.auditButtonClick(selist[i]._id)}
-                    className="btn btn-primary">Audit</a>);
+            else{
+                if(this.props.loginInfo.role == "sadmin"){
+                    buttonGrp.push(<a
+                        type="button"
+                        onClick={this.editButtonClick(selist[i]._id)}
+                        className="btn btn-primary">Edit</a>);
+                    buttonGrp.push(<a
+                        type="button"
+                        onClick={this.deleteButtonClick(selist[i]._id)}
+                        className="btn btn-danger">Delete</a>);
+                }
             }
-            if(selist[i].status == Constant.SURVEYSTATUS_NORMAL || selist[i].status == Constant.SURVEYSTATUS_PROPOSE){
-                buttonGrp.push(<a
-                    type="button"
-                    onClick={this.withdrawButtonClick(selist[i]._id)}
-                    className="btn btn-primary">Withdraw</a>);
-            }
+
+
+
+
             mlist.push(
                 <tr key={"slist"+i} className={trclass}>
                     <td>{parseInt(startPos)+parseInt(i)+1}</td>
                     <td>{selist[i].name}</td>
+                    <td>{selist[i].type==Constant.TYPE_SURVEY?"survey":"template"}</td>
+                    <td>{selist[i].editorname?selist[i].editorname:""}</td>
                     <td>{new Date(selist[i].ctime).toLocaleString()}</td>
                     <td>{pdate}</td>
                     <td>{ stext }</td>
@@ -323,6 +398,8 @@ export var Surveylist = React.createClass({
                             <tr>
                                 <th><span className="">##</span></th>
                                 <th><span className="">Survey Name</span></th>
+                                <th><span className="">Type</span></th>
+                                <th><span className="">Editor</span></th>
                                 <th><span className="">Time Created</span></th>
                                 <th><span className="">Publish Time</span></th>
                                 <th><span className="">Status</span></th>
@@ -451,6 +528,41 @@ export var Surveylist = React.createClass({
                                 <a type="button"
                                    onClick={this.confirmWithdrawSurvey}
                                    className="btn btn-primary" >Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="createtemplate" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Generate template from survey</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    This operation will create a new template.Please input template's name.
+                                </h3>
+                                <form>
+                                    <div className="form-group">
+                                        <label htmlFor="surveynewform">Template Name</label>
+                                        <input type="text"
+                                               className="form-control"
+
+                                               placeholder=""
+                                               value={this.state.templatename}
+                                               onChange={this.templatenamechange}
+                                        />
+                                    </div>
+                                </form>
+
+
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmtemplatefromsurvey}>Confirm</a>
                             </div>
                         </div>
                     </div>
