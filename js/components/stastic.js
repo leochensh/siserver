@@ -92,7 +92,7 @@ export var Stastic = React.createClass({
                 bias = 1;
             }
             if(aNameList[2-bias]){
-                var nd=new Date(aNameList[2]);
+                var nd=new Date(aNameList[2-bias]);
                 var year = nd.getFullYear();
                 var month = nd.getMonth()+1;
                 var date = nd.getDate();
