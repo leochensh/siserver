@@ -88,7 +88,7 @@ export var Stastic = React.createClass({
 
             var aNameList = currentA.name.split("_");
             var bias = 0;
-            if(aNameList[0] == this.state.survey.name){
+            if(aNameList[0] != this.state.survey.name){
                 bias = 1;
             }
             if(aNameList[2-bias]){
