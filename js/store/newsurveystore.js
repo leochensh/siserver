@@ -11,7 +11,8 @@ var surveyData = {
     ifSurveyNameEmpty:false,
     surveystatus:Constant.SURVEYSTATUS_EDIT,
     qlist:[],
-    type:""
+    type:"",
+    metainfolist:[]
 };
 
 var opArray = [];
@@ -40,12 +41,19 @@ var opProc = function(){
 
             opArray.splice(index,1);
             $("#ajaxloading").show();
+            var data = {
+                name:surveyData.surveyname,
+                id:surveyData.surveyid
+            };
+            if(surveyData.metainfolist && surveyData.metainfolist.length>0){
+                data.metainfo = JSON.stringify(surveyData.metainfolist);
+            }
+            else{
+                data.metainfo = JSON.stringify([]);
+            }
             $.ajax({
                 url: Constant.BASE_URL+"editor/survey/edit",
-                data: $.param({
-                    name:surveyData.surveyname,
-                    id:surveyData.surveyid
-                }),
+                data: $.param(data),
                 type: 'PUT',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function (data) {
@@ -168,9 +176,68 @@ class NewsurveyStore extends Store{
                 ifSaved:false,
                 surveyid:null,
                 ifSurveyNameEmpty:false,
-                qlist:[]
+                surveystatus:Constant.SURVEYSTATUS_EDIT,
+                qlist:[],
+                type:"",
+                metainfolist:[]
             };
             this.__emitChange();
+        }
+        else if(payload.actionType == Constant.ADDNEWMETA){
+            if(!surveyData.metainfolist){
+                surveyData.metainfolist = [];
+            }
+            surveyData.metainfolist.push({
+                text:"",
+                qid:-1
+            });
+            this.__emitChange();
+        }
+        else if(payload.actionType == Constant.METATEXTCHANGE){
+            var index = payload.index;
+            var text = payload.text;
+
+
+            var metainfolist = surveyData.metainfolist;
+            metainfolist[index].text = text;
+
+            this.__emitChange();
+            addToProc({
+                type:"namechange"
+            });
+
+            setTimeout(function(){
+                opProc();
+            },opInterval);
+        }
+        else if(payload.actionType == Constant.METASELECTCHANGE){
+            var index = payload.index;
+            var select = payload.select;
+
+
+            var metainfolist = surveyData.metainfolist;
+            metainfolist[index].qid = select;
+
+            this.__emitChange();
+            addToProc({
+                type:"namechange"
+            });
+
+            setTimeout(function(){
+                opProc();
+            },opInterval);
+        }
+        else if(payload.actionType == Constant.DELETEMETA){
+            var index = payload.index;
+            surveyData.metainfolist.splice(index,1);
+            this.__emitChange();
+            addToProc({
+                type:"namechange"
+            });
+
+            setTimeout(function(){
+                opProc();
+            },opInterval);
         }
         else if(payload.actionType == Constant.SURVEYDATABATCHCHANGE){
             var ka = _.keys(payload.value);
@@ -267,7 +334,8 @@ class NewsurveyStore extends Store{
                     ifSurveyNameEmpty:false,
                     surveystatus:survey.status,
                     qlist:[],
-                    type:survey.type
+                    type:survey.type,
+                    metainfolist:survey.metainfolist
                 }
                 var nqlist = survey.questionlist;
                 for(var i in nqlist){
@@ -406,6 +474,23 @@ class NewsurveyStore extends Store{
         else if(payload.actionType == Constant.SURVEYQUESTIONDELETE){
             var qindex = payload.value;
 
+            if(surveyData.metainfolist && surveyData.metainfolist.length>0){
+                var fi = _.findIndex(surveyData.metainfolist,function(item){
+                    return item.qid == surveyData.qlist[qindex].id
+                })
+                if(fi>=0){
+                    surveyData.metainfolist.splice(fi,1);
+                    this.__emitChange();
+                    addToProc({
+                        type:"namechange"
+                    });
+
+                    setTimeout(function(){
+                        opProc();
+                    },opInterval);
+                }
+            }
+
 
             $("#ajaxloading").show();
             var that = this;
@@ -467,7 +552,7 @@ class NewsurveyStore extends Store{
                     else if(direction == "down" && qindex != surveyData.qlist.length-1){
                         var nextIndex = parseInt(qindex);
                         var temp = surveyData.qlist[nextIndex+1];
-                        surveyData.qlist[nex+1] = surveyData.qlist[qindex];
+                        surveyData.qlist[nextIndex+1] = surveyData.qlist[qindex];
                         surveyData.qlist[qindex] = temp;
                     }
 

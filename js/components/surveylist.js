@@ -17,7 +17,9 @@ export var Surveylist = React.createClass({
             currentpage:0,
             pagesize:10,
             templatename:"",
-            templatefromid:null
+            templatefromid:null,
+            newsurveyfromtemplatename:"",
+            surveyfromid:null
         }
     },
     contextTypes: {
@@ -163,9 +165,32 @@ export var Surveylist = React.createClass({
 
 
     },
+    generateSurveyButtonClick(sid){
+        var that = this;
+        var inFunc = function(){
+            var slist = that.props.surveyeditlist;
+            var survey = _.find(slist,function(item){
+                return item._id == sid;
+            });
+
+            if(survey){
+                that.setState({
+                    newsurveyfromtemplatename:survey.name,
+                    surveyfromid:sid
+                });
+                $("#createsurveyfromtemplate").modal("show");
+            }
+        };
+        return inFunc;
+    },
     templatenamechange(event){
         this.setState({
             templatename:event.target.value
+        });
+    },
+    surveynamefromtempchange(event){
+        this.setState({
+            newsurveyfromtemplatename:event.target.value
         });
     },
     confirmtemplatefromsurvey(){
@@ -175,6 +200,17 @@ export var Surveylist = React.createClass({
                 actionType: Constant.SURVEYTOTEMPLATE,
                 surveyid:this.state.templatefromid,
                 templatename:this.state.templatename,
+                role:this.props.loginInfo.role
+            });
+        }
+    },
+    confirmsurveyfromtemplate(){
+        if(this.state.newsurveyfromtemplatename && this.state.surveyfromid){
+            $("#createsurveyfromtemplate").modal("hide");
+            SisDispatcher.dispatch({
+                actionType: Constant.TEMPLATETOSURVEY,
+                surveyid:this.state.surveyfromid,
+                surveyname:this.state.newsurveyfromtemplatename,
                 role:this.props.loginInfo.role
             });
         }
@@ -335,6 +371,12 @@ export var Surveylist = React.createClass({
                         type="button"
                         onClick={this.deleteButtonClick(selist[i]._id)}
                         className="btn btn-danger">Delete</a>);
+                }
+                else{
+                    buttonGrp.push(<a
+                        type="button"
+                        onClick={this.generateSurveyButtonClick(selist[i]._id)}
+                        className="btn btn-primary">Generate survey</a>);
                 }
             }
 
@@ -563,6 +605,41 @@ export var Surveylist = React.createClass({
                             <div className="modal-footer">
                                 <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
                                 <a type="button" className="btn btn-primary" onClick={this.confirmtemplatefromsurvey}>Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="createsurveyfromtemplate" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Generate survey from template</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    This operation will create a new survey.Please input survey's name.
+                                </h3>
+                                <form>
+                                    <div className="form-group">
+                                        <label htmlFor="surveynewform">Survey Name</label>
+                                        <input type="text"
+                                               className="form-control"
+
+                                               placeholder=""
+                                               value={this.state.newsurveyfromtemplatename}
+                                               onChange={this.surveynamefromtempchange}
+                                        />
+                                    </div>
+                                </form>
+
+
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmsurveyfromtemplate}>Confirm</a>
                             </div>
                         </div>
                     </div>

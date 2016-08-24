@@ -797,9 +797,10 @@ aclHandler.registerWait(function(acl){
     app.put("/editor/survey/edit",acl.middleware(2),function(req,res){
         var name = req.body.name;
         var surveyid = req.body.id;
+        var metainfo = req.body.metainfo;
 
         if(name && ObjectID.isValid(surveyid)){
-            Staff.editSurvey(name,surveyid,function(err,msg){
+            Staff.editSurvey(name,surveyid,metainfo,function(err,msg){
                 if(msg == "notfound"){
                     res.status(404);
                     errorMsg.code = "survey not found";
@@ -945,6 +946,45 @@ aclHandler.registerWait(function(acl){
 
                     res.send(JSON.stringify(successMsg));
                 }
+            });
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+
+    });
+
+    app.post("/admin/survey/fromtemplate",acl.middleware(2),function(req,res){
+
+        var surveyid = req.body.surveyid;
+        var surveyname = req.body.surveyname;
+
+        if(surveyid && ObjectID.isValid(surveyid) && surveyname){
+
+            Staff.createSurvey(req.session.orgid,req.session.uid,surveyname,dict.TYPE_SURVEY,function(err,sur){
+                logger.logger.log("info","staff create survey",{
+                    id:sur,
+                    editorid:req.session.uid});
+
+
+
+                Staff.cloneQuestionListFromTemplate(sur,surveyid,function(err,msg){
+                    if(msg == "notfound"){
+                        res.status(404);
+                        errorMsg.code = "survey not found";
+                        res.send(JSON.stringify(errorMsg));
+                    }
+                    else{
+                        res.status(200);
+                        successMsg.body = msg;
+
+                        res.send(JSON.stringify(successMsg));
+                    }
+                })
+
             });
         }
         else{

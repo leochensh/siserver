@@ -11,6 +11,10 @@ export var Constant = {
     ADDNEWPERSON:"addnewperson",
     SURVEYVALUECHANGE:"surveyvaluechange",
     CLEANSURVEYDATA:"cleansurveydata",
+    ADDNEWMETA:"addnewmeta",
+    METATEXTCHANGE:"metatextchange",
+    METASELECTCHANGE:"metaselectchange",
+    DELETEMETA:"deletemeta",
     SURVEYDATABATCHCHANGE:"surveydatabatchchange",
     LOADCSV:"loadcsv",
     SAVESINGLEQUESTION:"savesinglequestion",
@@ -22,6 +26,7 @@ export var Constant = {
     AUDITSURVEY:"auditsurvey",
     WITHDRAWSURVEY:"withdrawsurvey",
     SURVEYTOTEMPLATE:"surveytotemplate",
+    TEMPLATETOSURVEY:"templatetosurvey",
     EDITSURVEY:"editsurvey",
     SURVEYNAMECHANGE:"surveynamechange",
     SURVEYADDNEWQUESTION:"surveyaddnewquestion",
@@ -105,10 +110,10 @@ export var Constant = {
     TYPE_SURVEY:"survey",
     TYPE_TEMPLATE:"template",
 
-    //BASE_FULL:"http://www.ouresa.com/si/public/#/",
-    //BASE_URL:"/si/",
-    //BASE_IMAGEURL:"/si/uploads/"
-    BASE_FULL:"http://localhost:8080/public/#/",
-    BASE_URL:"/",
-    BASE_IMAGEURL:"/uploads/"
+    BASE_FULL:"http://www.ouresa.com/si/public/#/",
+    BASE_URL:"/si/",
+    BASE_IMAGEURL:"/si/uploads/"
+    //BASE_FULL:"http://localhost:8080/public/#/",
+    //BASE_URL:"/",
+    //BASE_IMAGEURL:"/uploads/"
 };

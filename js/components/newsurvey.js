@@ -14,7 +14,8 @@ export var Newsurvey = React.createClass({
             surveyid:null,
             ifSurveyNameEmpty:false,
             qlist:[],
-            publishToPrivate:true
+            publishToPrivate:true,
+            deletemetaindex:null
         }
     },
     ownChecked(event){
@@ -66,6 +67,11 @@ export var Newsurvey = React.createClass({
             actionType: Constant.CLEANSURVEYDATA
         });
         $("#cleanall").modal("hide");
+    },
+    addMetaClick(){
+        SisDispatcher.dispatch({
+            actionType: Constant.ADDNEWMETA
+        });
     },
     publishsurvey(){
         if(this.props.newsurvey.surveystatus!=Constant.SURVEYSTATUS_NORMAL &&this.props.newsurvey.surveystatus!=Constant.SURVEYSTATUS_PROPOSE &&this.props.newsurvey.surveyid){
@@ -445,6 +451,48 @@ export var Newsurvey = React.createClass({
         };
         return dhandler;
     },
+    metatextchange(index){
+        var that = this;
+        var infunc = function(event){
+            //var qlist = that.props.newsurvey.qlist;
+            //qlist.splice(index,1);
+            SisDispatcher.dispatch({
+                actionType: Constant.METATEXTCHANGE,
+                index:index,
+                text:event.target.value
+            });
+
+        };
+        return infunc;
+    },
+    metaselectchange(index){
+        var that = this;
+        var infunc = function(event){
+            SisDispatcher.dispatch({
+                actionType: Constant.METASELECTCHANGE,
+                index:index,
+                select:event.target.value
+            });
+
+        };
+        return infunc;
+    },
+    deletemeta(index){
+        var that = this;
+        var infunc = function(event){
+            that.state.deletemetaindex = index;
+            $("#deletemeta").modal("show");
+        }
+        return infunc;
+    },
+    confirmdeletemeta(){
+        $("#deletemeta").modal("hide");
+        SisDispatcher.dispatch({
+            actionType: Constant.DELETEMETA,
+            index:this.state.deletemetaindex
+        });
+    },
+
     confirmnewfromfile(){
         $("#createsurveyfromfile").modal("hide");
         var that = this;
@@ -588,6 +636,69 @@ export var Newsurvey = React.createClass({
         },internal);
     },
     render(){
+        var dpoptionsList = [];
+        dpoptionsList.push(<option value="-1">
+            None
+        </option>);
+        for(var i in this.props.newsurvey.qlist){
+            dpoptionsList.push(<option value={this.props.newsurvey.qlist[i].id}>
+                {parseInt(i)+1},{this.props.newsurvey.qlist[i].title}
+            </option>)
+        }
+        dpoptionsList.push(<option value={9999}>
+            {parseInt(this.props.newsurvey.qlist.length)+1},END
+        </option>)
+        var metalist = [];
+        for(var i in this.props.newsurvey.metainfolist){
+            var cm = this.props.newsurvey.metainfolist[i];
+            var mp = <div className="panel panel-default">
+                <div className="panel-heading">
+                    <div className="row">
+                        <div className="col-sm-2">
+                            <span className="grey">{parseInt(i)+1}</span>
+                        </div>
+
+                        <div className="col-sm-offset-8 col-md-2">
+                            <a className="btn btn-danger" role="button" onClick={this.deletemeta(i)}>
+                                Delete
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+                <div className="panel-body">
+                    <div className="row">
+                        <label className="col-sm-2 control-label">
+                            Meta text:
+                        </label>
+                        <div className="col-sm-10">
+                            <input type="text"
+                                   value={cm.text}
+                                   onChange = {this.metatextchange(i)}
+                                   className="form-control"/>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <label className="col-sm-2 control-label">
+                            Before this question:
+                        </label>
+                        <div className="col-sm-10">
+                            <select className="form-control"
+                                    value={cm.qid}
+                                    onChange={this.metaselectchange(i)}
+                                    >
+                                {dpoptionsList}
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>;
+            metalist.push(mp);
+
+        }
+
+
         var emptystyle = {display:"none"};
         if(this.props.newsurvey.ifSurveyNameEmpty){
             emptystyle = {}
@@ -626,6 +737,10 @@ export var Newsurvey = React.createClass({
                 color:"blue",
                 fontSize:"10px"
             };
+        }
+        if(this.props.newsurvey.type == Constant.TYPE_TEMPLATE){
+            surveyStatusTxt = "";
+            ifDisablePublish = "disabled";
         }
         return(
             <div id="wrapper">
@@ -757,6 +872,25 @@ export var Newsurvey = React.createClass({
                                 <div className="alert alert-danger col-md-12" role="alert" style={emptystyle}>
                                     Survey name can not be empty.
                                 </div>
+
+                                <div className="panel panel-default">
+                                    <div className="panel-heading">
+                                        <div className="row">
+                                            <div className="col-md-2">
+                                                <h3 className="panel-title">Meta Text List</h3>
+                                            </div>
+                                            <div className="col-md-offset-8 col-md-2">
+                                                <a className="btn btn-default" role="button" onClick={this.addMetaClick}>
+                                                    Add Meta Text
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div className="panel-body">
+                                        {metalist}
+                                    </div>
+                                </div>
                                 <hr/>
                                 {questionList}
 
@@ -851,6 +985,27 @@ export var Newsurvey = React.createClass({
                             <div className="modal-footer">
                                 <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
                                 <a type="button" className="btn btn-primary" onClick={this.confirmnewfromfile}>Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="deletemeta" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Delete Meta Data</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    Confirm to delete this meta information?
+                                </h3>
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmdeletemeta}>Confirm</a>
                             </div>
                         </div>
                     </div>

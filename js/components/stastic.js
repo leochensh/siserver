@@ -87,21 +87,25 @@ export var Stastic = React.createClass({
             }
 
             var aNameList = currentA.name.split("_");
-            if(aNameList[2]){
+            var bias = 0;
+            if(aNameList[0] == this.state.survey.name){
+                bias = 1;
+            }
+            if(aNameList[2-bias]){
                 var nd=new Date(aNameList[2]);
                 var year = nd.getFullYear();
                 var month = nd.getMonth()+1;
                 var date = nd.getDate();
                 dstring = year+"/"+month+"/"+date;
             }
-            country = aNameList[3]?aNameList[3]:"";
-            city = aNameList[4]?aNameList[4]:"";
-            customer = aNameList[5]?aNameList[5]:"";
-            if(aNameList[6]){
-                if(aNameList[6] == "male"){
+            country = aNameList[3-bias]?aNameList[3-bias]:"";
+            city = aNameList[4-bias]?aNameList[4-bias]:"";
+            customer = aNameList[5-bias]?aNameList[5-bias]:"";
+            if(aNameList[6-bias]){
+                if(aNameList[6-bias] == "male"){
                     male = "1";
                 }
-                else if(aNameList[6] == "female"){
+                else if(aNameList[6-bias] == "female"){
                     female = "1";
                 }
             }

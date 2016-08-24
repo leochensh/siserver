@@ -200,7 +200,7 @@ Staff.getTemplateList = function(callback){
 };
 
 
-Staff.editSurvey = function(name,surveyid,callback){
+Staff.editSurvey = function(name,surveyid,metainfo,callback){
     mongoPool.acquire(function(err,db){
         if(err){
 
@@ -213,10 +213,24 @@ Staff.editSurvey = function(name,surveyid,callback){
                         callback(err,"notfound");
                     }
                     else{
-                        collection.updateOne({_id:ObjectID(surveyid)},{$set:{name:name}},function(err,result){
-                            mongoPool.release(db);
-                            callback(err,result);
-                        });
+                        if(metainfo){
+                            collection.updateOne({_id:ObjectID(surveyid)},
+                                {$set:{
+                                    name:name,
+                                    metainfolist:JSON.parse(metainfo)}},function(err,result){
+                                mongoPool.release(db);
+                                callback(err,result);
+                            });
+                        }
+                        else{
+                            collection.updateOne({_id:ObjectID(surveyid)},
+                                {$set:{
+                                    name:name}},function(err,result){
+                                    mongoPool.release(db);
+                                    callback(err,result);
+                                });
+                        }
+
                     }
                 });
 
@@ -885,6 +899,53 @@ Staff.generateTemplatefromSurvey = function(surveyid,templatename,callback){
                         });
 
 
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                });
+            });
+        }
+    });
+};
+
+Staff.cloneQuestionListFromTemplate = function(surveyid,templateid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,collection){
+                collection.find({_id:ObjectID(templateid)}).limit(1).next(function(err,template){
+                    if(template){
+                        async.map(template.questionlist,function(qu,cb){
+                            Staff.cloneQuestion(qu,surveyid,function(err,nqid){
+                                if(nqid!="notfound"){
+                                    cb(null,nqid);
+                                }
+                                else{
+                                    cb("notfound",null);
+                                }
+
+                            });
+                        },function(err,arrays){
+
+                            if(err){
+                                mongoPool.release(db);
+                                console.log("BIG PROBLEM");
+                                callback(err,"notfound");
+                            }
+                            else{
+                                collection.updateOne({_id:surveyid},{$set:{
+                                    questionlist:arrays
+                                }},function(err,msg){
+                                    console.log("completed template to survey");
+                                    mongoPool.release(db);
+                                    callback(err,msg);
+                                })
+                            }
+                        })
                     }
                     else{
                         mongoPool.release(db);
