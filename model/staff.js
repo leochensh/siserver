@@ -587,7 +587,7 @@ Staff.getSurveyDetail = function(surveyid,callback){
         }
         else{
             db.collection("surveys",function(err,surveycollection){
-                surveycollection.find({_id:ObjectID(surveyid)},{name:1,questionlist:1,status:1})
+                surveycollection.find({_id:ObjectID(surveyid)},{name:1,questionlist:1,status:1,metainfolist:1})
                     .limit(1).next(function(err,survey){
                         if(survey){
                             var qList = [];

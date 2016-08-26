@@ -27,7 +27,8 @@ export var Question = React.createClass({
             var ls = this.props.qdata.selectlist;
             ls.push({
                 title:"",
-                type:Constant.SELECTTYPE_TEXT
+                type:Constant.SELECTTYPE_TEXT,
+                qid:-1
             });
             this.informChange({
                 selectlist:ls
@@ -40,7 +41,8 @@ export var Question = React.createClass({
                 index:slsize,
                 start:0,
                 end:10,
-                step:1
+                step:1,
+                title:""
             });
             this.informChange({
                 scorelist:sl
@@ -92,6 +94,17 @@ export var Question = React.createClass({
         function handleStype(event){
             var slist = that.props.qdata.selectlist;
             slist[index].type = event.target.value;
+            that.informChange({
+                selectlist:slist
+            })
+        }
+        return handleStype;
+    },
+    jumptochange(index){
+        var that = this;
+        function handleStype(event){
+            var slist = that.props.qdata.selectlist;
+            slist[index].qid = event.target.value;
             that.informChange({
                 selectlist:slist
             })
@@ -195,12 +208,14 @@ export var Question = React.createClass({
             }]
         }
 
-
         this.informChange({scorelist:sarray})
     },
     informChange(obj){
+        var that = this;
+        setTimeout(function(){
+            that.props.qhandle(obj);
+        },10)
 
-        this.props.qhandle(obj);
         //this.setState(obj);
         //var that = this;
         //setTimeout(
@@ -348,6 +363,17 @@ export var Question = React.createClass({
         //    </option>)
         //}
 
+
+        var jumpOptionsList = [];
+        jumpOptionsList.push(<option value="-1">
+            None
+        </option>);
+        for(var i in this.props.qlist){
+            jumpOptionsList.push(<option value={this.props.qlist[i].id}>
+                {parseInt(i)+1},{this.props.qlist[i].title}
+            </option>)
+        }
+
         var slist = [];
         for(var i in this.props.qdata.selectlist){
             var s = this.props.qdata.selectlist[i];
@@ -371,6 +397,11 @@ export var Question = React.createClass({
 
             var upSelArrowClass = "btn btn-default";
             var downSelArrowClass = "btn btn-default";
+
+            var jumpqid = -1;
+            if(s.qid){
+                jumpqid = s.qid;
+            }
 
             if(i == 0){
                 upSelArrowClass = "btn btn-default disabled";
@@ -453,6 +484,18 @@ export var Question = React.createClass({
                                     </option>
                                 </select>
                             </div>
+
+
+                            <label  className="col-sm-2 control-label">
+                                Jump to:
+                            </label>
+                            <div className="col-sm-10">
+                                <select className="form-control"
+                                        value={jumpqid} onChange={this.jumptochange(i)}
+                                        >
+                                    {jumpOptionsList}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -474,6 +517,11 @@ export var Question = React.createClass({
         selectoptionsList.push(<option value="-1">
             None
         </option>);
+
+
+
+
+
         var ifDisplaySelectStyle = {
             display:"none"
         };
@@ -560,7 +608,6 @@ export var Question = React.createClass({
                 }
             }
             else{
-                console.log("here")
                 this.handleScoreChange(0,scoreStart,scoreEnd,scoreStep);
             }
         }
@@ -577,6 +624,32 @@ export var Question = React.createClass({
             downArrowClass = "btn btn-default disabled";
         }
 
+
+        //var dependencyQ = <div className="form-group">
+        //    <label className="col-sm-2 control-label">Dependent Question</label>
+        //    <div className="col-sm-10">
+        //        <select className="form-control"
+        //                value={this.props.qdata.precedentindex}
+        //                onChange={this.handleChange.bind(this,"precedentindex")}
+        //        >
+        //            {dpoptionsList}
+        //        </select>
+        //    </div>
+        //</div>;
+
+        var dependentList = <div className="form-group" style={ifDisplaySelectStyle}>
+            <label className="col-sm-2 control-label">Dependent Select</label>
+            <div className="col-sm-10">
+                <select className="form-control"
+                        value={this.props.qdata.precedentselectindex}
+                        onChange={this.handleChange.bind(this,"precedentselectindex")}
+                >
+                    {selectoptionsList}
+                </select>
+            </div>
+        </div>;
+
+        var dependencyQ = ""
 
 
 
@@ -622,29 +695,9 @@ export var Question = React.createClass({
                             </div>
                         </div>
 
-                        <div className="form-group">
-                            <label className="col-sm-2 control-label">Dependent Question</label>
-                            <div className="col-sm-10">
-                                <select className="form-control"
-                                        value={this.props.qdata.precedentindex}
-                                        onChange={this.handleChange.bind(this,"precedentindex")}
-                                >
-                                    {dpoptionsList}
-                                </select>
-                            </div>
-                        </div>
 
-                        <div className="form-group" style={ifDisplaySelectStyle}>
-                            <label className="col-sm-2 control-label">Dependent Select</label>
-                            <div className="col-sm-10">
-                                <select className="form-control"
-                                        value={this.props.qdata.precedentselectindex}
-                                        onChange={this.handleChange.bind(this,"precedentselectindex")}
-                                >
-                                    {selectoptionsList}
-                                </select>
-                            </div>
-                        </div>
+
+                        {dependencyQ}
                         <div className="form-group" style={ifDisplayScoreBeginEndStepStyle}>
                             {scoreHtml}
                         </div>

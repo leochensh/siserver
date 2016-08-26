@@ -81,54 +81,91 @@ export var Quest = React.createClass({
         if((direction=="left" && this.state.currentIndex>0) ||
             (direction=="right" && this.state.currentIndex<qsize-1)){
             var step = 1;
-            var next;
+
+
             if(direction == "right"){
-                next = this.state.survey.questionlist[this.state.currentIndex+step];
-            }
-            else{
-                next = this.state.survey.questionlist[this.state.currentIndex-step];
-            }
-            while(next && next.ifhasprecedent){
-                var preid = next.precedentid;
-                var preselectindex = next.precedentselectindex;
+                var that  = this;
+                var nextindex = this.state.currentIndex+step;
                 var amatchindex = _.findIndex(this.state.answer.answerlist,function(item){
-                    return item.questionid == preid;
+                    return item.questionid == that.state.survey.questionlist[that.state.currentIndex]._id;
                 });
-                console.log(amatchindex);
                 if(amatchindex>=0){
                     var sindexarr = this.state.answer.answerlist[amatchindex].selectindexlist;
-                    var newmatchindex = _.find(sindexarr,function(item){
-                        return item == preselectindex
-                    })
-                    console.log(newmatchindex);
-                    if(newmatchindex>=0){
-                        break;
-                    }
-                    else{
-                        step+=1;
-                    }
-                    if(direction == "right"){
-                        next = this.state.survey.questionlist[this.state.currentIndex+step];
-                    }
-                    else{
-                        next = this.state.survey.questionlist[this.state.currentIndex-step];
+                    console.log(sindexarr);
+                    for(var sindex in sindexarr){
+                        var selectjumpindex = sindexarr[sindex];
+                        console.log(selectjumpindex);
+                        console.log(this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid)
+                        if(this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid){
+                            nextindex = _.findIndex(this.state.survey.questionlist,function(item){
+                                return item._id == that.state.survey.questionlist[that.state.currentIndex].selectlist[selectjumpindex].qid;
+                            });
+                            console.log("herrrrrrrrrrrrrrrr")
+                            console.log(nextindex)
+                            break;
+                        }
                     }
                 }
-                else{
-                    break;
-                }
-
-            }
-            if(direction == "right"){
                 this.setState({
-                    currentIndex:this.state.currentIndex+step
+                    currentIndex:nextindex
                 })
+
             }
             else{
                 this.setState({
                     currentIndex:this.state.currentIndex-step
                 })
             }
+
+
+            //var next;
+            //if(direction == "right"){
+            //    next = this.state.survey.questionlist[this.state.currentIndex+step];
+            //}
+            //else{
+            //    next = this.state.survey.questionlist[this.state.currentIndex-step];
+            //}
+            //while(next && next.ifhasprecedent){
+            //    var preid = next.precedentid;
+            //    var preselectindex = next.precedentselectindex;
+            //    var amatchindex = _.findIndex(this.state.answer.answerlist,function(item){
+            //        return item.questionid == preid;
+            //    });
+            //    console.log(amatchindex);
+            //    if(amatchindex>=0){
+            //        var sindexarr = this.state.answer.answerlist[amatchindex].selectindexlist;
+            //        var newmatchindex = _.find(sindexarr,function(item){
+            //            return item == preselectindex
+            //        })
+            //        console.log(newmatchindex);
+            //        if(newmatchindex>=0){
+            //            break;
+            //        }
+            //        else{
+            //            step+=1;
+            //        }
+            //        if(direction == "right"){
+            //            next = this.state.survey.questionlist[this.state.currentIndex+step];
+            //        }
+            //        else{
+            //            next = this.state.survey.questionlist[this.state.currentIndex-step];
+            //        }
+            //    }
+            //    else{
+            //        break;
+            //    }
+            //
+            //}
+            //if(direction == "right"){
+            //    this.setState({
+            //        currentIndex:this.state.currentIndex+step
+            //    })
+            //}
+            //else{
+            //    this.setState({
+            //        currentIndex:this.state.currentIndex-step
+            //    })
+            //}
             //var scoreList = this.state.answer.answerlist[this.state.currentIndex].scorelist;
             //var sindex = _.findIndex(scoreList,function(item){
             //    return item.index == 0
@@ -288,9 +325,41 @@ export var Quest = React.createClass({
     },
     render(){
         if(this.state.survey){
+            var metalist = [];
+            if(this.state.survey.metainfolist){
+                metalist = this.state.survey.metainfolist;
+            }
+
+
             var Qlist = this.state.survey.questionlist;
             var percent = (this.state.currentIndex+1)/Qlist.length;
             var currentQ = Qlist[this.state.currentIndex];
+
+            //alert(currentQ._id)
+            var beforeAlert = "";
+
+            var alertIndex = _.findIndex(metalist,function(item){
+                return item.qid == currentQ._id
+            });
+
+            if(alertIndex>=0){
+                beforeAlert = <div className="alert alert-success" role="alert">
+                    {metalist[alertIndex].text}
+                </div>
+            }
+
+            var endAlert = "";
+            var endalertIndex = _.findIndex(metalist,function(item){
+                return item.qid == 9999
+            });
+
+            if(endalertIndex>=0){
+                endAlert = <div className="alert alert-success" role="alert">
+                    {metalist[endalertIndex].text}
+                </div>
+            }
+
+
             var currentType = currentQ.type;
             var slist = [];
             var leftDisabled = "";
@@ -477,6 +546,7 @@ export var Quest = React.createClass({
                             {this.state.currentIndex+1} of {Qlist.length}
                         </div>
                     </div>
+                    {beforeAlert}
                     <h2>{this.splitEnglish(Qlist[this.state.currentIndex].title)}</h2>
                     <form className="form-horizontal">
                         {slist}
@@ -517,6 +587,7 @@ export var Quest = React.createClass({
                 mainPart = (
                     <div className="container">
                         <h2>Submit success! Thanks for your cooperation.</h2>
+                        {endAlert}
                     </div>)
             }
             return (
