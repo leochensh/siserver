@@ -1,20 +1,24 @@
 import React from 'react';
 //import $ from "jquery"
+import crypto from "crypto";
+import FacebookLogin from 'react-facebook-login';
 import {Constant} from "../constant";
 import {SisDispatcher} from "../dispatcher";
-import {Emailcheck} from "./emailcheck"
 
-export var Forgetpass = React.createClass({
+export var Resetpass = React.createClass({
     contextTypes: {
         router: React.PropTypes.object.isRequired
     },
     componentDidMount: function(){
+        this.state.resetcode = this.props.params.resetcode;
     },
     getInitialState(){
         return{
-            email:"",
             iferror:false,
-            errorstr:""
+            errorstr:"",
+            resetcode:null,
+            pass:"",
+            repass:""
         }
     },
     handleChange(name,event){
@@ -25,51 +29,64 @@ export var Forgetpass = React.createClass({
     },
 
     handleClick(){
-        if(this.state.email && Emailcheck.validateEmail(this.state.email)){
+        if(this.state.pass &&
+            this.state.repass &&
+            this.state.pass.length>0 &&
+            this.state.repass.length>0){
+
+            var hash = crypto.createHash("md5");
+            hash.update(this.state.pass);
             var that = this;
             $("#ajaxloading").show();
             $.ajax({
-                url: Constant.BASE_URL + "resetpassword",
+                url: Constant.BASE_URL+"resetpassfromcode",
                 data: $.param({
-                    email:that.state.email
+                    code:this.props.params.resetcode,
+                    pass:hash.digest("hex")
                 }),
                 type: 'POST',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function (data) {
+
                     var msg = JSON.parse(data);
                     $("#ajaxloading").hide();
-                    $("#resetsucmodal").modal("show");
+                    $("#resetsucmodal").modal("show")
+
+
 
                 },
-                error: function () {
+                error:function(){
                     $("#ajaxloading").hide();
                 },
                 statusCode: {
                     404: function () {
                         that.setState({
                             iferror: true,
-                            errorstr: "This email address is not valid."
+                            errorstr: "This reset code is not valid."
                         });
                     },
-                    500: function () {
+                    409: function () {
                         that.setState({
                             iferror: true,
-                            errorstr: "Email send error."
+                            errorstr: "Password reset time out. Please try again."
                         });
                     }
                 }
             });
+
+
         }
         else{
             this.setState({
                 iferror:true,
-                errorstr:"Please input correct email address."
+                errorstr:"Please input correct password."
             })
         }
+
     },
     confirmreset(){
         $("#resetsucmodal").modal("hide");
-        this.context.router.push("/");
+        this.context.router.push("/login");
     },
     render() {
         var disStyle = {
@@ -87,16 +104,23 @@ export var Forgetpass = React.createClass({
                         <div className="panel-body" style={{backgroundColor:"#eee",padding:"30px"}}>
                             <form className="form-horizontal">
                                 <div className="form-group form-group-lg">
-                                    <label
-                                        style={{marginBottom:"30px"}}
-                                        htmlFor="inputEmail3" className="control-label">Input your register email to reset password</label>
-                                    <div className="">
-                                        <input type="text"
+                                    <label  className="col-sm-3 control-label">New password</label>
+                                    <div className="col-sm-9">
+                                        <input type="password"
                                                className="form-control"
-                                               id="inputEmail3"
-                                               placeholder="Email"
-                                               value={this.state.email}
-                                               onChange={this.handleChange.bind(this,"email")}
+                                               value={this.state.pass}
+                                               onChange={this.handleChange.bind(this,"pass")}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-group form-group-lg">
+                                    <label  className="col-sm-3 control-label">New password again</label>
+                                    <div className="col-sm-9">
+                                        <input type="password"
+                                               className="form-control"
+                                               value={this.state.repass}
+                                               onChange={this.handleChange.bind(this,"repass")}
                                         />
                                     </div>
                                 </div>
@@ -104,18 +128,18 @@ export var Forgetpass = React.createClass({
 
                             </form>
                             <div className="row">
-                                <div className="col-sm-2">
+                                <div className="col-sm-2 col-sm-offset-3">
                                     <a
-                                        className="btn btn-primary"
+                                        className="btn btn-primary btn-lg"
                                         onClick={this.handleClick}
-                                    >Reset</a>
+                                    >Confirm to reset password</a>
                                 </div>
 
                             </div>
                             <div style={{marginTop:"30px"}} className="row">
                                 <div
 
-                                    className="col-sm-8 alert alert-danger loginalert" role="alert" style={disStyle}>
+                                    className="col-sm-7 col-sm-offset-3 alert alert-danger loginalert" role="alert" style={disStyle}>
                                     {this.state.errorstr}
                                 </div>
                             </div>
@@ -133,7 +157,7 @@ export var Forgetpass = React.createClass({
                                 <h4 className="modal-title">Password reset confirm</h4>
                             </div>
                             <div className="modal-body">
-                                <p>A email is sent to your register email address. Please check your email and follow the link to reset password. </p>
+                                <p>Password reset successfully! Please login again. </p>
                             </div>
                             <div className="modal-footer">
                                 <a type="button"

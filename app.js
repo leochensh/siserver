@@ -2435,17 +2435,36 @@ aclHandler.registerWait(function(acl){
     app.post("/resetpassword",function(req,res){
         var email = req.body.email;
 
-        if(fbid){
-            Admin.lookupFacebookId(fbid,function(err,msg){
+        if(email){
+            Admin.generatResetpassEmailCode(email,function(err,msg){
                 if(msg == "notfound"){
                     res.status(404);
-                    errorMsg.code = "not found";
+                    errorMsg.code = "email not found";
                     res.send(JSON.stringify(errorMsg));
                 }
                 else{
-                    res.status(200);
-                    successMsg.body = msg;
-                    res.send(JSON.stringify(successMsg));
+                    var mailOptions = {
+                        from: from,
+                        to: email,
+                        subject: "Reset your password",
+                        text: "Please click this link to reset your password: http://www.ouresa.com/si/public/#/resetpass/"+msg
+                    };
+                    smtpTransport.sendMail(mailOptions, function(error, response){
+                        if(error){
+                            console.log(error);
+                            res.status(500);
+                            errorMsg.code = "wrong";
+                            res.send(JSON.stringify(errorMsg));
+                        }else{
+                            console.log("ok");
+                            res.status(200);
+                            successMsg.body = "ok";
+
+                            res.send(JSON.stringify(successMsg));
+                        }
+                    });
+
+
                 }
             })
         }
@@ -2454,6 +2473,40 @@ aclHandler.registerWait(function(acl){
             errorMsg.code = "wrong";
             res.send(JSON.stringify(errorMsg));
         }
+    });
+
+    app.post("/resetpassfromcode",function(req,res){
+        var code = req.body.code;
+        var pass = req.body.pass;
+
+        if(code && pass){
+            Admin.resetPassWithCode(code,pass,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else if(msg == "timeout"){
+                    res.status(409);
+                    errorMsg.code = "timeout";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = "ok";
+
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+
+
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
     });
 
 });

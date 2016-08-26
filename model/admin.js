@@ -7,6 +7,7 @@ var _ = require("underscore");
 var randomstring = require("randomstring");
 var ccap = require('ccap');
 
+
 module.exports = Admin;
 
 const crypto = require('crypto');
@@ -250,6 +251,72 @@ Admin.createOrgAdmin = function(orgid,name,pass,role,callback){
     });
 };
 
+Admin.resetPassWithCode = function(code,pass,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,admincollection){
+                admincollection.find({passresetcode:code}).limit(1).next(function(err,admin){
+                    if(admin){
+                        var currentTime = new Date();
+                        var oldtime = new Date(admin.passcodectime);
+
+                        var tdiff = currentTime-oldtime;
+
+                        if(tdiff>2*60*60*1000){ //larger than 2 hour
+                            mongoPool.release(db);
+                            callback(err,"timeout");
+                        }
+                        else{
+                            admincollection.updateOne({passresetcode:code},
+                                {$set:{passhash:pass,passresetcode:null}},function(err,msg){
+                                    mongoPool.release(db);
+                                    callback(err,msg);
+                                })
+                        }
+
+
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+};
+
+Admin.generatResetpassEmailCode = function(email,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("admins",function(err,admincollection){
+                admincollection.find({email:email}).limit(1).next(function(err,admin){
+                    if(admin){
+                        crypto.randomBytes(48,function(cerr,buf){
+                            var codeStr = buf.toString("hex");
+                            admincollection.updateOne({email:email},
+                                {$set:{passresetcode:codeStr,passcodectime:new Date()}},function(err,msg){
+                                    mongoPool.release(db);
+                                    callback(err,codeStr);
+                                })
+                        })
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+};
+
 Admin.createOrgAdminWithEmail = function(orgid,name,pass,email,role,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -306,7 +373,7 @@ Admin.createOrgAdminWithFbid = function(orgid,name,pass,email,fbid,role,callback
                 collection.find({_id:ObjectID(orgid)}).limit(1).next(function(err,org){
                     if(org){
                         db.collection("admins",function(err,adcollection){
-                            adcollection.find({name:name}).limit(1).next(function(err,admin){
+                            adcollection.find({$or:[{name:name},{email:email}]}).limit(1).next(function(err,admin){
                                 if(admin){
                                     mongoPool.release(db);
                                     callback(err,"nameduplicate");

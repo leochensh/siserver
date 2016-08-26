@@ -189,172 +189,172 @@ export var Login = React.createClass({
         var disStyle = this.state.iferror?{}:{display:"none"};
         var fbdisstyle = this.state.iffberror?{}:{display:"none"};
         return (
-        <div className="row">
+            <div className="row">
 
-            <div className="col-md-6 col-md-offset-3">
-                <div className="panel panel-default" style={{marginTop:"30px"}}>
+                <div className="col-md-6 col-md-offset-3">
+                    <div className="panel panel-default" style={{marginTop:"30px"}}>
 
-                    <div className="panel-body" style={{backgroundColor:"#eee"}}>
-                        <form className="form-horizontal">
-                            <div className="form-group form-group-lg">
-                                <label htmlFor="inputEmail3" className="col-sm-2 control-label">Username</label>
-                                <div className="col-sm-10">
-                                    <input type="text"
-                                           className="form-control"
-                                           id="inputEmail3"
-                                           placeholder="Username"
-                                           value={this.state.username}
-                                           onChange={this.handleChange.bind(this,"username")}
-                                    />
-                                </div>
-                            </div>
-                            <div className="form-group form-group-lg">
-                                <label htmlFor="inputPassword3" className="col-sm-2 control-label">Password</label>
-                                <div className="col-sm-10">
-                                    <input type="password"
-                                           ref="nameInput"
-                                           onKeyPress={this.keypress}
-                                           className="form-control"
-                                           id="inputPassword3"
-                                           placeholder="Password"
-                                           value={this.state.password}
-                                           onChange={this.handleChange.bind(this,"password")}
-                                    />
-                                </div>
-                            </div>
-                            <div className="form-group form-group-lg">
-                                <div className="col-sm-offset-2 col-sm-10">
-                                    <div className="checkbox">
-                                        <label>
-                                            <a onClick={this.forgetpassword}>Forget password</a>
-                                        </label>
+                        <div className="panel-body" style={{backgroundColor:"#eee"}}>
+                            <form className="form-horizontal">
+                                <div className="form-group form-group-lg">
+                                    <label htmlFor="inputEmail3" className="col-sm-2 control-label">Username</label>
+                                    <div className="col-sm-10">
+                                        <input type="text"
+                                               className="form-control"
+                                               id="inputEmail3"
+                                               placeholder="Username"
+                                               value={this.state.username}
+                                               onChange={this.handleChange.bind(this,"username")}
+                                        />
                                     </div>
                                 </div>
-                            </div>
-
-                        </form>
-                        <div>
-
-
-                            <div className="col-sm-offset-2 col-sm-2">
-                                <a
-
-                                    className="btn btn-primary"
-                                    onClick={this.handleClick}
-                                >Log in</a>
-                            </div>
-                            <div className="col-sm-offset-1 col-sm-2">
-                                <a
-                                    className="btn btn-default"
-                                    onClick={this.handleRegisterClick}
-                                >Register</a>
-                            </div>
-
-                            <div className="col-sm-offset-1 col-sm-2">
-                                <FacebookLogin
-                                    appId="1820455008188736"
-                                    autoLoad={false}
-                                    callback={this.responseFacebook} />
-                            </div>
-                        </div>
-                        <div className="alert alert-danger loginalert" role="alert" style={disStyle}>
-                            Username/Password error
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div className="modal fade" id="newfbuser" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 className="modal-title" >Register new user</h4>
-                        </div>
-                        <div className="modal-body">
-                            <h3>
-                                This is your first time login. Please fill out detail info.
-                            </h3>
-                            <form>
-                                <div className="form-group">
-                                    <label htmlFor="fbname">User Name</label>
-                                    <input type="text"
-                                           className="form-control"
-                                           id="fbname"
-                                           placeholder=""
-                                           value={this.state.fbname}
-                                           onChange={this.handleChange.bind(this,"fbname")}
-                                    />
+                                <div className="form-group form-group-lg">
+                                    <label htmlFor="inputPassword3" className="col-sm-2 control-label">Password</label>
+                                    <div className="col-sm-10">
+                                        <input type="password"
+                                               ref="nameInput"
+                                               onKeyPress={this.keypress}
+                                               className="form-control"
+                                               id="inputPassword3"
+                                               placeholder="Password"
+                                               value={this.state.password}
+                                               onChange={this.handleChange.bind(this,"password")}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group form-group-lg">
+                                    <div className="col-sm-offset-2 col-sm-10">
+                                        <div className="checkbox">
+                                            <label>
+                                                <a onClick={this.forgetpassword}>Forget password</a>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="form-group">
-                                    <label htmlFor="fbemail">Email</label>
-                                    <input type="email"
-                                           className="form-control"
-                                           id="fbemail"
-                                           placeholder=""
-                                           value={this.state.fbemail}
-                                           onChange={this.handleChange.bind(this,"fbemail")}
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="fbpass">Password</label>
-                                    <input type="password"
-                                           className="form-control"
-                                           id="fbpass"
-                                           placeholder=""
-                                           value={this.state.fbpass}
-                                           onChange={this.handleChange.bind(this,"fbpass")}
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="fbrepass">Reenter Password</label>
-                                    <input type="password"
-                                           className="form-control"
-                                           id="fbrepass"
-                                           placeholder=""
-                                           value={this.state.fbrepass}
-                                           onChange={this.handleChange.bind(this,"fbrepass")}
-                                    />
-                                </div>
                             </form>
+                            <div>
 
-                            <div className="alert alert-danger loginalert" role="alert" style={fbdisstyle}>
-                                {this.state.fberrorstr}
+
+                                <div className="col-sm-offset-2 col-sm-2">
+                                    <a
+
+                                        className="btn btn-primary"
+                                        onClick={this.handleClick}
+                                    >Log in</a>
+                                </div>
+                                <div className="col-sm-offset-1 col-sm-2">
+                                    <a
+                                        className="btn btn-default"
+                                        onClick={this.handleRegisterClick}
+                                    >Register</a>
+                                </div>
+
+                                <div className="col-sm-offset-1 col-sm-2">
+                                    <FacebookLogin
+                                        appId="1820455008188736"
+                                        autoLoad={false}
+                                        callback={this.responseFacebook} />
+                                </div>
                             </div>
-
+                            <div className="alert alert-danger loginalert" role="alert" style={disStyle}>
+                                Username/Password error
+                            </div>
                         </div>
-                        <div className="modal-footer">
-                            <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
-                            <a type="button" className="btn btn-primary" onClick={this.confirmnewfbuser}>Confirm</a>
+
+                    </div>
+
+                </div>
+
+                <div className="modal fade" id="newfbuser" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Register new user</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    This is your first time login. Please fill out detail info.
+                                </h3>
+                                <form>
+                                    <div className="form-group">
+                                        <label htmlFor="fbname">User Name</label>
+                                        <input type="text"
+                                               className="form-control"
+                                               id="fbname"
+                                               placeholder=""
+                                               value={this.state.fbname}
+                                               onChange={this.handleChange.bind(this,"fbname")}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="fbemail">Email</label>
+                                        <input type="email"
+                                               className="form-control"
+                                               id="fbemail"
+                                               placeholder=""
+                                               value={this.state.fbemail}
+                                               onChange={this.handleChange.bind(this,"fbemail")}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="fbpass">Password</label>
+                                        <input type="password"
+                                               className="form-control"
+                                               id="fbpass"
+                                               placeholder=""
+                                               value={this.state.fbpass}
+                                               onChange={this.handleChange.bind(this,"fbpass")}
+                                        />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="fbrepass">Reenter Password</label>
+                                        <input type="password"
+                                               className="form-control"
+                                               id="fbrepass"
+                                               placeholder=""
+                                               value={this.state.fbrepass}
+                                               onChange={this.handleChange.bind(this,"fbrepass")}
+                                        />
+                                    </div>
+                                </form>
+
+                                <div className="alert alert-danger loginalert" role="alert" style={fbdisstyle}>
+                                    {this.state.fberrorstr}
+                                </div>
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmnewfbuser}>Confirm</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="loginmodal" className="modal fade" tabindex="-1" role="dialog">
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h4 className="modal-title">Login success</h4>
-                        </div>
-                        <div className="modal-body">
-                            <p>Login success.</p>
-                        </div>
-                        <div className="modal-footer">
-                            <a type="button"
-                               onClick={this.gotoLogin}
-                               className="btn btn-primary">Confirm</a>
+                <div id="loginmodal" className="modal fade" tabindex="-1" role="dialog">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title">Login success</h4>
+                            </div>
+                            <div className="modal-body">
+                                <p>Login success.</p>
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button"
+                                   onClick={this.gotoLogin}
+                                   className="btn btn-primary">Confirm</a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
         )
     }
 });
