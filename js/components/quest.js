@@ -96,7 +96,9 @@ export var Quest = React.createClass({
                         var selectjumpindex = sindexarr[sindex];
                         console.log(selectjumpindex);
                         console.log(this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid)
-                        if(this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid){
+                        if(this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid &&
+                            this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid != -1
+                        ){
                             nextindex = _.findIndex(this.state.survey.questionlist,function(item){
                                 return item._id == that.state.survey.questionlist[that.state.currentIndex].selectlist[selectjumpindex].qid;
                             });
@@ -334,7 +336,7 @@ export var Quest = React.createClass({
             var Qlist = this.state.survey.questionlist;
             var percent = (this.state.currentIndex+1)/Qlist.length;
             var currentQ = Qlist[this.state.currentIndex];
-
+            console.log(this.state.currentIndex)
             //alert(currentQ._id)
             var beforeAlert = "";
 

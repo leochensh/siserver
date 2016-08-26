@@ -491,6 +491,23 @@ class NewsurveyStore extends Store{
                 }
             }
 
+            for(var questionindex in surveyData.qlist){
+                var cq = surveyData.qlist[questionindex];
+                for (var selectindex in cq.selectlist){
+                    if(cq.selectlist[selectindex].qid == surveyData.qlist[qindex].id){
+                        cq.selectlist[selectindex].qid = -1;
+                        addToProc({
+                            type:"questionchange",
+                            index:questionindex
+                        });
+
+                        setTimeout(function(){
+                            opProc();
+                        },opInterval);
+                    }
+                }
+            }
+
 
             $("#ajaxloading").show();
             var that = this;

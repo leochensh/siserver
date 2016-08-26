@@ -13,6 +13,9 @@ export var Login = React.createClass({
         this.refs.nameInput.getDOMNode().focus();
         $.get(Constant.BASE_URL+"firstpagevisit");
     },
+    forgetpassword(){
+        this.context.router.push("/forgetpass");
+    },
     getInitialState(){
         return{
             username:"",
@@ -223,7 +226,7 @@ export var Login = React.createClass({
                                 <div className="col-sm-offset-2 col-sm-10">
                                     <div className="checkbox">
                                         <label>
-                                            <input type="checkbox"/> Remember me
+                                            <a onClick={this.forgetpassword}>Forget password</a>
                                         </label>
                                     </div>
                                 </div>

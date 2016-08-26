@@ -261,7 +261,7 @@ Admin.createOrgAdminWithEmail = function(orgid,name,pass,email,role,callback){
                 collection.find({_id:ObjectID(orgid)}).limit(1).next(function(err,org){
                     if(org){
                         db.collection("admins",function(err,adcollection){
-                            adcollection.find({name:name}).limit(1).next(function(err,admin){
+                            adcollection.find({$or:[{name:name},{email:email}]}).limit(1).next(function(err,admin){
                                 if(admin){
                                     mongoPool.release(db);
                                     callback(err,"nameduplicate");

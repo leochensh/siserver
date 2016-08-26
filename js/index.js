@@ -19,6 +19,7 @@ import {Org} from "./components/org"
 import {Settings} from "./components/settings"
 import {Edata} from "./components/edata"
 import {Frontpage} from "./components/frontpage"
+import {Forgetpass} from "./components/forgetpass"
 
 var main = document.getElementsByTagName('main')[0];
 
@@ -40,6 +41,7 @@ ReactDom.render(
             <Route path="org" component={Org} />
             <Route path="settings" component={Settings} />
             <Route path="edata" component={Edata} />
+            <Route path="forgetpass" component={Forgetpass} />
         </Route>
     </Router>,
     main

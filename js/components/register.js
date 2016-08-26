@@ -3,10 +3,8 @@ import React from 'react';
 import crypto from "crypto"
 import {Constant} from "../constant"
 import {SisDispatcher} from "../dispatcher";
-function validateEmail(email) {
-    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(email);
-}
+import {Emailcheck} from "./emailcheck"
+
 export var Register = React.createClass({
     contextTypes: {
         router: React.PropTypes.object.isRequired
@@ -72,7 +70,7 @@ export var Register = React.createClass({
                 success: function (data) {
 
                     $("#ajaxloading").hide();
-                    if(that.state.email && validateEmail(that.state.email)){
+                    if(that.state.email && Emailcheck.validateEmail(that.state.email)){
                         $("#ajaxloading").show();
                         $.ajax({
                             url: Constant.BASE_URL+"sendverifiedcode",
@@ -184,7 +182,7 @@ export var Register = React.createClass({
                         409:function(){
                             that.setState({
                                 iferror:true,
-                                errorstr:"User name duplicated."});
+                                errorstr:"User name or email duplicated."});
                         }
                     }
                 });

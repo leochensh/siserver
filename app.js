@@ -2432,6 +2432,30 @@ aclHandler.registerWait(function(acl){
 
     });
 
+    app.post("/resetpassword",function(req,res){
+        var email = req.body.email;
+
+        if(fbid){
+            Admin.lookupFacebookId(fbid,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    res.status(200);
+                    successMsg.body = msg;
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
 });
 
 function checkSurveyData(data){
