@@ -312,7 +312,15 @@ class NewsurveyStore extends Store{
                     //alert(data);
                     $("#ajaxloading").hide();
                     var msg = JSON.parse(data).body;
+                    for(var qindex in msg.questionlist){
+                        var cq = msg.questionlist[qindex];
+                        if(cq.selectlist){
+                            if(_.isString(cq.selectlist)){
+                                cq.selectlist = JSON.parse(cq.selectlist);
+                            }
+                        }
 
+                    }
                     //editSurveyList = msg;
                     SisDispatcher.dispatch({
                         actionType: Constant.PARSESURVEYDETAIL,

@@ -205,6 +205,16 @@ export var Quest = React.createClass({
                 $("#ajaxloading").hide();
                 var msg = JSON.parse(data).body;
 
+                for(var qxindex in msg.questionlist){
+                    var cq = msg.questionlist[qxindex];
+                    if(cq.selectlist){
+                        if(_.isString(cq.selectlist)){
+                            cq.selectlist = JSON.parse(cq.selectlist);
+                        }
+                    }
+
+                }
+
                 var answer = {
                     surveyid:msg._id,
                     begintime:new Date().toISOString(),
