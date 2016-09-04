@@ -5,6 +5,7 @@ import {Question} from "./question"
 import _ from "underscore"
 import crypto from "crypto"
 var Dropzone = require('react-dropzone');
+import {Emailcheck} from "./emailcheck";
 
 export var Newsurvey = React.createClass({
     getInitialState(){

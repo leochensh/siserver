@@ -1,11 +1,12 @@
 import React from 'react';
 import {Constant} from "../constant"
 import {SisDispatcher} from "../dispatcher";
-import {Question} from "./question"
-import _ from "underscore"
-import crypto from "crypto"
-import async from "async"
-import {Starrating} from "./starrating"
+import {Question} from "./question";
+import _ from "underscore";
+import crypto from "crypto";
+import async from "async";
+import {Starrating} from "./starrating";
+import {Emailcheck} from "./emailcheck";
 
 export var Quest = React.createClass({
     getInitialState(){
@@ -209,7 +210,7 @@ export var Quest = React.createClass({
                     var cq = msg.questionlist[qxindex];
                     if(cq.selectlist){
                         if(_.isString(cq.selectlist)){
-                            cq.selectlist = JSON.parse(cq.selectlist);
+                            cq.selectlist = Emailcheck.safeJsonParse(cq.selectlist,[]);
                         }
                     }
 

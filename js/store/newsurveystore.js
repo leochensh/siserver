@@ -2,7 +2,8 @@ import {Store} from 'flux/utils';
 import {SisDispatcher} from "../dispatcher"
 import {Constant} from "../constant"
 import _ from "underscore";
-import async from "async"
+import async from "async";
+import {Emailcheck} from "../components/emailcheck";
 
 var surveyData = {
     surveyname:"",
@@ -312,11 +313,11 @@ class NewsurveyStore extends Store{
                     //alert(data);
                     $("#ajaxloading").hide();
                     var msg = JSON.parse(data).body;
-                    for(var qindex in msg.questionlist){
+                    for(var qindex in msg.questionlist){  //如果是android客户端上传，可能是打包成json字符串，因此要进行处理。再quest和stastic中也要同样处理。
                         var cq = msg.questionlist[qindex];
                         if(cq.selectlist){
                             if(_.isString(cq.selectlist)){
-                                cq.selectlist = JSON.parse(cq.selectlist);
+                                cq.selectlist = Emailcheck.safeJsonParse(cq.selectlist,[]);
                             }
                         }
 
