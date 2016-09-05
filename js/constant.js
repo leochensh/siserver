@@ -6,6 +6,7 @@ export var Constant = {
 
 
     LOGINSUCCESS:"loginsuccess",
+    LOGOUT:"logout",
     ERROR500:"error500",
     GETPERSONAL_LIST:"getpersonallist",
     ADDNEWPERSON:"addnewperson",

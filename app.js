@@ -208,6 +208,18 @@ app.post("/staff/login",function(req,res){
 
 });
 
+app.get("/logout",function(req,res){
+
+    res.status(200);
+    successMsg.body = "success";
+    req.session.userId = null;
+    req.session.orgid = null;
+    req.session.uid = null;
+    req.session.role = null;
+    res.send(JSON.stringify(successMsg));
+
+});
+
 app.get("/firstpagevisit",function(req,res){
     var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     Admin.firstPageVisit(ip,function(){

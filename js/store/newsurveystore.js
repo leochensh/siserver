@@ -299,6 +299,9 @@ class NewsurveyStore extends Store{
                 setTimeout(function(){
                     $("#saveallbutton").popover("hide");
                 },1500);
+
+                $("#dataimporting").modal("hide");
+                $("#dataimportend").modal("show");
             });
         }
         else if(payload.actionType == Constant.EDITSURVEY){
