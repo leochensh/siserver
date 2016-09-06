@@ -510,7 +510,53 @@ Admin.getPersonalList = function(callback){
         }
     });
 }
+/*add by zzl 2016.8.29*/
+Admin.getLogsList = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
 
+        }
+        else{
+            db.collection("logs",function(err,collection){
+                collection.find().sort({ctime:-1}).toArray(function(err,logs){
+                    if(logs){
+                        mongoPool.release(db);
+                        callback(err,logs);
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,[]);
+                    }
+                });
+            });
+        }
+    });
+
+}
+Admin.deletelogList = function(logid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("logs",function(err,collection){
+
+                collection.find({_id:ObjectID(logid)}).limit(1).next(function(err,fb){
+                    if(fb){
+                        collection.deleteOne({_id:ObjectID(logid)},function(err,msg){
+                            mongoPool.release(db);
+                            callback(err,"ok");
+                        });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+}
 Admin.getOrgStaffList = function(orgid,callback){
     mongoPool.acquire(function(err,db){
         if(err){

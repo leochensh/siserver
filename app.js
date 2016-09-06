@@ -484,7 +484,48 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(successMsg));
         })
     });
+    /*add by zzl 2016.8.29*/
+    app.get("/sadmin/logs/list",acl.middleware(1),function(req,res){
+        Admin.getLogsList(function(err,msg){
+            res.status(200);
+            successMsg.body = msg;
+            res.send(JSON.stringify(successMsg));
+        })
+    });
 
+    app.delete("/sadmin/logs/delete",acl.middleware(1),function(req,res){
+        var logid = req.body.logid;
+        console.log(logid);
+        if(logid&&ObjectID.isValid(logid)){
+            Admin.deletelogList(logid,function(err,msg){
+                if(msg == "notfound"){
+                    logger.logger.log("info","not found this log!",{
+                        logid:req.body.logid
+                    });
+                    console.log(msg);
+                    res.status(404);
+                    errorMsg.code = "this log not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","delete successed !",{
+                        logid:req.body.logid
+                    });
+                    console.log(msg);
+                    res.status(200);
+                    successMsg.body = "ok";
+                    res.send(JSON.stringify(successMsg));
+                }
+            });
+        }else{
+            logger.logger.log("info","logid wrong!",{
+                logid:req.body.logid
+            });
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
     app.get("/admin/staff/list",acl.middleware(2),function(req,res){
         var orgid = req.session.orgid;
         Admin.getOrgStaffList(orgid,function(err,msg){

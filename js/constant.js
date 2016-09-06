@@ -6,6 +6,8 @@ export var Constant = {
 
 
     LOGINSUCCESS:"loginsuccess",
+    DELETELOG:"deletelog",
+    GETLOGSLIST:"getlogslist",//add by zzl 2016.8.30
     ERROR500:"error500",
     GETPERSONAL_LIST:"getpersonallist",
     ADDNEWPERSON:"addnewperson",
@@ -102,7 +104,11 @@ export var Constant = {
         "surveyedit":"Edit",
         "surveynormal":"Published"
     },
-
+    SETPAGESIZE:{
+        num1:20,
+        num2:50,
+        num3:100
+    },
     PLATFORMTYPE_ANDROID:"android",
     PLATFORMTYPE_IOS:"ios",
     PLATFORMTYPE_WEB:"web",
@@ -110,10 +116,10 @@ export var Constant = {
     TYPE_SURVEY:"survey",
     TYPE_TEMPLATE:"template",
 
-    BASE_FULL:"http://www.ouresa.com/si/public/#/",
-    BASE_URL:"/si/",
-    BASE_IMAGEURL:"/si/uploads/"
-    //BASE_FULL:"http://localhost:8080/public/#/",
-    //BASE_URL:"/",
-    //BASE_IMAGEURL:"/uploads/"
+    //BASE_FULL:"http://www.ouresa.com/si/public/#/",
+    //BASE_URL:"/si/",
+    //BASE_IMAGEURL:"/si/uploads/"
+    BASE_FULL:"http://localhost:8080/public/#/",
+    BASE_URL:"/",
+    BASE_IMAGEURL:"/uploads/"
 };

@@ -6,6 +6,7 @@ import {surveyEditListStore} from '../store/surveyeditliststore'
 import {adStore} from '../store/adstore'
 import {versionStore} from "../store/versionstore"
 import {orgStore} from "../store/orgstore"
+import {logsStore} from "../store/logsstore"
 import {Link} from 'react-router'
 
 export var App = React.createClass({
@@ -20,6 +21,7 @@ export var App = React.createClass({
         this.adtoken = adStore.addListener(this._onChange);
         this.versiontoken = versionStore.addListener(this._onChange);
         this.orgtoken = orgStore.addListener(this._onChange);
+        this.logtoken = logsStore.addListener(this._onChange);
     },
     componentWillUnmount(){
         loginStore.remove(this.token);
@@ -29,6 +31,7 @@ export var App = React.createClass({
         adStore.remove(this.adtoken);
         versionStore.remove(this.versiontoken);
         orgStore.remove(this.orgtoken);
+        logsStore.remove(this.logtoken);
     },
     homeclick(){
         var cpath = this.props.routes[this.props.routes.length-1]['path']
@@ -80,7 +83,8 @@ export var App = React.createClass({
                             adlist:adStore.getAll(),
                             versionlist:versionStore.getAll(),
                             orglist:orgStore.getAll(),
-                            orgdata:orgStore.getData()
+                            orgdata:orgStore.getData(),
+                            logsList:logsStore.getAll()
                         })
                 }
             </div>
