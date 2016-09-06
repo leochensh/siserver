@@ -26,6 +26,12 @@ class LoginStore extends Store{
             loginInfo.id = null;
             this.__emitChange();
         }
+        else if(payload.actionType == Constant.LOGOUT){
+            loginInfo.ifLogin = false;
+            loginInfo.role = null;
+            loginInfo.id = null;
+            this.__emitChange();
+        }
     }
 }
 

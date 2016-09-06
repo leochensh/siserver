@@ -8,6 +8,8 @@ import {versionStore} from "../store/versionstore"
 import {orgStore} from "../store/orgstore"
 import {logsStore} from "../store/logsstore"
 import {Link} from 'react-router'
+import {Constant} from "../constant";
+import {SisDispatcher} from "../dispatcher";
 
 export var App = React.createClass({
     contextTypes: {
@@ -51,7 +53,45 @@ export var App = React.createClass({
         }
         this.setState({a:1});
     },
+    logoutClick(){
+        $("#logoutmodal").modal("show");
+    },
+    gotologout(){
+        var that = this;
+        $.ajax({
+            url: Constant.BASE_URL+"logout",
+
+            type: 'GET',
+            success: function (data) {
+                $("#logoutmodal").modal("hide");
+                SisDispatcher.dispatch({
+                    actionType: Constant.LOGOUT
+
+                });
+            },
+            error:function(jxr,scode){
+            },
+            statusCode:{
+                406:function(){
+
+                },
+                500:function(){
+
+                },
+                409:function(){
+
+                }
+            }
+        });
+    },
     render() {
+        var logoutStyle = {display:"none"};
+        var loginInfo = loginStore.getLoginInfo();
+        if(loginInfo.ifLogin){
+            logoutStyle = {};
+        }
+
+
         return (
             <div>
                 <nav className="navbar navbar-default navbar-fixed-top">
@@ -70,10 +110,33 @@ export var App = React.createClass({
                                 <li><a onClick={this.homeclick}>Entries</a></li>
                             </ul>
 
+                            <ul className="nav navbar-nav navbar-right">
+                                <li style={logoutStyle}><a onClick={this.logoutClick}>Logout</a></li>
+                            </ul>
+
                         </div>
 
                     </div>
                 </nav>
+                <div className="modal fade" id="logoutmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" id="myModalLabel">Logout</h4>
+                            </div>
+                            <div className="modal-body">
+                                Are you sure to logout?
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button"
+                                   onClick={this.gotologout}
+                                   className="btn btn-primary">Confirm</a>
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Close</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {
                     this.props.children && React.cloneElement(this.props.children,
                         {loginInfo:loginStore.getLoginInfo(),

@@ -5,6 +5,7 @@ import {Question} from "./question"
 import _ from "underscore"
 import crypto from "crypto"
 var Dropzone = require('react-dropzone');
+import {Emailcheck} from "./emailcheck";
 
 export var Newsurvey = React.createClass({
     getInitialState(){
@@ -507,6 +508,7 @@ export var Newsurvey = React.createClass({
                     q.id = null;
                 }
                 //alert(JSON.stringify(that.state.tmsg))
+                $("#dataimporting").modal("show");
                 SisDispatcher.dispatch({
                     actionType: Constant.SURVEYDATABATCHCHANGE,
                     value:{
@@ -634,6 +636,9 @@ export var Newsurvey = React.createClass({
                 },internal);
             },internal);
         },internal);
+    },
+    importend(){
+        $("#dataimportend").modal("hide");
     },
     render(){
         var dpoptionsList = [];
@@ -1006,6 +1011,41 @@ export var Newsurvey = React.createClass({
                             <div className="modal-footer">
                                 <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
                                 <a type="button" className="btn btn-primary" onClick={this.confirmdeletemeta}>Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="dataimporting" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" id="myModalLabel">Data importing</h4>
+                            </div>
+                            <div className="modal-body">
+                                Data importing, please wait...
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="dataimportend" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" id="myModalLabel">Data importing</h4>
+                            </div>
+                            <div className="modal-body">
+                                Data imported successfully.
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button"
+                                   onClick={this.importend}
+                                   className="btn btn-primary">Confirm</a>
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Close</a>
                             </div>
                         </div>
                     </div>

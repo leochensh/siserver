@@ -6,6 +6,7 @@ import {RgraphControl} from "./rgraphcontrol"
 import _ from "underscore"
 import crypto from "crypto"
 import async from "async"
+import {Emailcheck} from "./emailcheck"
 
 export var Stastic = React.createClass({
     getInitialState(){
@@ -306,6 +307,15 @@ export var Stastic = React.createClass({
                 type: 'GET',
                 success: function (data) {
                     var msg = JSON.parse(data).body;
+                    for(var qindex in msg.questionlist){
+                        var cq = msg.questionlist[qindex];
+                        if(cq.selectlist){
+                            if(_.isString(cq.selectlist)){
+                                cq.selectlist = Emailcheck.safeJsonParse(cq.selectlist,[]);
+                            }
+                        }
+
+                    }
                     that.setState({
                         survey:msg,
                     });
@@ -327,7 +337,7 @@ export var Stastic = React.createClass({
                     for(var i in msg){
                         var answerlist = msg[i].answerlist;
                         if(_.isString(answerlist)){
-                            msg[i].answerlist = JSON.parse(answerlist);
+                            msg[i].answerlist = Emailcheck.safeJsonParse(answerlist,[]);
                         }
                     }
                     that.setState({
