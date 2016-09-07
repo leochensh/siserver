@@ -17,7 +17,8 @@ export var Stastic = React.createClass({
             detailid:null,
             ifexport:false,
             exporturl:null,
-            filterList:[]
+            filterList:[],
+            asindex:null
         }
     },
     contextTypes: {
@@ -56,6 +57,12 @@ export var Stastic = React.createClass({
 
                 for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
                     firstQ.push(base_str+"_"+(parseInt(i)))
+                }
+            }
+
+            else if(q.type == Constant.QTYPE_SEQUENCE){
+                for(var j in q.selectlist){
+                    firstQ.push(base_str+"_"+(parseInt(j)+1))
                 }
             }
             else{
@@ -203,6 +210,34 @@ export var Stastic = React.createClass({
                         firstQ.push(tempList[tindex]);
                     }
                 }
+                else if(q.type == Constant.QTYPE_SEQUENCE){
+                    var sortlist = [];
+                    var qfi = _.findIndex(calist,function(item){
+                        return item.questionid == q._id;
+                    });
+                    if(qfi>=0){
+                        if(calist[qfi].sortlist){
+                            var sorted = _.sortBy(calist[qfi].sortlist,function(item){
+                                return item.sort
+                            })
+
+                            for(var qi in sorted){
+                                /*
+                                var nub =parseInt(sorted[qi].index)+1;
+                                sortlist[qi] = nub.toString();
+                                */
+                                sortlist[qi] = parseInt(sorted[qi].index)+1;
+                            }
+                        }
+                    }
+
+                    for(var tindex in sortlist){
+                        firstQ.push(sortlist[tindex]);
+                    }
+
+                    //    firstQ.push(sortlist);
+
+                }
                 else{
                     var qfi = _.findIndex(calist,function(item){
                         return item.questionid == q._id;
@@ -268,35 +303,42 @@ export var Stastic = React.createClass({
         };
         return infunc;
     },
-    deleteAnswer(index){
-        var that  = this;
-        var infunc = function(){
-            var aid = that.state.answerlist[index]._id;
-            $("#ajaxloading").show();
-            $.ajax({
-                url: Constant.BASE_URL+"admin/survey/answer/delete",
-                data: $.param({
-                    answerid:aid
-                }),
-                type: 'DELETE',
-                contentType: 'application/x-www-form-urlencoded',
-                success: function (data) {
-                    var msg = JSON.parse(data);
-                    $("#ajaxloading").hide();
-                    that.fetchAndRefresh();
+    deleteAnswerClick(index){
+        var that = this;
+        var inFunc = function(){
+            that.state.asindex = index;
+            $("#deleteanswer").modal("show");
 
-                },
-                error:function(){
-                    $("#ajaxloading").hide();
-                },
-                statusCode:{
-                    404:function(){
-
-                    }
-                }
-            });
         };
-        return infunc;
+        return inFunc;
+    },
+    deleteAnswer(){
+        $("#deleteanswer").modal("hide");
+        var that  = this;
+        var aid = that.state.answerlist[that.state.asindex]._id;
+        $("#ajaxloading").show();
+        $.ajax({
+            url: Constant.BASE_URL+"admin/survey/answer/delete",
+            data: $.param({
+                answerid:aid
+            }),
+            type: 'DELETE',
+            contentType: 'application/x-www-form-urlencoded',
+            success: function (data) {
+                var msg = JSON.parse(data);
+                $("#ajaxloading").hide();
+                that.fetchAndRefresh();
+
+            },
+            error:function(){
+                $("#ajaxloading").hide();
+            },
+            statusCode:{
+                404:function(){
+
+                }
+            }
+        });
     },
     fetchAndRefresh(){
         $("#ajaxloading").show();
@@ -769,7 +811,7 @@ export var Stastic = React.createClass({
 
                             <a
                                 type="button"
-                                onClick={this.deleteAnswer(i)}
+                                onClick={this.deleteAnswerClick(i)}
                                 className="btn btn-danger">Delete</a>
                         </div>
                     </td>
@@ -1076,7 +1118,31 @@ export var Stastic = React.createClass({
                         </div>
                     </div>
                 </div>
+                <div className="modal fade" id="deleteanswer" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Confirm to delete</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    Are you sure to delete this Answer?
+                                </h3>
 
+
+
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button"
+                                   onClick={this.deleteAnswer}
+                                   className="btn btn-primary" >Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         )

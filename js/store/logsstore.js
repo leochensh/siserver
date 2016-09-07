@@ -18,12 +18,36 @@ class LogsStore extends Store{
             this.__emitChange();
         }
         else if(payload.actionType == Constant.DELETELOG){
-            logsList.splice(payload.index,1);
-            SisDispatcher.dispatch({
-                actionType: Constant.DELETELOG
+            var index = payload.logidex;
+            $("#ajaxloading").show();
+            $.ajax({
+                url: Constant.BASE_URL+"sadmin/logs/delete",
+                data: $.param({
+                    logid:index
+                }),
+                type: 'DELETE',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function(data){
+                    $("#ajaxloading").hide();
+                    var rindex = _.findIndex(logsList,function(item){
+                        return item._id == index;
+                    });
+                    if(rindex>=0){
+                        logsList.splice(rindex,1);
+
+                        SisDispatcher.dispatch({
+                            actionType: Constant.DELETELOGOK
+                        });
+                    }
+
+                },
+                error:function(){
+                    $("#ajaxloading").hide();
+                }
             });
+
         }
-        else if(payload.actionType == Constant.DELETEAD){
+        else if(payload.actionType == Constant.DELETELOGOK){
             this.__emitChange();
         }
     }

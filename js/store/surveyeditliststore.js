@@ -129,10 +129,16 @@ class EditSurveyList extends Store{
                 success: function (data) {
                     $("#ajaxloading").hide();
                     var msg = JSON.parse(data);
-                    editSurveyList.splice(index,1);
-                    SisDispatcher.dispatch({
-                        actionType: Constant.FORCEEDITORSURVEYCHANGE
+                    var rindex = _.findIndex(editSurveyList,function(item){
+                        return item._id == index;
                     });
+                    if(rindex>=0){
+                        editSurveyList.splice(rindex,1);
+                        SisDispatcher.dispatch({
+                            actionType: Constant.FORCEEDITORSURVEYCHANGE
+                        });
+                    }
+
                 },
                 error:function(jxr,scode){
                     $("#ajaxloading").hide();

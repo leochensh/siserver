@@ -33,7 +33,6 @@ export var Resetpass = React.createClass({
             this.state.repass &&
             this.state.pass.length>0 &&
             this.state.repass.length>0){
-
             var hash = crypto.createHash("md5");
             hash.update(this.state.pass);
             var that = this;
@@ -89,6 +88,7 @@ export var Resetpass = React.createClass({
         this.context.router.push("/login");
     },
     render() {
+
         var disStyle = {
             display:"none"
         };

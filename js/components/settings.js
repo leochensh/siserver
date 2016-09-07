@@ -15,7 +15,8 @@ export var Settings = React.createClass({
             pagenum:9,
             jumppage:1,
             filtertext:"",
-            logglist:[]
+            logglist:[],
+            logindex:null
 
         }
     },
@@ -152,39 +153,49 @@ export var Settings = React.createClass({
             }
         });
     },
-    deletelogclick(id){
-        $("#ajaxloading").show();
+    deleteButtonClick(id){
         var that = this;
+        var inFunc = function(){
+            that.state.logindex = id;
+            $("#deletelog").modal("show");
 
-        var infunc = function(){
-            $.ajax({
+        };
+        return inFunc;
+    },
+    deletelogclick(){
+        $("#deletelog").modal("hide");
+      //  $("#ajaxloading").show();
+
+        SisDispatcher.dispatch({
+            actionType: Constant.DELETELOG,
+            logidex:this.state.logindex
+        });
+
+    /*
+        var that = this;
+        $.ajax({
                 url: Constant.BASE_URL+"sadmin/logs/delete",
                 data: $.param({
-                    logid:id
+                    logid:that.state.logindex
                 }),
                 type: 'DELETE',
                 contentType: 'application/x-www-form-urlencoded',
                 success: function(data){
                     $("#ajaxloading").hide();
-                    //that.getLogsList();
-
-                    that.setState({
-                        logglist:that.props.logsList.splice(id,1)
-                    })
-                    /*
-                    SisDispatcher.dispatch({
-                        actionType: Constant.DELETELOG,
-                        index:id
+                    var rindex = _.findIndex(that.props.logsList,function(item){
+                        return item._id == that.state.logindex;
                     });
-                    */
-
+                    if(rindex>=0){
+                        that.setState({
+                            logglist:that.props.logsList.splice(rindex,1)
+                        })
+                    }
                 },
                 error:function(){
                     $("#ajaxloading").hide();
                 }
-            });
-        };
-        return infunc;
+        });
+    */
     },
 
     getVersionList(){
@@ -372,7 +383,7 @@ export var Settings = React.createClass({
                         <div className="btn-group" role="group" >
                             <a
                                 type="button"
-                                onClick={this.deletelogclick(mli._id)}
+                                onClick={this.deleteButtonClick(mli._id)}
                                 className="btn btn-danger">Delete</a>
                         </div>
 
@@ -488,11 +499,32 @@ export var Settings = React.createClass({
                             </div>
                         </div>
                     </div>
-
-
-
                 </div>
+                <div className="modal fade" id="deletelog" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Confirm to delete</h4>
+                            </div>
+                            <div className="modal-body">
+                                <h3>
+                                    Are you sure to delete this log?
+                                </h3>
 
+
+
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button"
+                                   onClick={this.deletelogclick}
+                                   className="btn btn-primary" >Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
         )

@@ -252,6 +252,7 @@ Admin.createOrgAdmin = function(orgid,name,pass,role,callback){
 };
 
 Admin.resetPassWithCode = function(code,pass,callback){
+
     mongoPool.acquire(function(err,db){
         if(err){
 
