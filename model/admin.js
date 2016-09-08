@@ -796,20 +796,35 @@ Admin.publishSurveyToOwn = function(surveyid,uid,role,callback){
             db.collection("surveys",function(err,collection){
                 collection.find({_id:ObjectID(surveyid)}).limit(1).next(function(err,survey){
                     if(survey){
-                        if(role!="sadmin" && survey.editorid != uid){
+                        if((role==dict.STAFF_PERSONAL || role == dict.STAFF_ORG) && survey.editorid != uid){
                             callback(err,"forbidden");
                             mongoPool.release(db);
                         }
                         else{
-                            collection.updateOne({_id:ObjectID(surveyid)},
-                                {$set:{status:dict.SURVEYSTATUS_NORMAL,
-                                    publishstatus:dict.SURVEYPUBLISHSTATUS_PRIVATEPERSONAL,
-                                    publishtime:new Date()}},function(err,upres){
-                                    callback(err,upres);
-                                    mongoPool.release(db);
+                            db.collection("admins",function(err,admincollection){
+                                admincollection.find({_id:ObjectID(survey.editorid)}).limit(1).next(function(err,adm){
+                                    if(adm){
+                                        var pstatu = dict.SURVEYPUBLISHSTATUS_PRIVATEPERSONAL;
+                                        if(adm.role == "admin" || adm.role == dict.STAFF_ORG){
+                                            pstatu = dict.SURVEYPUBLISHSTATUS_PRIVATEORG;
+                                        }
+                                        collection.updateOne({_id:ObjectID(surveyid)},
+                                            {$set:{status:dict.SURVEYSTATUS_NORMAL,
+                                                publishstatus:pstatu,
+                                                publishtime:new Date()}},function(err,upres){
+                                                callback(err,upres);
+                                                mongoPool.release(db);
+                                            });
+                                    }
+                                    else{
+                                        mongoPool.release(db);
+                                        callback(err,"notfound")
+                                    }
                                 });
-                        }
+                            });
 
+
+                        }
                     }
                     else{
                         mongoPool.release(db);
@@ -830,18 +845,34 @@ Admin.publishSurveyToAll = function(surveyid,uid,role,callback){
             db.collection("surveys",function(err,collection){
                 collection.find({_id:ObjectID(surveyid)}).limit(1).next(function(err,survey){
                     if(survey){
-                        if((role!="sadmin" && survey.editorid != uid) || survey.status!=dict.SURVEYSTATUS_EDIT){
+                        if(((role==dict.STAFF_PERSONAL || role == dict.STAFF_ORG) && survey.editorid != uid) || survey.status!=dict.SURVEYSTATUS_EDIT){
                             callback(err,"forbidden");
                             mongoPool.release(db);
                         }
                         else{
-                            collection.updateOne({_id:ObjectID(surveyid)},
-                                {$set:{status:dict.SURVEYSTATUS_PROPOSE,
-                                    publishstatus:dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL,
-                                    publishtime:new Date()}},function(err,upres){
-                                    callback(err,upres);
-                                    mongoPool.release(db);
+                            db.collection("admins",function(err,admincollection){
+                                admincollection.find({_id:ObjectID(survey.editorid)}).limit(1).next(function(err,adm){
+                                    if(adm){
+                                        var pstatu = dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL;
+                                        if(adm.role == "admin" || adm.role == dict.STAFF_ORG){
+                                            pstatu = dict.SURVEYPUBLISHSTATUS_PUBLICORG;
+                                        }
+                                        collection.updateOne({_id:ObjectID(surveyid)},
+                                            {$set:{status:dict.SURVEYSTATUS_PROPOSE,
+                                                publishstatus:pstatu,
+                                                publishtime:new Date()}},function(err,upres){
+                                                callback(err,upres);
+                                                mongoPool.release(db);
+                                            });
+                                    }
+                                    else{
+                                        mongoPool.release(db);
+                                        callback(err,"notfound")
+                                    }
                                 });
+                            });
+
+
                         }
 
                     }
@@ -920,11 +951,13 @@ Admin.sadminAuditSurvey = function(surveyid,callback){
             db.collection("surveys",function(err,collection){
                 collection.find({_id:ObjectID(surveyid)}).limit(1).next(function(err,survey){
                     if(survey){
-                        if(survey.status!=dict.SURVEYSTATUS_PROPOSE || survey.publishstatus != dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL){
+                        if(survey.status!=dict.SURVEYSTATUS_PROPOSE ||
+                            (survey.publishstatus != dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL && survey.publishstatus != dict.SURVEYPUBLISHSTATUS_PUBLICORG)){
                             callback(err,"forbidden");
                             mongoPool.release(db);
                         }
                         else{
+
                             collection.updateOne({_id:ObjectID(surveyid)},
                                 {$set:{status:dict.SURVEYSTATUS_NORMAL,
                                     audittime:new Date()}},function(err,upres){

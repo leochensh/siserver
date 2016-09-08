@@ -281,6 +281,12 @@ export var Newsurvey = React.createClass({
             }
         });
     },
+    keypress(event){
+        //event.stopPropagation();
+        if(event.key == "Enter"){
+            this.savesurvey();
+        }
+    },
     savesurvey(){
 
         if(!this.props.newsurvey.surveyname){
@@ -858,6 +864,7 @@ export var Newsurvey = React.createClass({
                                                    className="form-control"
                                                    id="suveynameinput"
                                                    value={this.props.newsurvey.surveyname}
+                                                   onKeyPress={this.keypress}
                                                    onChange={this.surveyNameChange}
                                                    placeholder="Survey Name"/>
                                         </div>

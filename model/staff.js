@@ -513,32 +513,61 @@ Staff.deleteSurvey = function(surveyid,callback){
 };
 
 
-Staff.getStaffSurveyList = function(staffid,callback){
+Staff.getStaffSurveyList = function(staffid,orgid,role,callback){
     mongoPool.acquire(function(err,db){
         if(err){
 
         }
         else{
             db.collection("surveys",function(err,scollection){
-                scollection.find({"$or":[{
-                    status:dict.SURVEYSTATUS_NORMAL,
-                    publishstatus:dict.SURVEYPUBLISHSTATUS_PRIVATEPERSONAL,
-                    editorid:staffid,
-                    type:dict.TYPE_SURVEY
+                if(role == dict.STAFF_PERSONAL){
+                    scollection.find({"$or":[{
+                        status:dict.SURVEYSTATUS_NORMAL,
+                        publishstatus:dict.SURVEYPUBLISHSTATUS_PRIVATEPERSONAL,
+                        editorid:staffid,
+                        type:dict.TYPE_SURVEY
 
-                },{
-                    status:dict.SURVEYSTATUS_NORMAL,
-                    publishstatus:dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL,
-                    type:dict.TYPE_SURVEY
-                }]},{
-                    orgid:0,questionlist:0,editorid:0
-                }).sort({ctime:-1}).toArray(function(err,surveys){
-                    for(var i in surveys){
-                        surveys[i].surveyid = surveys[i]._id;
-                    }
+                    },{
+                        status:dict.SURVEYSTATUS_NORMAL,
+                        publishstatus:dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL,
+                        type:dict.TYPE_SURVEY
+                    }]},{
+                        orgid:0,questionlist:0,editorid:0
+                    }).sort({ctime:-1}).toArray(function(err,surveys){
+                        for(var i in surveys){
+                            surveys[i].surveyid = surveys[i]._id;
+                        }
+                        mongoPool.release(db);
+                        callback(err,surveys);
+                    });
+                }
+                else if(role == dict.STAFF_ORG){
+                    scollection.find({"$or":[{
+                        status:dict.SURVEYSTATUS_NORMAL,
+                        publishstatus:dict.SURVEYPUBLISHSTATUS_PRIVATEORG,
+                        editorid:staffid,
+                        type:dict.TYPE_SURVEY
+
+                    },{
+                        status:dict.SURVEYSTATUS_NORMAL,
+                        publishstatus:dict.SURVEYPUBLISHSTATUS_PUBLICORG,
+                        orgid:orgid,
+                        type:dict.TYPE_SURVEY
+                    }]},{
+                        orgid:0,questionlist:0,editorid:0
+                    }).sort({ctime:-1}).toArray(function(err,surveys){
+                        for(var i in surveys){
+                            surveys[i].surveyid = surveys[i]._id;
+                        }
+                        mongoPool.release(db);
+                        callback(err,surveys);
+                    });
+                }
+                else{
                     mongoPool.release(db);
-                    callback(err,surveys);
-                });
+                    callback(err,[]);
+                }
+
             });
 
 

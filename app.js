@@ -1051,17 +1051,22 @@ aclHandler.registerWait(function(acl){
 
     app.get("/admin/survey/list",acl.middleware(2),function(req,res){
         var orgid = req.session.orgid;
-        Staff.getAdminSurveyList(orgid,function(err,ss){
-            if(!ss){
-                ss = [];
-            }
-            logger.logger.log("info","admin get survey list",{
-                editorid:req.session.uid});
-            res.status(200);
-            successMsg.body = ss;
+        Staff.getTemplateList(function(err,templates){
+            Staff.getAdminSurveyList(orgid,function(err,ss){
+                if(!ss){
+                    ss = [];
+                }
+                logger.logger.log("info","admin get survey list",{
+                    editorid:req.session.uid});
+                res.status(200);
+                successMsg.body = _.union(templates,ss);
 
-            res.send(JSON.stringify(successMsg));
-        });
+                res.send(JSON.stringify(successMsg));
+            });
+
+
+        })
+
     });
 
     app.delete("/editor/survey/question/delete",acl.middleware(2),function(req,res){
@@ -1464,7 +1469,7 @@ aclHandler.registerWait(function(acl){
     //});
 
     app.get('/investigator/survey/list',acl.middleware(2),function(req,res){
-        Staff.getStaffSurveyList(req.session.uid,function(err,msg){
+        Staff.getStaffSurveyList(req.session.uid,req.session.orgid,req.session.role,function(err,msg){
             if(msg == "notfound"){
                 res.status(404);
                 errorMsg.code = "survey not found";
