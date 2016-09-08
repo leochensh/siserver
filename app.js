@@ -2536,7 +2536,6 @@ aclHandler.registerWait(function(acl){
     app.post("/resetpassfromcode",function(req,res){
         var code = req.body.code;
         var pass = req.body.pass;
-
         if(code && pass){
             Admin.resetPassWithCode(code,pass,function(err,msg){
                 if(msg == "notfound"){

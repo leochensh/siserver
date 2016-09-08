@@ -7,6 +7,7 @@ export var Constant = {
 
     LOGINSUCCESS:"loginsuccess",
     DELETELOG:"deletelog",
+    DELETELOGOK:"deletelogok",
     GETLOGSLIST:"getlogslist",//add by zzl 2016.8.30
     LOGOUT:"logout",
     ERROR500:"error500",
