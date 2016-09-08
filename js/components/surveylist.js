@@ -319,7 +319,7 @@ export var Surveylist = React.createClass({
                         onClick={this.deleteButtonClick(selist[i]._id)}
                         className="btn btn-danger">Delete</a>);
                 }
-                if(this.props.loginInfo.role == "sadmin" ||
+                if(this.props.loginInfo.role == "sadmin" || this.props.loginInfo.role == "admin" ||
                     (selist[i].status != Constant.SURVEYSTATUS_NORMAL &&
                     selist[i].status != Constant.SURVEYSTATUS_PROPOSE)){
                     buttonGrp.push(<a
@@ -334,7 +334,7 @@ export var Surveylist = React.createClass({
                         className="btn btn-primary">Share it</a>);
 
                 }
-                if(this.props.loginInfo.role == "sadmin" &&
+                if((this.props.loginInfo.role == "sadmin" ||  this.props.loginInfo.role == "admin") &&
                     (selist[i].status == Constant.SURVEYSTATUS_PROPOSE)){
                     buttonGrp.push(<a
                         type="button"
@@ -348,7 +348,7 @@ export var Surveylist = React.createClass({
                         className="btn btn-primary">Withdraw</a>);
                 }
 
-                if(this.props.loginInfo.role == "sadmin" &&
+                if((this.props.loginInfo.role == "sadmin" ||  this.props.loginInfo.role == "admin") &&
                     (selist[i].status == Constant.SURVEYSTATUS_NORMAL)){
                     buttonGrp.push(<a
                         type="button"

@@ -16,7 +16,7 @@ mongoPool.acquire(function(err, db){
 
     aclHandler.allow([
         {
-            roles:['sadmin'],
+            roles:['sadmin',"admin"],
             allows:[
                 {resources:'/testacl', permissions:'get'},
                 {resources:'/edata', permissions:'get'},

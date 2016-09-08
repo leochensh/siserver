@@ -100,6 +100,9 @@ export var Constant = {
     SURVEYPUBLISHSTATUS_PRIVATEPERSONAL:"surveypublishstatusprivatepersonal",
     SURVEYPUBLISHSTATUS_PUBLICPERSONAL:"surveypublishstatuspublicpersonal",
 
+    SURVEYPUBLISHSTATUS_PRIVATEORG:"surveypublishstatusprivateorg",
+    SURVEYPUBLISHSTATUS_PUBLICORG:"surveypublishstatuspublicorg",
+
     SURVEYSTATUSMAP:{
         "surveypropose":"Wait for audit",
         "surveyedit":"Edit",
@@ -117,10 +120,10 @@ export var Constant = {
     TYPE_SURVEY:"survey",
     TYPE_TEMPLATE:"template",
 
-    //BASE_FULL:"http://www.ouresa.com/si/public/#/",
-    //BASE_URL:"/si/",
-    //BASE_IMAGEURL:"/si/uploads/"
-    BASE_FULL:"http://localhost:8080/public/#/",
-    BASE_URL:"/",
-    BASE_IMAGEURL:"/uploads/"
+    BASE_FULL:"http://www.ouresa.com/si/public/#/",
+    BASE_URL:"/si/",
+    BASE_IMAGEURL:"/si/uploads/"
+    //BASE_FULL:"http://localhost:8080/public/#/",
+    //BASE_URL:"/",
+    //BASE_IMAGEURL:"/uploads/"
 };
