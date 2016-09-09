@@ -10,6 +10,7 @@ import {logsStore} from "../store/logsstore"
 import {Link} from 'react-router'
 import {Constant} from "../constant";
 import {SisDispatcher} from "../dispatcher";
+import {feedbackStore} from '../store/feedbackstore'
 
 export var App = React.createClass({
     contextTypes: {
@@ -24,6 +25,7 @@ export var App = React.createClass({
         this.versiontoken = versionStore.addListener(this._onChange);
         this.orgtoken = orgStore.addListener(this._onChange);
         this.logtoken = logsStore.addListener(this._onChange);
+        this.Ftoken = feedbackStore.addListener(this._onChange);
     },
     componentWillUnmount(){
         loginStore.remove(this.token);
@@ -34,6 +36,7 @@ export var App = React.createClass({
         versionStore.remove(this.versiontoken);
         orgStore.remove(this.orgtoken);
         logsStore.remove(this.logtoken);
+        feedbackStore.remove(this.Ftoken);
     },
     homeclick(){
         var cpath = this.props.routes[this.props.routes.length-1]['path']
@@ -147,6 +150,7 @@ export var App = React.createClass({
                             versionlist:versionStore.getAll(),
                             orglist:orgStore.getAll(),
                             orgdata:orgStore.getData(),
+                            feedbackList:feedbackStore.getAll(),
                             logsList:logsStore.getAll()
                         })
                 }

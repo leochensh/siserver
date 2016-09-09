@@ -206,7 +206,66 @@ Admin.getOrgList = function(callback){
         }
     });
 }
+Admin.getFeedbackList = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
 
+        }else{
+            db.collection("feedbacks",function(err,collection){
+                collection.find().sort({ctime:-1}).toArray(function(err,feedbacks){
+                    if(feedbacks) {
+                        async.forEach(feedbacks, function (fdk, cb) {
+                            db.collection("admins", function (err, adcollection) {
+                                adcollection.find({_id: ObjectID(fdk.staffid)}).limit(1).next(function (err, admin) {
+                                    if (admin) {
+                                        fdk.name = admin.name;
+                                    }
+                                    else {
+                                        fdk.name = "not found";
+                                    }
+                                    cb();
+                                });
+                            });
+
+                        }, function (err) {
+                            // console.log(feedbacks);
+                            mongoPool.release(db);
+                            callback(err, feedbacks);
+
+                        });
+                    }else{
+                        mongoPool.release(db);
+                        callback(err,[]);
+                    }
+                });
+            });
+        }
+    });
+}
+Admin.deleteFeedbackList = function(feedbackid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("feedbacks",function(err,collection){
+
+                collection.find({_id:ObjectID(feedbackid)}).limit(1).next(function(err,fb){
+                    if(fb){
+                        collection.deleteOne({_id:ObjectID(feedbackid)},function(err,msg){
+                            mongoPool.release(db);
+                            callback(err,"ok");
+                        });
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+};
 Admin.createOrgAdmin = function(orgid,name,pass,role,callback){
     mongoPool.acquire(function(err,db){
         if(err){

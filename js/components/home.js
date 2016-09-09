@@ -31,6 +31,9 @@ export var Home = React.createClass({
     edataclick(){
         this.context.router.push("/edata");
     },
+    feedbacklick(event){
+        this.context.router.push("/feedback")
+    },
     render() {
         var style = {
             marginTop:"30px"
@@ -44,6 +47,7 @@ export var Home = React.createClass({
         var adsDisable = "disabled";
         var settingsDisable = "disabled";
         var edataDisable = "disabled";
+        var feedbackDisable = "disabled";
 
         if(loginInfo.role == "sadmin"){
             orgDisable = "";
@@ -52,6 +56,7 @@ export var Home = React.createClass({
             settingsDisable = "";
             edataDisable = "";
             surveyManageDisable = "";
+            feedbackDisable = "";
         }
         else if(loginInfo.role == "admin"){
             personalDisable = "";
@@ -162,7 +167,6 @@ export var Home = React.createClass({
                         </div>
                     </button>
 
-
                 </div>
                 <div className="row">
                     <button className="col-md-3 col-md-offset-3 btn btn-default"
@@ -175,6 +179,20 @@ export var Home = React.createClass({
                             </div>
                             <div>
                                 <span>{"Edata"}</span>
+                            </div>
+                        </div>
+                    </button>
+
+                    <button className="col-md-3 btn btn-default"
+                            disabled={feedbackDisable} onClick={this.feedbacklick}>
+
+                        <div className="fixed-size-square">
+                            <div>
+                            <span className="glyphicon glyphicon-list-alt" aria-hidden="true">
+                            </span>
+                            </div>
+                            <div>
+                                <span>View Feedback</span>
                             </div>
                         </div>
                     </button>

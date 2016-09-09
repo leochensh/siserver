@@ -42,6 +42,7 @@ export var Constant = {
     FORCEADLISTREFRESH:"forceadlistrefresh",
     DELETEAD:"deletead",
     ADDAD:"addad",
+    GETFEEDBACKLIST:"getfeedbacklist",
     GETVERSIONLIST:"getversionlist",
     FORCEVERSIONLISTREFRESH:"forceversionlistrefresh",
     DELETEVERSION:"deleteversion",
@@ -110,9 +111,9 @@ export var Constant = {
         "surveynormal":"Published"
     },
     SETPAGESIZE:{
-        num1:20,
-        num2:50,
-        num3:100
+        "num1":20,
+        "num2":50,
+        "num3":100
     },
     PLATFORMTYPE_ANDROID:"android",
     PLATFORMTYPE_IOS:"ios",
@@ -121,10 +122,10 @@ export var Constant = {
     TYPE_SURVEY:"survey",
     TYPE_TEMPLATE:"template",
 
-    BASE_FULL:"http://www.ouresa.com/si/public/#/",
-    BASE_URL:"/si/",
-    BASE_IMAGEURL:"/si/uploads/"
-    //BASE_FULL:"http://localhost:8080/public/#/",
-    //BASE_URL:"/",
-    //BASE_IMAGEURL:"/uploads/"
+   // BASE_FULL:"http://www.ouresa.com/si/public/#/",
+    //BASE_URL:"/si/",
+   // BASE_IMAGEURL:"/si/uploads/"
+    BASE_FULL:"http://localhost:8080/public/#/",
+    BASE_URL:"/",
+    BASE_IMAGEURL:"/uploads/"
 };

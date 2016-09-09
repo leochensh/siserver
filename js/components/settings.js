@@ -80,7 +80,7 @@ export var Settings = React.createClass({
     },
     pagesizeChange(event){
         this.setState({
-            pagesize:event.target.value,
+            pagesize:parseInt(event.target.value),
             currentpage:0
         })
     },
@@ -447,7 +447,7 @@ export var Settings = React.createClass({
                             <div className="panel-heading">
                                 <div className="row">
                                     <div className="col-md-3">
-                                        <select type="number"className="form-control" value={this.state.pagesize} onChange={this.pagesizeChange}>
+                                        <select className="form-control" value={this.state.pagesize} onChange={this.pagesizeChange}>
                                             {setPagesizeSelect}
                                         </select>
                                     </div>
