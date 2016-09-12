@@ -29,7 +29,7 @@ export var Home = React.createClass({
         this.context.router.push("/settings");
     },
     edataclick(){
-        this.context.router.push("/edata");
+        this.context.router.push("/edata2");
     },
     feedbacklick(event){
         this.context.router.push("/feedback")

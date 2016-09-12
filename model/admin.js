@@ -1036,6 +1036,89 @@ Admin.sadminAuditSurvey = function(surveyid,callback){
     });
 };
 
+Admin.createSpider = function(sname,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("spider",function(err,collection){
+                collection.find({status:dict.SPIDERSTATU_ACTIVE}).limit(1).next(function(err,spider){
+                    if(spider){
+                        mongoPool.release(db);
+                        callback(err,"BUSY");
+                    }
+                    else{
+                        var ns = {
+                            name:sname,
+                            ctime:new Date(),
+                            status:dict.SPIDERSTATU_ACTIVE
+                        };
+                        collection.insertOne(ns,function(err,result){
+                            mongoPool.release(db);
+                            callback(err,result.insertedId);
+                        })
+                    }
+                })
+            });
+        }
+    });
+};
+
+Admin.getSpiderList = function(sname,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("spider",function(err,collection){
+                collection.find({name:sname}).sort({ctime:-1}).toArray(function(err,sarray){
+                    mongoPool.release(db);
+                    callback(err,sarray);
+                })
+            });
+        }
+    });
+};
+
+Admin.deleteSpider = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("spider",function(err,collection){
+                collection.deleteOne({_id:ObjectID(sid)},function(err,res){
+                    mongoPool.release(db);
+                    callback(err,res);
+                })
+            });
+        }
+    });
+};
+
+Admin.getSpiderActiveId = function(sname,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("spider",function(err,collection){
+                collection.find({name:sname,status:dict.SPIDERSTATU_ACTIVE}).limit(1).next(function(err,activeitem){
+                    mongoPool.release(db);
+                    if(activeitem){
+                        callback(err,activeitem._id)
+                    }
+                    else{
+                        callback(err,0);
+                    }
+
+                })
+            });
+        }
+    });
+};
+
 Admin.publishSurvey = function(orgid,surveyid,stafflist,callback){
     mongoPool.acquire(function(err,db){
         if(err){

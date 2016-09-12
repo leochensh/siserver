@@ -10,7 +10,8 @@ import {logsStore} from "../store/logsstore"
 import {Link} from 'react-router'
 import {Constant} from "../constant";
 import {SisDispatcher} from "../dispatcher";
-import {feedbackStore} from '../store/feedbackstore'
+import {edataStore} from "../store/edatastore";
+import {feedbackStore} from '../store/feedbackstore';
 
 export var App = React.createClass({
     contextTypes: {
@@ -25,6 +26,7 @@ export var App = React.createClass({
         this.versiontoken = versionStore.addListener(this._onChange);
         this.orgtoken = orgStore.addListener(this._onChange);
         this.logtoken = logsStore.addListener(this._onChange);
+        this.edatatoken = edataStore.addListener(this._onChange);
         this.Ftoken = feedbackStore.addListener(this._onChange);
     },
     componentWillUnmount(){
@@ -36,15 +38,14 @@ export var App = React.createClass({
         versionStore.remove(this.versiontoken);
         orgStore.remove(this.orgtoken);
         logsStore.remove(this.logtoken);
+        edataStore.remove(this.edatatoken);
         feedbackStore.remove(this.Ftoken);
     },
     homeclick(){
         var cpath = this.props.routes[this.props.routes.length-1]['path']
-
         if(cpath!="home" && cpath!="login"){
             this.context.router.push("/home");
         }
-
     },
     loginclick(){
         this.context.router.push("/frontpage");
@@ -63,7 +64,6 @@ export var App = React.createClass({
         var that = this;
         $.ajax({
             url: Constant.BASE_URL+"logout",
-
             type: 'GET',
             success: function (data) {
                 $("#logoutmodal").modal("hide");
@@ -76,13 +76,10 @@ export var App = React.createClass({
             },
             statusCode:{
                 406:function(){
-
                 },
                 500:function(){
-
                 },
                 409:function(){
-
                 }
             }
         });
@@ -93,8 +90,6 @@ export var App = React.createClass({
         if(loginInfo.ifLogin){
             logoutStyle = {};
         }
-
-
         return (
             <div>
                 <nav className="navbar navbar-default navbar-fixed-top">
@@ -105,7 +100,6 @@ export var App = React.createClass({
                             </a>
                             <a style={{fontSize:"40px",fontWeight:"bolder"}} className="navbar-brand" href="#">Ouresa</a>
                         </div>
-
                         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul className="nav navbar-nav">
 
@@ -118,7 +112,6 @@ export var App = React.createClass({
                             </ul>
 
                         </div>
-
                     </div>
                 </nav>
                 <div className="modal fade" id="logoutmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -150,12 +143,12 @@ export var App = React.createClass({
                             versionlist:versionStore.getAll(),
                             orglist:orgStore.getAll(),
                             orgdata:orgStore.getData(),
+                            edata:edataStore.getAll(),
                             feedbackList:feedbackStore.getAll(),
                             logsList:logsStore.getAll()
                         })
                 }
             </div>
-
         )
     }
 });

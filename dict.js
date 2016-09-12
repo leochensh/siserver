@@ -39,5 +39,8 @@ module.exports = {
 
     PLATFORMTYPE_ANDROID:"android",
     PLATFORMTYPE_IOS:"ios",
-    PLATFORMTYPE_WEB:"web"
+    PLATFORMTYPE_WEB:"web",
+
+    SPIDERSTATU_ACTIVE:"spiderstatuactive",
+    SPIDERSTATU_DONE:"spiderstatudone"
 };

@@ -55,6 +55,10 @@ export var Constant = {
     GETORGADMINLIST:"getorgadminlist",
     DELETEORGADMIN:"deleteorgadmin",
     FORCESTAFFLISTREFRESH:"forcestafflistrefresh",
+    TARGETCLICK:"targetclick",
+    CREATESPIDER:"createspider",
+    GETSPIDERLIST:"getspiderlist",
+    SPIDERLISTUPDATE:"spiderlistupdate",
 
 
     QTYPE_SINGLESELECT:"singleselect",//单选题
@@ -122,10 +126,13 @@ export var Constant = {
     TYPE_SURVEY:"survey",
     TYPE_TEMPLATE:"template",
 
-   // BASE_FULL:"http://www.ouresa.com/si/public/#/",
-    //BASE_URL:"/si/",
-   // BASE_IMAGEURL:"/si/uploads/"
-    BASE_FULL:"http://localhost:8080/public/#/",
-    BASE_URL:"/",
-    BASE_IMAGEURL:"/uploads/"
+    SPIDERSTATU_ACTIVE:"spiderstatuactive",
+    SPIDERSTATU_DONE:"spiderstatudone",
+
+    BASE_FULL:"http://www.ouresa.com/si/public/#/",
+    BASE_URL:"/si/",
+    BASE_IMAGEURL:"/si/uploads/"
+    //BASE_FULL:"http://localhost:8080/public/#/",
+    //BASE_URL:"/",
+    //BASE_IMAGEURL:"/uploads/"
 };

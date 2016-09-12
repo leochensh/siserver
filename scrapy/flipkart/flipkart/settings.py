@@ -11,6 +11,8 @@
 
 BOT_NAME = 'flipkart'
 
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
+
 SPIDER_MODULES = ['flipkart.spiders']
 NEWSPIDER_MODULE = 'flipkart.spiders'
 
@@ -30,7 +32,7 @@ DOWNLOAD_DELAY=2
 #CONCURRENT_REQUESTS_PER_IP=16
 
 # Disable cookies (enabled by default)
-COOKIES_ENABLED=False
+COOKIES_ENABLED=True
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED=False

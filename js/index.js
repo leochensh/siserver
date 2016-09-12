@@ -18,6 +18,7 @@ import {Ads} from "./components/ads"
 import {Org} from "./components/org"
 import {Settings} from "./components/settings"
 import {Edata} from "./components/edata"
+import {Edata2} from "./components/edata2"
 import {Frontpage} from "./components/frontpage"
 import {Forgetpass} from "./components/forgetpass"
 import {Resetpass} from "./components/resetpass"
@@ -43,6 +44,7 @@ ReactDom.render(
             <Route path="org" component={Org} />
             <Route path="settings" component={Settings} />
             <Route path="edata" component={Edata} />
+            <Route path="edata2" component={Edata2} />
             <Route path="feedback" component={Feedback} />
             <Route path="forgetpass" component={Forgetpass} />
             <Route path="resetpass/:resetcode" component={Resetpass} />

@@ -5,6 +5,11 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import pymongo
+import requests
+import json
+
+req = requests.get("http://localhost:8080/sadmin/activeid/flipkart")
+spiderid = json.loads(req.text)
 
 class brandPipeline(object):
     collection_name = "brand"
@@ -22,15 +27,18 @@ class brandPipeline(object):
         #self.client = pymongo.MongoClient("192.168.1.188",27017)
         self.client = pymongo.MongoClient()
         self.db = self.client[self.mongo_db]
+        print spiderid
+        self.db[self.collection_name].remove({"spiderid":spiderid})
 
     def close_spider(self, spider):
         self.client.close()
 
     def process_item(self, item, spider):
         if spider.name=="brandspider":
-            self.db[self.collection_name].remove({})
+            # self.db[self.collection_name].remove({})
             infos = item['infos']
             for info in infos:
+                info["spiderid"] = spiderid
                 self.db[self.collection_name].insert(info)
             return item
         else:
@@ -60,7 +68,7 @@ class brandNumPipeline(object):
     def process_item(self, item, spider):
         if spider.name=="brandNumspider":
             infos = item['infos']
-            self.db[self.collection_name].update( { "brand" : infos["brand"]} ,{ '$set' : { "num" : infos["num"]} },False,True );
+            self.db[self.collection_name].update( { "brand" : infos["brand"],"spiderid":spiderid} ,{ '$set' : { "num" : infos["num"]} },False,True );
             return item
         else:
             return item
@@ -82,6 +90,7 @@ class offerLinkPipeline(object):
         #self.client = pymongo.MongoClient("192.168.1.188",27017)
         self.client = pymongo.MongoClient()
         self.db = self.client[self.mongo_db]
+        self.db[self.collection_name].remove({"spiderid": spiderid})
 
     def close_spider(self, spider):
         self.client.close()
@@ -90,9 +99,10 @@ class offerLinkPipeline(object):
         if spider.name=="linkspider":
             infos = item['infos']
             for info in infos:
-                existI = self.db[self.collection_name].find_one({"dataPid":info["dataPid"]})
-                if existI:
-                    self.db[self.collection_name].remove({"dataPid":info["dataPid"]})
+                # existI = self.db[self.collection_name].find_one({"dataPid":info["dataPid"]})
+                # if existI:
+                #     self.db[self.collection_name].remove({"dataPid":info["dataPid"]})
+                info["spiderid"] = spiderid
                 self.db[self.collection_name].insert(info)
             return item
         else:
