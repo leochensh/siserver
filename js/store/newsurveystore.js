@@ -274,6 +274,7 @@ class NewsurveyStore extends Store{
             });
         }
         else if(payload.actionType == Constant.SAVEALLQUESTION){
+            var that = this;
             async.forEachOfSeries(surveyData.qlist,function(v,i,cb){
                 saveQuestion(v,function(data){
                     v.ifSaved = true;
@@ -302,6 +303,35 @@ class NewsurveyStore extends Store{
 
                 $("#dataimporting").modal("hide");
                 $("#dataimportend").modal("show");
+
+                for(var qindex in surveyData.qlist){
+                    var cq = surveyData.qlist[qindex];
+                    var cslist = cq.selectlist;
+                    for(var sindex in cslist){
+                        var cs = cslist[sindex];
+                        if(cs.qindex && cs.qindex>=0){
+                            cs.qid = surveyData.qlist[cs.qindex].id;
+                            console.log("+++++++++++++++++++++++++++++");
+                            console.log(cs);
+
+
+                            addToProc({
+                                type:"questionchange",
+                                index:qindex
+                            });
+
+                            setTimeout(function(){
+                                opProc();
+                            },opInterval);
+                        }
+                    }
+
+                }
+                SisDispatcher.dispatch({
+                    actionType: Constant.CAUSECHANGE,
+                });
+
+
             });
         }
         else if(payload.actionType == Constant.EDITSURVEY){

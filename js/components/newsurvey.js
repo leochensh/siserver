@@ -715,10 +715,13 @@ export var Newsurvey = React.createClass({
             emptystyle = {}
         }
 
-        var saveButtonStype = {};
+        var saveButtonStype = {
+            marginBottom:"30px"
+        };
         if(this.props.newsurvey.ifSaved){
             saveButtonStype = {
-                display:"none"
+                display:"none",
+                marginBottom:"30px"
             }
         }
 
@@ -871,21 +874,20 @@ export var Newsurvey = React.createClass({
 
                                     </div>
 
-                                    <div className="form-group">
-                                        <div className="col-sm-offset-2 col-sm-10" style={saveButtonStype}>
-                                            <a className="btn btn-primary"
-                                               id = "surveynamesavebutton"
-                                                    onClick={this.savesurvey}>
-                                                Save
-                                            </a>
-                                        </div>
-                                    </div>
+
                                 </form>
+                                <div className="col-sm-offset-2 col-sm-10" style={saveButtonStype}>
+                                    <a className="btn btn-primary"
+                                       id = "surveynamesavebutton"
+                                       onClick={this.savesurvey}>
+                                        Save
+                                    </a>
+                                </div>
                                 <div className="alert alert-danger col-md-12" role="alert" style={emptystyle}>
                                     Survey name can not be empty.
                                 </div>
 
-                                <div className="panel panel-default">
+                                <div className="panel panel-default" style={{marginTop:"60px"}}>
                                     <div className="panel-heading">
                                         <div className="row">
                                             <div className="col-md-2">

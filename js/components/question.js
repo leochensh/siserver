@@ -23,7 +23,9 @@ export var Question = React.createClass({
             this.props.qdata.type == Constant.QTYPE_MULTISELECT_TEXT||
             this.props.qdata.type == Constant.QTYPE_SINGLESELECT||
             this.props.qdata.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT||
-            this.props.qdata.type == Constant.QTYPE_SINGLESELECT_TEXT){
+            this.props.qdata.type == Constant.QTYPE_SINGLESELECT_TEXT||
+            this.props.qdata.type == Constant.QTYPE_SEQUENCE
+        ){
             var ls = this.props.qdata.selectlist;
             ls.push({
                 title:"",
