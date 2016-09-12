@@ -546,9 +546,7 @@ export var Stastic = React.createClass({
             </div>
 
         );
-        var filterRenderList = [
-
-        ];
+        var filterRenderList = [];
         if(this.state.survey){
             var filterOptionList = [
                 <option className="form-control"
@@ -776,6 +774,77 @@ export var Stastic = React.createClass({
                     )
 
                 }
+
+                else if(q.type == Constant.QTYPE_SEQUENCE){
+                    var ScoreNum = q.selectlist.length;
+                    var labelList = [];
+                    var valueList = [];
+                    var valuePercentList = [];
+                   /* var scortscore = new array[ScoreNum];
+                    for(var z in scortscore ){
+                        scortscore[z] = 0;
+                    }
+                    */
+                    var scortscore = [];
+                    for(var z =0;z< ScoreNum;z++){
+                        scortscore[z] = 0;
+                    }
+
+                    for(var zindex in this.state.answerlist){
+
+                        var currentZ = this.state.answerlist[zindex];
+                        var calistz = currentZ.answerlist;
+                        var qfi = _.findIndex(calistz, function(item){
+                            return item.questionid == q._id;
+                        });
+                        if(qfi >= 0){
+                            if (calistz[qfi].sortlist){
+                                var sorted = _.sortBy(calistz[qfi].sortlist, function(item){
+                                    return item.sort
+                                })
+
+                                for(var i in sorted){
+                                    scortscore[parseInt(sorted[i].index)] += (ScoreNum - i);
+                                }
+                            }
+                        }
+
+                    }
+
+                    var allscore = 0;
+                    for(var j in q.selectlist){
+                        labelList.push("S" + (parseInt(j) + 1));
+                      //  alert(scortscore[j]);
+                        allscore += scortscore[j];
+                    }
+                    for(var k in scortscore){
+                        valueList.push(parseInt(scortscore[k]));
+                        valuePercentList.push(Math.floor(parseInt(scortscore[k])/parseInt(allscore)*100)+"%");
+                        slist.push(
+                            <div className="row">
+                                <div className="col-md-4" >
+                                    <div  className="alert alert-success">
+                                        <span className="red">{parseInt(k)+1}</span>
+                                    </div>
+
+                                </div>
+                                <div className="col-md-8">
+                                    <div className="alert alert-info">&nbsp;&nbsp;
+                                        Serial number {parseInt(k)+1},Total score:{parseInt(scortscore[k])}
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        )
+                    }
+                    slist.push(
+                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
+                        </RgraphControl>
+                    )
+                }
+
+
 
                 var qbody = <div className="panel panel-default">
                     <div className="panel-heading">

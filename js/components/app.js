@@ -11,6 +11,7 @@ import {Link} from 'react-router'
 import {Constant} from "../constant";
 import {SisDispatcher} from "../dispatcher";
 import {edataStore} from "../store/edatastore";
+import {feedbackStore} from '../store/feedbackstore';
 
 export var App = React.createClass({
     contextTypes: {
@@ -26,6 +27,7 @@ export var App = React.createClass({
         this.orgtoken = orgStore.addListener(this._onChange);
         this.logtoken = logsStore.addListener(this._onChange);
         this.edatatoken = edataStore.addListener(this._onChange);
+        this.Ftoken = feedbackStore.addListener(this._onChange);
     },
     componentWillUnmount(){
         loginStore.remove(this.token);
@@ -37,6 +39,7 @@ export var App = React.createClass({
         orgStore.remove(this.orgtoken);
         logsStore.remove(this.logtoken);
         edataStore.remove(this.edatatoken);
+        feedbackStore.remove(this.Ftoken);
     },
     homeclick(){
         var cpath = this.props.routes[this.props.routes.length-1]['path']
@@ -140,8 +143,9 @@ export var App = React.createClass({
                             versionlist:versionStore.getAll(),
                             orglist:orgStore.getAll(),
                             orgdata:orgStore.getData(),
-                            logsList:logsStore.getAll(),
-                            edata:edataStore.getAll()
+                            edata:edataStore.getAll(),
+                            feedbackList:feedbackStore.getAll(),
+                            logsList:logsStore.getAll()
                         })
                 }
             </div>

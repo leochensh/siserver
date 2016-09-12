@@ -42,6 +42,7 @@ export var Constant = {
     FORCEADLISTREFRESH:"forceadlistrefresh",
     DELETEAD:"deletead",
     ADDAD:"addad",
+    GETFEEDBACKLIST:"getfeedbacklist",
     GETVERSIONLIST:"getversionlist",
     FORCEVERSIONLISTREFRESH:"forceversionlistrefresh",
     DELETEVERSION:"deleteversion",
@@ -114,9 +115,9 @@ export var Constant = {
         "surveynormal":"Published"
     },
     SETPAGESIZE:{
-        num1:20,
-        num2:50,
-        num3:100
+        "num1":20,
+        "num2":50,
+        "num3":100
     },
     PLATFORMTYPE_ANDROID:"android",
     PLATFORMTYPE_IOS:"ios",

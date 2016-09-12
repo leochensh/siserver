@@ -1999,6 +1999,44 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(successMsg));
         })
     });
+    /* add by zhangzhiliang 2016.9.9  start*/
+    app.get("/sadmin/feedback/list",acl.middleware(),function(req,res){
+        Admin.getFeedbackList(function(err,msg){
+            res.status(200);
+            successMsg.body = msg;
+            res.send(JSON.stringify(successMsg));
+        });
+    });
+    app.delete("/sadmin/feedback/delete",acl.middleware(),function(req,res){
+        var feedbackid = req.body.feedbackid;
+        if(feedbackid&&ObjectID.isValid(feedbackid)){
+            Admin.deleteFeedbackList(feedbackid,function(err,msg){
+                if(msg == "notfound"){
+                    logger.logger.log("info","not found feedback",{
+                        feedbackid:req.body.feedbackid
+                    });
+                    res.status(404);
+                    errorMsg.code = "feedback not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info","ok delete feedback",{
+                        feedbackid:req.body.feedbackid
+                    });
+                    res.status(200);
+                    successMsg.body = "ok";
+                    res.send(JSON.stringify(successMsg));
+                }
+            });
+        }else{
+            logger.logger.log("info","wrong feedback",{
+                feedbackid:req.body.feedbackid
+            });
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
 
     app.post("/admin/version/add",acl.middleware(2),function(req,res){
         var platform = req.body.platform;
