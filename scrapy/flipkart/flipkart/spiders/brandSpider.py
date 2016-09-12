@@ -24,9 +24,10 @@ class brandSpider(Spider):
         sel = Selector(response)
         sites = sel.xpath('//ul[@id="brand"]/li')
         for site in sites:
-            text = site.xpath('a/span[1]/text()')[0].extract().strip()
+            text = site.xpath('a/span[@class="title fk-inline-block lmargin5"]/text()')[0].extract().strip()
+            num = site.xpath('a/span[@class="count"]/text()')[0].extract().strip()
             # print text
-            info = {'brand':text,'num':0}
+            info = {'brand':text,'num':num}
             infos.append(info)
 
         item['infos'] = infos

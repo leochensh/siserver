@@ -4,18 +4,25 @@ from scrapy import Selector
 from ..items import brandItem
 from scrapy.spiders import Spider
 
+import requests
+import json
+
+req = requests.get("http://localhost:8080/sadmin/activeid/flipkart")
+spiderid = json.loads(req.text)
+
 def getUrl():
 
     urlList = []
     client = pymongo.MongoClient()
     db = client["smartinsight"]
-    brandInfo = db['brand'].find({},{'_id':0})
+    brandInfo = db['brand'].find({"spiderid":spiderid},{'_id':0})
     for bi in brandInfo:
         num = bi['num']
         brand = bi['brand']
         i = 0
         while 20*i<num:
-            urlList.append('http://www.flipkart.com/lc/pr/pv1/spotList1/spot1/productList?p[]=facets.brand%255B%255D%3D'+brand+'&sid=tyy%2C4io&filterNone=true&start='+str(20*i+1))
+            # urlList.append('http://www.flipkart.com/lc/pr/pv1/spotList1/spot1/productList?p[]=facets.brand%255B%255D%3D'+brand+'&sid=tyy%2C4io&filterNone=true&start='+str(20*i+1))
+            urlList.append('http://www.flipkart.com/mobiles/pr?p%5B%5D=facets.brand%255B%255D%3D'+brand+'&sid=tyy%2C4io&filterNone=true&start='+str(20*i+1))
             i+=1
 
     return urlList

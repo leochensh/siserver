@@ -54,6 +54,10 @@ export var Constant = {
     GETORGADMINLIST:"getorgadminlist",
     DELETEORGADMIN:"deleteorgadmin",
     FORCESTAFFLISTREFRESH:"forcestafflistrefresh",
+    TARGETCLICK:"targetclick",
+    CREATESPIDER:"createspider",
+    GETSPIDERLIST:"getspiderlist",
+    SPIDERLISTUPDATE:"spiderlistupdate",
 
 
     QTYPE_SINGLESELECT:"singleselect",//单选题
@@ -120,6 +124,9 @@ export var Constant = {
 
     TYPE_SURVEY:"survey",
     TYPE_TEMPLATE:"template",
+
+    SPIDERSTATU_ACTIVE:"spiderstatuactive",
+    SPIDERSTATU_DONE:"spiderstatudone",
 
     BASE_FULL:"http://www.ouresa.com/si/public/#/",
     BASE_URL:"/si/",

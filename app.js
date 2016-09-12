@@ -15,6 +15,7 @@ var avconv = require("avconv");
 
 
 
+
 var mime = require('mime');
 
 
@@ -1366,6 +1367,123 @@ aclHandler.registerWait(function(acl){
                     successMsg.body = null;
                     res.send(JSON.stringify(successMsg));
                 }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    function flipkartBrandSpider(callback){
+        var py = spawn("scrapy",["crawl","brandspider"],{
+            cwd:path.resolve("./scrapy/flipkart/flipkart")
+        });
+
+        py.stdout.on('data', function(data) {
+            console.log("stdout:"+data);
+        });
+
+        py.stderr.on('data', function(data) {
+            console.log("stderr:"+data);
+        });
+
+        py.on("close",function(code){
+            console.log("close:"+code);
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++++++")
+            if(callback){
+                callback();
+            }
+
+        })
+    }
+
+    function flipkartLinkSpider(callback){
+        var py = spawn("scrapy",["crawl","linkspider"],{
+            cwd:path.resolve("./scrapy/flipkart/flipkart")
+        });
+
+        py.stdout.on('data', function(data) {
+            console.log("stdout:"+data);
+        });
+
+        py.stderr.on('data', function(data) {
+            console.log("stderr:"+data);
+        });
+
+        py.on("close",function(code){
+            console.log("close:"+code)
+            if(callback){
+                callback();
+            }
+        })
+    }
+
+    app.post("/sadmin/createspider",acl.middleware(1),function(req,res){
+        var spidername = req.body.spidername;
+        if(spidername){
+            Admin.createSpider(spidername,function(err,msg){
+                if(msg == "BUSY"){
+                    res.status(409);
+                    errorMsg.code = "busy";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+
+                    if(spidername == "flipkart"){
+                        flipkartBrandSpider(function(){
+                            flipkartLinkSpider();
+                        });
+                    }
+
+
+
+                    res.status(200);
+                    successMsg.body = msg;
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+    });
+
+    app.get("/sadmin/spiderlist/:spidername",acl.middleware(1),function(req,res){
+        var sname = req.params.spidername;
+        if(sname){
+            Admin.getSpiderList(sname,function(err,msg){
+                res.status(200);
+                successMsg.body = msg;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/activeid/:spidername",function(req,res){
+        var sname = req.params.spidername;
+        Admin.getSpiderActiveId(sname,function(err,msg){
+            res.status(200);
+            res.send(msg);
+        })
+    });
+
+    app.delete("/sadmin/delete",acl.middleware(1),function(req,res){
+        var sid = req.body.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+            Admin.deleteSpider(sid,function(err,msg){
+                res.status(200);
+                successMsg.body = "ok";
+                res.send(JSON.stringify(successMsg));
             })
         }
         else{
