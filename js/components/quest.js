@@ -503,7 +503,7 @@ export var Quest = React.createClass({
                             )
                             startI+=scoreStep;
                         }
-
+                        slist.push(<h3>({si}). {currentQ.scorelist[si].title}</h3>)
                         slist.push(
                             <select
                                 style={{marginTop:"30px"}}
@@ -560,7 +560,7 @@ export var Quest = React.createClass({
                         </div>
                     </div>
                     {beforeAlert}
-                    <h2>{this.splitEnglish(Qlist[this.state.currentIndex].title)}</h2>
+                    <h2>Question{this.state.currentIndex+1}: {this.splitEnglish(Qlist[this.state.currentIndex].title)}</h2>
                     <form className="form-horizontal">
                         {slist}
                     </form>

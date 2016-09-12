@@ -1882,14 +1882,14 @@ aclHandler.registerWait(function(acl){
         })
     });
     /* add by zhangzhiliang 2016.9.9  start*/
-    app.get("/sadmin/feedback/list",acl.middleware(),function(req,res){
+    app.get("/sadmin/feedback/list",acl.middleware(1),function(req,res){
         Admin.getFeedbackList(function(err,msg){
             res.status(200);
             successMsg.body = msg;
             res.send(JSON.stringify(successMsg));
         });
     });
-    app.delete("/sadmin/feedback/delete",acl.middleware(),function(req,res){
+    app.delete("/sadmin/feedback/delete",acl.middleware(1),function(req,res){
         var feedbackid = req.body.feedbackid;
         if(feedbackid&&ObjectID.isValid(feedbackid)){
             Admin.deleteFeedbackList(feedbackid,function(err,msg){
