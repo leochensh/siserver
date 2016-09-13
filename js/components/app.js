@@ -12,10 +12,17 @@ import {Constant} from "../constant";
 import {SisDispatcher} from "../dispatcher";
 import {edataStore} from "../store/edatastore";
 import {feedbackStore} from '../store/feedbackstore';
-
+import crypto from "crypto"
 export var App = React.createClass({
     contextTypes: {
         router: React.PropTypes.object.isRequired,
+    },
+    getInitialState(){
+        return{
+            password1st:"",
+            password2nd:"",
+            ifpassnotequal:false
+        }
     },
     componentDidMount(){
         this.token=loginStore.addListener(this._onChange);
@@ -41,6 +48,12 @@ export var App = React.createClass({
         edataStore.remove(this.edatatoken);
         feedbackStore.remove(this.Ftoken);
     },
+    handleChange(name,event){
+        var newstate = {};
+        newstate[name] = event.target.value;
+        newstate.ifpassnotequal = false;
+        this.setState(newstate);
+    },
     homeclick(){
         var cpath = this.props.routes[this.props.routes.length-1]['path']
         if(cpath!="home" && cpath!="login"){
@@ -59,6 +72,56 @@ export var App = React.createClass({
     },
     logoutClick(){
         $("#logoutmodal").modal("show");
+    },
+    resetpassClick(){
+
+        var newstate = {};
+        newstate.password1st = "";
+        newstate.password2nd = "";
+        newstate.ifpassnotequal = false;
+        this.setState(newstate);
+
+        $("#allresetpass").modal("show");
+    },
+    confirmReset(){
+        if(this.state.password1st && this.state.password2nd){
+            if(this.state.password1st!=this.state.password2nd){
+                this.setState({ifpassnotequal:true})
+            }
+            else{
+
+                var hash = crypto.createHash("md5");
+                hash.update(this.state.password1st);
+
+                $("#ajaxloading").show();
+
+                var that = this;
+                $.ajax({
+                    url: Constant.BASE_URL+"all/resetpass",
+                    data: $.param({
+                        password:hash.digest("hex")
+                    }),
+                    type: 'PUT',
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function (data) {
+                        $("#allresetpass").modal("hide");
+                        $("#ajaxloading").hide();
+                        var newstate = {};
+                        newstate.password1st = "";
+                        newstate.password2nd = "";
+                        newstate.ifpassnotequal = false;
+                        this.setState(newstate);
+
+                    },
+                    error:function(jxr,scode){
+                        $("#allresetpass").hide();
+                    },
+                    statusCode:{
+
+                    }
+                });
+            }
+        }
     },
     gotologout(){
         var that = this;
@@ -90,6 +153,10 @@ export var App = React.createClass({
         if(loginInfo.ifLogin){
             logoutStyle = {};
         }
+        var notequalpassstyle = {display:"none"};
+        if(this.state.ifpassnotequal){
+            notequalpassstyle = {}
+        }
         return (
             <div>
                 <nav className="navbar navbar-default navbar-fixed-top">
@@ -108,6 +175,7 @@ export var App = React.createClass({
                             </ul>
 
                             <ul className="nav navbar-nav navbar-right">
+                                <li style={logoutStyle}><a onClick={this.resetpassClick}>Setting</a></li>
                                 <li style={logoutStyle}><a onClick={this.logoutClick}>Logout</a></li>
                             </ul>
 
@@ -129,6 +197,38 @@ export var App = React.createClass({
                                    onClick={this.gotologout}
                                    className="btn btn-primary">Confirm</a>
                                 <a type="button" className="btn btn-default" data-dismiss="modal">Close</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal fade" id="allresetpass" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Reset Password</h4>
+                            </div>
+                            <div className="modal-body">
+                                <form>
+                                    <div className="form-group">
+                                        <label htmlFor="personnewpass">New Password</label>
+                                        <input type="password" className="form-control" id="personnewpass" placeholder="New Password"
+                                               onChange={this.handleChange.bind(this,"password1st")} value={this.state.password1st}/>
+                                        <label htmlFor="personnewpass2nd">Retype New Password</label>
+                                        <input type="password" className="form-control" id="personnewpass2nd" placeholder="New Password Again"
+                                               onChange={this.handleChange.bind(this,"password2nd")} value={this.state.password2nd}/>
+                                    </div>
+
+                                </form>
+
+                                <div className="alert alert-danger col-md-8" role="alert" style={notequalpassstyle}>
+                                    You should input same password twice.
+                                </div>
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button" className="btn btn-primary" onClick={this.confirmReset}>Confirm</a>
                             </div>
                         </div>
                     </div>

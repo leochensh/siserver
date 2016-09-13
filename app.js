@@ -573,6 +573,34 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(errorMsg));
         }
     });
+    app.put("/all/resetpass",function(req,res){
+        var adminid = req.session.uid;
+        var pass = req.body.password;
+        console.log(1);
+        if(adminid && pass){
+            Admin.sadminResetAdminPass(adminid,pass,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    console.log(2);
+                    errorMsg.code = "the staff not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info"," reset the staff password");
+                    res.status(200);
+                    console.log(3);
+                    successMsg.body = null;
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            console.log(4);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
 
     app.delete("/sadmin/org/admin/delete",acl.middleware(1),function(req,res){
         var adminid = req.body.adminid;
