@@ -21,7 +21,8 @@ export var App = React.createClass({
         return{
             password1st:"",
             password2nd:"",
-            ifpassnotequal:false
+            ifpassnotequal:false,
+            iffail:false
         }
     },
     componentDidMount(){
@@ -79,6 +80,7 @@ export var App = React.createClass({
         newstate.password1st = "";
         newstate.password2nd = "";
         newstate.ifpassnotequal = false;
+        newstate.iffail = false;
         this.setState(newstate);
 
         $("#allresetpass").modal("show");
@@ -106,18 +108,24 @@ export var App = React.createClass({
                     success: function (data) {
                         $("#allresetpass").modal("hide");
                         $("#ajaxloading").hide();
-                        var newstate = {};
-                        newstate.password1st = "";
-                        newstate.password2nd = "";
-                        newstate.ifpassnotequal = false;
-                        this.setState(newstate);
 
                     },
                     error:function(jxr,scode){
                         $("#allresetpass").hide();
                     },
                     statusCode:{
-
+                        406:function(){
+                            that.setState({
+                                iffail: true
+                            });
+                        },
+                        200:function(){
+                        },
+                        404:function(){
+                            that.setState({
+                                iffail: true
+                            });
+                        }
                     }
                 });
             }
@@ -156,6 +164,10 @@ export var App = React.createClass({
         var notequalpassstyle = {display:"none"};
         if(this.state.ifpassnotequal){
             notequalpassstyle = {}
+        }
+        var failerror = {display:"none"};
+        if(this.state.iffail){
+            failerror = {}
         }
         return (
             <div>
@@ -224,6 +236,10 @@ export var App = React.createClass({
                                 <div className="alert alert-danger col-md-8" role="alert" style={notequalpassstyle}>
                                     You should input same password twice.
                                 </div>
+                                <div className="alert alert-danger col-md-8" role="alert" style={failerror}>
+                                    Resetpassword fail.
+                                </div>
+
 
                             </div>
                             <div className="modal-footer">
