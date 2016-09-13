@@ -1925,7 +1925,6 @@ aclHandler.registerWait(function(acl){
                 fs.readFile("./uploads/"+file,function(err,data){
 
                     parse(data,function(err,output){
-
                         //output = output[0]
                         if(output[0][0] == "2"){
                             var qlist = parseV2List(output);
@@ -1934,6 +1933,11 @@ aclHandler.registerWait(function(acl){
                         }
                         else if(output[0][0] == "3"){
                             var qlist = parseV3List(output);
+                            successMsg.body = qlist;
+                            res.send(JSON.stringify(successMsg));
+                        }
+                        else if(output[0][0] == "4"){
+                            var qlist = parseV4List(output);
                             successMsg.body = qlist;
                             res.send(JSON.stringify(successMsg));
                         }
@@ -1984,6 +1988,10 @@ aclHandler.registerWait(function(acl){
                 }
                 else if(resultList[0][0] == 3){
                     var qlist = parseV3List(resultList);
+                }
+                else if(resultList[0][0] == "4"){
+                    var qlist = parseV4List(resultList);
+
                 }
                 else{
                     var qlist = parseV1List(resultList);
@@ -2991,6 +2999,119 @@ function parseV3List(input){
                         q.selectlist.push({
                             type:stype,
                             title:vtrim
+                        });
+                    }
+
+                    start+=1;
+                }
+                qlist.push(q)
+            }
+
+
+        }
+    }
+    return qlist;
+}
+
+function parseV4List(input){
+    console.log("It is 4 version")
+    var qlist = [];
+    var typemap = {
+        "单选题":dict.QTYPE_SINGLESELECT,
+        "单选文本题":dict.QTYPE_SINGLESELECT_TEXT,
+        "单选录音文本题":dict.QTYPE_SINGLESELECT_RECORD_TEXT,
+        "多选题":dict.QTYPE_MULTISELECT,
+        "多选文本题":dict.QTYPE_MULTISELECT_TEXT,
+        "多选录音文本题":dict.QTYPE_MULTISELECT_RECORD_TEXT,
+        "文本题":dict.QTYPE_DESCRIPTION,
+        "录音文本题":dict.QTYPE_DESCRIPTION_RECORD_TEXT,
+        "图片上传文本题":dict.QTYPE_DESCRIPTION_IMAGE_TEXT,
+        "选项排序题":dict.QTYPE_SEQUENCE,
+        "数字题":dict.QTYPE_SCORE
+    };
+
+
+    for(var i in input){
+
+        var q = {}
+        var jumpArray = []
+        if(i>=2){
+            if(input[i][1] && input[i][2]){
+                var titleSplit = input[i][1].trim().split(",");
+                var tindex = titleSplit[0]
+                if(titleSplit.length>1){
+                    var arrayLength = titleSplit.length;
+
+                    var firstPos = 1;
+                    var nextPos = 2;
+
+
+
+                    while(firstPos<arrayLength && nextPos<arrayLength){
+                        var selectindex = parseInt(titleSplit[firstPos]);
+                        var questionindex = parseInt(titleSplit[nextPos]);
+                        jumpArray.push([selectindex,questionindex]);
+                        firstPos += 2;
+                        nextPos += 2;
+                    }
+                }
+
+                q.title = input[i][2].trim();
+                q.type = typemap[tindex]
+                q.selectlist = [];
+                q.scorelist = [];
+                var start = 3;
+                while(input[i][start]){
+                    var stype = dict.SELECTTYPE_TEXT;
+                    var vtrim = input[i][start].trim();
+
+                    var selectIndex = parseInt(start)-3;
+
+                    if(q.type == dict.QTYPE_SCORE){
+                        var scoreSplit = vtrim.split(",");
+                        if(scoreSplit.length == 3){
+                            q.scorelist.push({
+                                index:parseInt(start)-3,
+                                start:scoreSplit[0],
+                                end:scoreSplit[1],
+                                step:scoreSplit[2]
+                            })
+                        }
+                        else if(scoreSplit.length == 4){
+                            q.scorelist.push({
+                                index:parseInt(start)-3,
+                                start:scoreSplit[1],
+                                end:scoreSplit[2],
+                                step:scoreSplit[3],
+                                title:scoreSplit[0]
+                            });
+                        }
+                    }
+                    else{
+                        if(vtrim == "*图形*"){
+                            stype = dict.SELECTTYPE_IMAGE;
+                            vtrim = ""
+                        }
+                        else if(vtrim == "*视频*"){
+                            stype = dict.SELECTTYPE_VIDEO;
+                            vtrim = ""
+                        }
+                        else if(vtrim.indexOf("###,")==0){
+                            stype = dict.SELECTTYPE_DESCRIPTION;
+                            vtrim = vtrim.slice(4);
+                        }
+                        var qindex = -1;
+                        for(var jumpindex in jumpArray){
+                            var jpair = jumpArray[jumpindex];
+                            if(jpair[0] - 1 == parseInt(selectIndex)){
+                                qindex = jpair[1] - 1;
+                            }
+                        }
+
+                        q.selectlist.push({
+                            type:stype,
+                            title:vtrim,
+                            qindex:qindex
                         });
                     }
 
