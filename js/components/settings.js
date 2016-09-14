@@ -65,16 +65,25 @@ export var Settings = React.createClass({
         return infun;
     },
     goclick(){
+
         if(this.state.jumppage != (this.state.currentpage+1)){
             this.setState({
                 currentpage:this.state.jumppage-1
             })
+
         }
     },
     jumpChange(event){
+
         if(event.target.value!=""&&(parseInt(event.target.value)>0)){
             this.setState({
                 jumppage:parseInt(event.target.value)
+            })
+
+        }
+        else if(parseInt(event.target.value) <= 0){
+            this.setState({
+                jumppage:1
             })
         }
     },

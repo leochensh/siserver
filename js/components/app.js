@@ -12,6 +12,7 @@ import {Constant} from "../constant";
 import {SisDispatcher} from "../dispatcher";
 import {edataStore} from "../store/edatastore";
 import {feedbackStore} from '../store/feedbackstore';
+import {templateStore} from '../store/templatestore';
 import crypto from "crypto"
 export var App = React.createClass({
     contextTypes: {
@@ -36,6 +37,7 @@ export var App = React.createClass({
         this.logtoken = logsStore.addListener(this._onChange);
         this.edatatoken = edataStore.addListener(this._onChange);
         this.Ftoken = feedbackStore.addListener(this._onChange);
+        this.Ttoken = templateStore.addListener(this._onChange);
     },
     componentWillUnmount(){
         loginStore.remove(this.token);
@@ -48,6 +50,7 @@ export var App = React.createClass({
         logsStore.remove(this.logtoken);
         edataStore.remove(this.edatatoken);
         feedbackStore.remove(this.Ftoken);
+        templateStore.remove(this.Ttoken);
     },
     handleChange(name,event){
         var newstate = {};
@@ -261,7 +264,8 @@ export var App = React.createClass({
                             orgdata:orgStore.getData(),
                             edata:edataStore.getAll(),
                             feedbackList:feedbackStore.getAll(),
-                            logsList:logsStore.getAll()
+                            logsList:logsStore.getAll(),
+                            templateList:templateStore.getAll()
                         })
                 }
             </div>

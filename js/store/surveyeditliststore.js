@@ -246,8 +246,8 @@ class EditSurveyList extends Store{
                     $("#ajaxloading").hide();
                     var msg = JSON.parse(data);
                     SisDispatcher.dispatch({
-                        actionType: Constant.GETSURVEYEDITLIST,
-                        role:payload.role
+                        actionType: Constant.GETTEMPLATELIST
+                       // role:payload.role
                     });
                 },
                 error:function(jxr,scode){
