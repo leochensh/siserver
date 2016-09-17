@@ -132,10 +132,10 @@ export var Constant = {
     SPIDERSTATU_ACTIVE:"spiderstatuactive",
     SPIDERSTATU_DONE:"spiderstatudone",
 
-    // BASE_FULL:"http://www.ouresa.com/si/public/#/",
-    // BASE_URL:"/si/",
-    // BASE_IMAGEURL:"/si/uploads/"
-    BASE_FULL:"http://localhost:8080/public/#/",
-    BASE_URL:"/",
-    BASE_IMAGEURL:"/uploads/"
+    BASE_FULL:"http://www.ouresa.com/si/public/#/",
+    BASE_URL:"/si/",
+    BASE_IMAGEURL:"/si/uploads/"
+    // BASE_FULL:"http://localhost:8080/public/#/",
+    // BASE_URL:"/",
+    // BASE_IMAGEURL:"/uploads/"
 };
