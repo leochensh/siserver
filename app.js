@@ -170,7 +170,6 @@ app.post("/admin/login",function(req,res){
         errorMsg.code = "wrong";
         res.send(JSON.stringify(errorMsg));
     }
-
 });
 
 app.post("/staff/login",function(req,res){
@@ -1376,9 +1375,9 @@ aclHandler.registerWait(function(acl){
         }
     });
 
-    function flipkartBrandSpider(callback){
-        var py = spawn("scrapy",["crawl","brandspider"],{
-            cwd:path.resolve("./scrapy/flipkart/flipkart")
+    function flipkartModelSpider(callback){
+        var py = spawn("scrapy",["crawl","modelspider"],{
+            cwd:path.resolve("./scrapy/flipkart")
         });
 
         py.stdout.on('data', function(data) {
@@ -1399,8 +1398,8 @@ aclHandler.registerWait(function(acl){
         })
     }
 
-    function flipkartLinkSpider(callback){
-        var py = spawn("scrapy",["crawl","linkspider"],{
+    function flipkartModelDetailSpider(callback){
+        var py = spawn("scrapy",["crawl","modeldetailspider"],{
             cwd:path.resolve("./scrapy/flipkart/flipkart")
         });
 
@@ -1432,8 +1431,14 @@ aclHandler.registerWait(function(acl){
                 else{
 
                     if(spidername == "flipkart"){
-                        flipkartBrandSpider(function(){
-                            flipkartLinkSpider();
+                        flipkartModelSpider(function(){
+                            flipkartModelDetailSpider(
+                                function(){
+                                    Admin.stopSpider(function(err,res){
+                                        console.log("spider done");
+                                    })
+                                }
+                            );
                         });
                     }
 
