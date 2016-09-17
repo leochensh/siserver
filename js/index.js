@@ -23,6 +23,7 @@ import {Frontpage} from "./components/frontpage"
 import {Forgetpass} from "./components/forgetpass"
 import {Resetpass} from "./components/resetpass"
 import {Feedback} from "./components/feedback"
+import {Template} from "./components/template"
 
 var main = document.getElementsByTagName('main')[0];
 
@@ -46,6 +47,7 @@ ReactDom.render(
             <Route path="edata" component={Edata} />
             <Route path="edata2" component={Edata2} />
             <Route path="feedback" component={Feedback} />
+            <Route path="template" component={Template} />
             <Route path="forgetpass" component={Forgetpass} />
             <Route path="resetpass/:resetcode" component={Resetpass} />
         </Route>

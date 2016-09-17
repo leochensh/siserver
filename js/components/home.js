@@ -34,6 +34,9 @@ export var Home = React.createClass({
     feedbacklick(event){
         this.context.router.push("/feedback")
     },
+    templateclick(){
+        this.context.router.push("/template")
+    },
     render() {
         var style = {
             marginTop:"30px"
@@ -193,6 +196,21 @@ export var Home = React.createClass({
                             </div>
                             <div>
                                 <span>View Feedback</span>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+                <div className="row">
+                    <button className="col-md-3 col-md-offset-3 btn btn-default"
+                            onClick={this.templateclick}>
+
+                        <div className="fixed-size-square">
+                            <div>
+                            <span className="glyphicon glyphicon-list-alt" aria-hidden="true">
+                            </span>
+                            </div>
+                            <div>
+                                <span>{"Survey Templates"}</span>
                             </div>
                         </div>
                     </button>

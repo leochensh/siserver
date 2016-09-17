@@ -572,7 +572,40 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(errorMsg));
         }
     });
+    app.put("/all/resetpass",function(req,res){
+        var adminid = req.session.uid;
+        var pass = req.body.password;
+        if(adminid && pass){
+            Admin.sadminResetAdminPass(adminid,pass,function(err,msg){
+                if(msg == "notfound"){
+                    res.status(404);
+                    errorMsg.code = "the staff not found";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else{
+                    logger.logger.log("info"," reset the staff password");
+                    res.status(200);
+                    successMsg.body = null;
+                    res.send(JSON.stringify(successMsg));
+                }
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+    app.get("/all/templatelist",function(req,res){
+        Staff.getTemplateList(function(err,templates){
+            logger.logger.log("info","get template list",{
+                editorid:req.session.uid});
+            res.status(200);
+            successMsg.body = templates;
 
+            res.send(JSON.stringify(successMsg));
+        })
+    });
     app.delete("/sadmin/org/admin/delete",acl.middleware(1),function(req,res){
         var adminid = req.body.adminid;
 
@@ -944,7 +977,7 @@ aclHandler.registerWait(function(acl){
 
     app.get("/editor/survey/list",acl.middleware(2),function(req,res){
         var editorid = req.session.uid;
-        Staff.getTemplateList(function(err,templates){
+
             Staff.getEditorSurveyList(editorid,function(err,ss){
                 if(!ss){
                     ss = [];
@@ -952,26 +985,26 @@ aclHandler.registerWait(function(acl){
                 logger.logger.log("info","editor get survey list",{
                     editorid:req.session.uid});
                 res.status(200);
-                successMsg.body = _.union(templates,ss);
+                successMsg.body = ss;
 
                 res.send(JSON.stringify(successMsg));
             });
-        })
+
 
     });
 
     app.get("/sadmin/survey/list",acl.middleware(1),function(req,res){
-        Staff.getTemplateList(function(err,templates){
+
             Staff.getSAdminSurveyList(function(err,ss){
 
                 logger.logger.log("info","admin get survey list",{
                     editorid:req.session.uid});
                 res.status(200);
-                successMsg.body = _.union(templates,ss);
+                successMsg.body = ss;
 
                 res.send(JSON.stringify(successMsg));
             });
-        })
+
 
 
     });
@@ -1051,7 +1084,7 @@ aclHandler.registerWait(function(acl){
 
     app.get("/admin/survey/list",acl.middleware(2),function(req,res){
         var orgid = req.session.orgid;
-        Staff.getTemplateList(function(err,templates){
+
             Staff.getAdminSurveyList(orgid,function(err,ss){
                 if(!ss){
                     ss = [];
@@ -1059,13 +1092,13 @@ aclHandler.registerWait(function(acl){
                 logger.logger.log("info","admin get survey list",{
                     editorid:req.session.uid});
                 res.status(200);
-                successMsg.body = _.union(templates,ss);
+                successMsg.body = ss;
 
                 res.send(JSON.stringify(successMsg));
             });
 
 
-        })
+
 
     });
 

@@ -315,6 +315,9 @@ export var Quest = React.createClass({
         return innerFunc;
 
     },
+    frontclick(){
+        this.context.router.push("/frontpage");
+    },
     submit(){
         var that = this;
         this.state.answer.endtime = new Date().toISOString();
@@ -600,6 +603,11 @@ export var Quest = React.createClass({
                 mainPart = (
                     <div className="container">
                         <h2>Submit success! Thanks for your cooperation.</h2>
+                        <p>
+                            <a className="btn btn-danger btn-lg"
+                               onClick={this.frontclick}
+                               role="button">Create My Survey</a>
+                        </p>
                         {endAlert}
                     </div>)
             }

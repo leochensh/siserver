@@ -17,9 +17,9 @@ export var Surveylist = React.createClass({
             currentpage:0,
             pagesize:10,
             templatename:"",
-            templatefromid:null,
-            newsurveyfromtemplatename:"",
-            surveyfromid:null
+            templatefromid:null
+           // newsurveyfromtemplatename:"",
+           // surveyfromid:null
         }
     },
     contextTypes: {
@@ -165,6 +165,7 @@ export var Surveylist = React.createClass({
 
 
     },
+    /*
     generateSurveyButtonClick(sid){
         var that = this;
         var inFunc = function(){
@@ -183,16 +184,19 @@ export var Surveylist = React.createClass({
         };
         return inFunc;
     },
+    */
     templatenamechange(event){
         this.setState({
             templatename:event.target.value
         });
     },
+    /*
     surveynamefromtempchange(event){
         this.setState({
             newsurveyfromtemplatename:event.target.value
         });
     },
+    */
     confirmtemplatefromsurvey(){
         if(this.state.templatename && this.state.templatefromid){
             $("#createtemplate").modal("hide");
@@ -204,6 +208,7 @@ export var Surveylist = React.createClass({
             });
         }
     },
+    /*
     confirmsurveyfromtemplate(){
         if(this.state.newsurveyfromtemplatename && this.state.surveyfromid){
             $("#createsurveyfromtemplate").modal("hide");
@@ -215,6 +220,7 @@ export var Surveylist = React.createClass({
             });
         }
     },
+    */
     stastic(index){
         var that = this;
         var inFunc = function(){
@@ -362,6 +368,7 @@ export var Surveylist = React.createClass({
                     className="btn btn-primary">Statistics</a>);
             }
             else{
+                /*
                 if(this.props.loginInfo.role == "sadmin"){
                     buttonGrp.push(<a
                         type="button"
@@ -378,6 +385,7 @@ export var Surveylist = React.createClass({
                         onClick={this.generateSurveyButtonClick(selist[i]._id)}
                         className="btn btn-primary">Generate survey</a>);
                 }
+                */
             }
 
 
@@ -630,7 +638,7 @@ export var Surveylist = React.createClass({
                                                placeholder=""
                                                value={this.state.newsurveyfromtemplatename}
                                                onChange={this.surveynamefromtempchange}
-                                        />
+                                            />
                                     </div>
                                 </form>
 
