@@ -11,7 +11,7 @@
 
 BOT_NAME = 'flipkart'
 
-# USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"
 
 SPIDER_MODULES = ['flipkart.spiders']
 NEWSPIDER_MODULE = 'flipkart.spiders'
@@ -77,7 +77,9 @@ DOWNLOADER_MIDDLEWARES = {
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'flipkart.pipelines.modelSpiderPipeline':300,
-    'flipkart.pipelines.modelDetailSpiderPipeline':300
+    'flipkart.pipelines.modelDetailSpiderPipeline':300,
+    'flipkart.pipelines.amazonIndiamodelSpiderPipeline':300,
+    'flipkart.pipelines.ainModelDetailSpiderPipeline':300
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

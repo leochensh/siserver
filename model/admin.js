@@ -1135,7 +1135,7 @@ Admin.getSpiderActiveId = function(sname,callback){
                         callback(err,activeitem._id)
                     }
                     else{
-                        callback(err,"notfound");
+                        callback(err,"-10000");
                     }
 
                 })

@@ -1452,6 +1452,50 @@ aclHandler.registerWait(function(acl){
         })
     }
 
+    function amazonInModelSpider(callback){
+        var py = spawn("scrapy",["crawl","ainmodelspider"],{
+            cwd:path.resolve("./scrapy/flipkart")
+        });
+
+        py.stdout.on('data', function(data) {
+            console.log("stdout:"+data);
+        });
+
+        py.stderr.on('data', function(data) {
+            console.log("stderr:"+data);
+        });
+
+        py.on("close",function(code){
+            console.log("close:"+code);
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++++++")
+            if(callback){
+                callback();
+            }
+
+        })
+    }
+
+    function amazonInModelDetailSpider(callback){
+        var py = spawn("scrapy",["crawl","ainmodeldetailspider"],{
+            cwd:path.resolve("./scrapy/flipkart/flipkart")
+        });
+
+        py.stdout.on('data', function(data) {
+            console.log("stdout:"+data);
+        });
+
+        py.stderr.on('data', function(data) {
+            console.log("stderr:"+data);
+        });
+
+        py.on("close",function(code){
+            console.log("close:"+code)
+            if(callback){
+                callback();
+            }
+        })
+    }
+
     app.post("/sadmin/createspider",acl.middleware(1),function(req,res){
         var spidername = req.body.spidername;
         if(spidername){
@@ -1473,6 +1517,15 @@ aclHandler.registerWait(function(acl){
                                 }
                             );
                         });
+                    }
+                    else if(spidername == "amazonindia"){
+                        amazonInModelSpider(function(){
+                            amazonInModelDetailSpider(function () {
+                                Admin.stopSpider(function(err,res){
+                                    console.log("spider done");
+                                })
+                            })
+                        })
                     }
 
 

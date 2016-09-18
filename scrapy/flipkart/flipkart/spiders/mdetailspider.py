@@ -7,8 +7,6 @@ from scrapy_splash import SplashRequest
 import re
 import requests
 
-req = requests.get("http://localhost:8080/sadmin/activeid/flipkart")
-spiderid = json.loads(req.text)
 
 
 class modelDetailSpider(Spider):
@@ -20,11 +18,18 @@ class modelDetailSpider(Spider):
 
     urlMap = {}
 
+    def __init__(self):
+        self.req = requests.get("http://localhost:8080/sadmin/activeid/flipkart")
+        self.spiderid = json.loads(self.req.text)
+
+
     def start_requests(self):
         client = pymongo.MongoClient()
         db = client["smartinsight"]
-
-        modelList = db["model"].find({"spiderid":spiderid})
+        modelList = db["model"].find({"spiderid":self.spiderid})
+        print "+++++++++++++++++++++++++++++++++++++++++++++"
+        print self.spiderid
+        print modelList
         for model in modelList:
             if "href" in model:
                 self.urlMap[self.baseUrl+model["href"]] = model;
