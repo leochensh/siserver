@@ -1135,39 +1135,33 @@ export var Stastic = React.createClass({
                         Total {totalNum} answers. {clientNum} answers from Android Client and {totalNum-clientNum} answers from web anonymous users.
                     </h3>
                 </div>
-                <a className="btn btn-primary" role="button" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-                    Toggle Survey Answers General Info
-                </a>
-                <div className="collapse"  id="collapseExample">
-                    {qlist}
-                </div>
-                <div>
-                    <a className="btn btn-primary" role="button" data-toggle="collapse" href="#answerdetail" aria-expanded="false" aria-controls="collapseExample">
-                        Toggle Survey Answers Detail Info
-                    </a>
-                </div>
-
-                <div className="panel panel-default collapse" id="answerdetail">
-                    <div className="panel-heading">
-                        <h3>
-                            Answers List
-                        </h3>
+                <ul className="nav nav-tabs" role="tablist">
+                    <li role="presentation" className="active"><a href="#answerdetail" aria-controls="answerdetail" role="tab" data-toggle="tab"><h4>Survey Answers List </h4></a></li>
+                    <li role="presentation"><a  href="#collapseExample" aria-controls="collapseExample" role="tab" data-toggle="tab"><h4>Toggle Survey Answers General Info</h4></a></li>
+                </ul>
+                <div className="tab-content">
+                    <div role="tabpanel" className="tab-pane active" id="answerdetail">
+                        <div className="panel panel-default paddingpanel">
+                            <table  className="table" >
+                                <thead>
+                                <tr>
+                                    <th><span className="">##</span></th>
+                                    <th><span className="">Answer Name</span></th>
+                                    <th><span className="">Create Time</span></th>
+                                    <th><span className="">Source</span></th>
+                                    <th><span className="">Operations</span></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {mlist}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <div className="panel-body">
-                        <table  className="table" >
-                            <thead>
-                            <tr>
-                                <th><span className="">##</span></th>
-                                <th><span className="">Answer Name</span></th>
-                                <th><span className="">Create Time</span></th>
-                                <th><span className="">Source</span></th>
-                                <th><span className="">Operations</span></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {mlist}
-                            </tbody>
-                        </table>
+                    <div role="tabpanel" className="tab-pane" id="collapseExample">
+                        <div className="panel panel-default paddingpanel">
+                            {qlist}
+                        </div>
                     </div>
                 </div>
 
