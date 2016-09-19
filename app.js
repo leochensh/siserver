@@ -170,7 +170,6 @@ app.post("/admin/login",function(req,res){
         errorMsg.code = "wrong";
         res.send(JSON.stringify(errorMsg));
     }
-
 });
 
 app.post("/staff/login",function(req,res){
@@ -1409,9 +1408,9 @@ aclHandler.registerWait(function(acl){
         }
     });
 
-    function flipkartBrandSpider(callback){
-        var py = spawn("scrapy",["crawl","brandspider"],{
-            cwd:path.resolve("./scrapy/flipkart/flipkart")
+    function flipkartModelSpider(callback){
+        var py = spawn("scrapy",["crawl","modelspider"],{
+            cwd:path.resolve("./scrapy/flipkart")
         });
 
         py.stdout.on('data', function(data) {
@@ -1432,8 +1431,52 @@ aclHandler.registerWait(function(acl){
         })
     }
 
-    function flipkartLinkSpider(callback){
-        var py = spawn("scrapy",["crawl","linkspider"],{
+    function flipkartModelDetailSpider(callback){
+        var py = spawn("scrapy",["crawl","modeldetailspider"],{
+            cwd:path.resolve("./scrapy/flipkart/flipkart")
+        });
+
+        py.stdout.on('data', function(data) {
+            console.log("stdout:"+data);
+        });
+
+        py.stderr.on('data', function(data) {
+            console.log("stderr:"+data);
+        });
+
+        py.on("close",function(code){
+            console.log("close:"+code)
+            if(callback){
+                callback();
+            }
+        })
+    }
+
+    function amazonInModelSpider(callback){
+        var py = spawn("scrapy",["crawl","ainmodelspider"],{
+            cwd:path.resolve("./scrapy/flipkart")
+        });
+
+        py.stdout.on('data', function(data) {
+            console.log("stdout:"+data);
+        });
+
+        py.stderr.on('data', function(data) {
+            console.log("stderr:"+data);
+        });
+
+        py.on("close",function(code){
+            console.log("close:"+code);
+            console.log("+++++++++++++++++++++++++++++++++++++++++++++++++")
+            if(callback){
+                callback();
+            }
+
+        })
+    }
+
+    function amazonInModelDetailSpider(callback){
+        var py = spawn("scrapy",["crawl","ainmodeldetailspider"],{
             cwd:path.resolve("./scrapy/flipkart/flipkart")
         });
 
@@ -1465,9 +1508,24 @@ aclHandler.registerWait(function(acl){
                 else{
 
                     if(spidername == "flipkart"){
-                        flipkartBrandSpider(function(){
-                            flipkartLinkSpider();
+                        flipkartModelSpider(function(){
+                            flipkartModelDetailSpider(
+                                function(){
+                                    Admin.stopSpider(function(err,res){
+                                        console.log("spider done");
+                                    })
+                                }
+                            );
                         });
+                    }
+                    else if(spidername == "amazonindia"){
+                        amazonInModelSpider(function(){
+                            amazonInModelDetailSpider(function () {
+                                Admin.stopSpider(function(err,res){
+                                    console.log("spider done");
+                                })
+                            })
+                        })
                     }
 
 

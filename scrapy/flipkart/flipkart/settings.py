@@ -49,10 +49,22 @@ COOKIES_ENABLED=True
 #    'jd.middlewares.MyCustomSpiderMiddleware': 543,
 #}
 
+
+# For Splash-scrapy setting
+SPLASH_URL = 'http://127.0.0.1:8050'
+
+SPIDER_MIDDLEWARES = {
+    'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
+}
+DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
+
 # Enable or disable downloader middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   'flipkart.middlewares.FilterResponseDownloaderMiddleware': 543
+    'scrapy_splash.SplashCookiesMiddleware': 723,
+    'scrapy_splash.SplashMiddleware': 725,
+    'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
+    'flipkart.middlewares.FilterResponseDownloaderMiddleware': 543
 }
 
 # Enable or disable extensions
@@ -64,11 +76,10 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'flipkart.pipelines.brandPipeline': 300,
-    'flipkart.pipelines.brandNumPipeline': 300,
-    'flipkart.pipelines.offerLinkPipeline': 300,
-    'flipkart.pipelines.offerInfoPipeline': 300,
-    'flipkart.pipelines.reviewPipeline': 300
+    'flipkart.pipelines.modelSpiderPipeline':300,
+    'flipkart.pipelines.modelDetailSpiderPipeline':300,
+    'flipkart.pipelines.amazonIndiamodelSpiderPipeline':300,
+    'flipkart.pipelines.ainModelDetailSpiderPipeline':300
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

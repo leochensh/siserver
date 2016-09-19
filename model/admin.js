@@ -1065,6 +1065,31 @@ Admin.createSpider = function(sname,callback){
     });
 };
 
+Admin.stopSpider = function(callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("spider",function(err,collection){
+                collection.find({status:dict.SPIDERSTATU_ACTIVE}).limit(1).next(function(err,spider){
+                    if(spider){
+                        collection.updateOne({_id:spider._id},
+                            {$set:{status:dict.SPIDERSTATU_DONE,endtime:new Date()}},function(err,res){
+                                mongoPool.release(db);
+                                callback(err,res);
+                            })
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                })
+            });
+        }
+    });
+};
+
 Admin.getSpiderList = function(sname,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -1110,7 +1135,7 @@ Admin.getSpiderActiveId = function(sname,callback){
                         callback(err,activeitem._id)
                     }
                     else{
-                        callback(err,0);
+                        callback(err,"-10000");
                     }
 
                 })

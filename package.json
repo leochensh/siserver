@@ -62,6 +62,7 @@
     "ccap": "^0.6.10",
     "csv": "^0.4.6",
     "flux": "^2.1.1",
+    "node-captcha": "^0.2.2",
     "nodemailer": "^2.4.1",
     "randomstring": "^1.1.5",
     "react": "^0.14.7",

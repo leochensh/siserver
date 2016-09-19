@@ -7,15 +7,17 @@
 import pymongo
 import requests
 import json
+from bson.objectid import ObjectId
 
-req = requests.get("http://localhost:8080/sadmin/activeid/flipkart")
-spiderid = json.loads(req.text)
 
-class brandPipeline(object):
-    collection_name = "brand"
+class modelSpiderPipeline(object):
+    collection_name = "model"
 
     def __init__(self, mongo_db):
         self.mongo_db = mongo_db
+        self.req = requests.get("http://localhost:8080/sadmin/activeid/flipkart")
+        self.spiderid = json.loads(self.req.text)
+
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -27,26 +29,35 @@ class brandPipeline(object):
         #self.client = pymongo.MongoClient("192.168.1.188",27017)
         self.client = pymongo.MongoClient()
         self.db = self.client[self.mongo_db]
-        print spiderid
-        self.db[self.collection_name].remove({"spiderid":spiderid})
 
     def close_spider(self, spider):
         self.client.close()
 
     def process_item(self, item, spider):
-        if spider.name=="brandspider":
+        if spider.name=="modelspider":
             # self.db[self.collection_name].remove({})
             infos = item['infos']
             for info in infos:
-                info["spiderid"] = spiderid
+                bone = self.db["brand"].find_one({"spiderid":self.spiderid,"name":info["brand"]})
+                brandId = None
+                if not bone:
+                    insertResult = self.db["brand"].insert({
+                        "spiderid":self.spiderid,
+                        "name":info["brand"] 
+                    })
+                    brandId = str(insertResult)
+                else:
+                    brandId = str(bone["_id"]);
+
+                info["spiderid"] = self.spiderid
+                info["brandid"] = brandId
                 self.db[self.collection_name].insert(info)
             return item
         else:
             return item
 
-
-class brandNumPipeline(object):
-    collection_name = "brand"
+class modelDetailSpiderPipeline(object):
+    collection_name = "model"
 
     def __init__(self, mongo_db):
         self.mongo_db = mongo_db
@@ -66,53 +77,25 @@ class brandNumPipeline(object):
         self.client.close()
 
     def process_item(self, item, spider):
-        if spider.name=="brandNumspider":
-            infos = item['infos']
-            self.db[self.collection_name].update( { "brand" : infos["brand"],"spiderid":spiderid} ,{ '$set' : { "num" : infos["num"]} },False,True );
-            return item
-        else:
-            return item
-
-
-class offerLinkPipeline(object):
-    collection_name = "link"
-
-    def __init__(self, mongo_db):
-        self.mongo_db = mongo_db
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(
-        mongo_db=crawler.settings.get('MONGO_DATABASE')
-        )
-
-    def open_spider(self, spider):
-        #self.client = pymongo.MongoClient("192.168.1.188",27017)
-        self.client = pymongo.MongoClient()
-        self.db = self.client[self.mongo_db]
-        self.db[self.collection_name].remove({"spiderid": spiderid})
-
-    def close_spider(self, spider):
-        self.client.close()
-
-    def process_item(self, item, spider):
-        if spider.name=="linkspider":
+        if spider.name=="modeldetailspider":
+            # self.db[self.collection_name].remove({})
             infos = item['infos']
             for info in infos:
-                # existI = self.db[self.collection_name].find_one({"dataPid":info["dataPid"]})
-                # if existI:
-                #     self.db[self.collection_name].remove({"dataPid":info["dataPid"]})
-                info["spiderid"] = spiderid
-                self.db[self.collection_name].insert(info)
+                self.db[self.collection_name].update({"_id":ObjectId(info["modleid"])},{"$set":info},False,True)
             return item
         else:
             return item
 
-class offerInfoPipeline(object):
-    collection_name = "flipkartData"
+   
+
+class amazonIndiamodelSpiderPipeline(object):
+    collection_name = "model"
 
     def __init__(self, mongo_db):
         self.mongo_db = mongo_db
+        self.req = requests.get("http://localhost:8080/sadmin/activeid/amazonindia")
+        self.spiderid = json.loads(self.req.text)
+
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -129,46 +112,54 @@ class offerInfoPipeline(object):
         self.client.close()
 
     def process_item(self, item, spider):
-        if spider.name=="infospider":
-            infos = item['infos']
-            existI = self.db[self.collection_name].find_one({"dataPid":infos["dataPid"]})
-            if existI:
-                self.db[self.collection_name].remove({"dataPid":infos["dataPid"]})
-            self.db[self.collection_name].insert(infos)
-            return item
-        else:
-            return item
-
-
-
-class reviewPipeline(object):
-    collection_name = "review"
-
-    def __init__(self, mongo_db):
-        self.mongo_db = mongo_db
-
-    @classmethod
-    def from_crawler(cls, crawler):
-        return cls(
-        mongo_db=crawler.settings.get('MONGO_DATABASE')
-        )
-
-    def open_spider(self, spider):
-        #self.client = pymongo.MongoClient("192.168.1.188",27017)
-        self.client = pymongo.MongoClient()
-        self.db = self.client[self.mongo_db]
-
-    def close_spider(self, spider):
-        self.client.close()
-
-    def process_item(self, item, spider):
-        if spider.name=="reviewspider":
+        if spider.name=="ainmodelspider":
+            # self.db[self.collection_name].remove({})
             infos = item['infos']
             for info in infos:
-                existI = self.db[self.collection_name].find_one({"dataPid":info["dataPid"],"reviewId":info["reviewId"]})
-                if existI:
-                    self.db[self.collection_name].remove({"dataPid":info["dataPid"],"reviewId":info["reviewId"]})
+                bone = self.db["brand"].find_one({"spiderid":self.spiderid,"name":info["brand"]})
+                brandId = None
+                if not bone:
+                    insertResult = self.db["brand"].insert({
+                        "spiderid":self.spiderid,
+                        "name":info["brand"] 
+                    })
+                    brandId = str(insertResult)
+                else:
+                    brandId = str(bone["_id"]);
+
+                info["spiderid"] = self.spiderid
+                info["brandid"] = brandId
                 self.db[self.collection_name].insert(info)
+            return item
+        else:
+            return item
+
+class ainModelDetailSpiderPipeline(object):
+    collection_name = "model"
+
+    def __init__(self, mongo_db):
+        self.mongo_db = mongo_db
+
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+        mongo_db=crawler.settings.get('MONGO_DATABASE')
+        )
+
+    def open_spider(self, spider):
+        #self.client = pymongo.MongoClient("192.168.1.188",27017)
+        self.client = pymongo.MongoClient()
+        self.db = self.client[self.mongo_db]
+
+    def close_spider(self, spider):
+        self.client.close()
+
+    def process_item(self, item, spider):
+        if spider.name=="ainmodeldetailspider":
+            # self.db[self.collection_name].remove({})
+            infos = item['infos']
+            for info in infos:
+                self.db[self.collection_name].update({"_id":ObjectId(info["modleid"])},{"$set":info},False,True)
             return item
         else:
             return item
