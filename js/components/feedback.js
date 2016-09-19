@@ -19,8 +19,8 @@ export var Feedback = React.createClass({
           pagesize:10,
           fbackList:[],
           fdindex:null,
-          filtertext:"",
-          contentss:null
+          filtertext:""
+
       }
     },
 
@@ -85,18 +85,7 @@ export var Feedback = React.createClass({
             currentpage:0
         });
     },
-    viewfeedbacklick(content){
-        var that = this;
-        var infunc = function(){
-            that.setState({
-                contentss:content
-            });
-            $("#viewfeedback").modal("show");
 
-        };
-
-        return infunc;
-    },
     deleteButtonClick(id){
         var that = this;
         var inFunc = function(){
@@ -198,6 +187,7 @@ export var Feedback = React.createClass({
                 <tr>
                     <td>{parseInt(startPos)+parseInt(i)+1}</td>
                     <td>{Fli.name}</td>
+                    <td>{Fli.content}</td>
                     <td>{new Date(Fli.ctime).toLocaleString()}</td>
                     <td className="list_btn">
                         <div className="btn-group" role="group" >
@@ -205,10 +195,6 @@ export var Feedback = React.createClass({
                                 type="button"
                                 onClick={this.deleteButtonClick(i)}
                                 className="btn btn-danger">Delete</a>
-                            <a
-                                type="button"
-                                onClick={this.viewfeedbacklick(Fli.content)}
-                                className="btn btn-primary">View Content</a>
 
                         </div>
 
@@ -254,6 +240,7 @@ export var Feedback = React.createClass({
                             <tr>
                                 <th><span className="">##</span></th>
                                 <th><span className="">Staff Name</span></th>
+                                <th><span className="">Content</span></th>
                                 <th><span className="">Feedback Time</span></th>
                                 <th><span className="">Operations</span></th>
                             </tr>
@@ -274,22 +261,7 @@ export var Feedback = React.createClass({
                     </div>
 
                 </div>
-                <div className="modal fade" id="viewfeedback" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
-                    <div className="modal-dialog" role="document">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <h4 className="modal-title" id="myModalLabel">Content Feedback</h4>
-                            </div>
-                            <div className="modal-body">
-                                {this.state.contentss}
-                            </div>
-                            <div className="modal-footer">
-                                <a type="button" className="btn btn-default" data-dismiss="modal">Close</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
                 <div className="modal fade" id="deletefeedback" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div className="modal-dialog">
                         <div className="modal-content">

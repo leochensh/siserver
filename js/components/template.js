@@ -81,11 +81,42 @@ export var Template = React.createClass({
     confirmsurveyfromtemplate(){
         if(this.state.newsurveyfromtemplatename && this.state.surveyfromid){
             $("#createsurveyfromtemplate").modal("hide");
-            SisDispatcher.dispatch({
-                actionType: Constant.TEMPLATETOSURVEY,
-                surveyid:this.state.surveyfromid,
-                surveyname:this.state.newsurveyfromtemplatename,
-                role:this.props.loginInfo.role
+            var that = this;
+
+            $("#ajaxloading").show();
+            $.ajax({
+                url: Constant.BASE_URL+"admin/survey/fromtemplate",
+                data: $.param({
+                    surveyid:that.state.surveyfromid,
+                    surveyname:that.state.newsurveyfromtemplatename
+                }),
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#ajaxloading").hide();
+                    var msg = JSON.parse(data);
+                    SisDispatcher.dispatch({
+                        actionType: Constant.EDITSURVEY,
+                        id:msg.body
+                    });
+                    that.context.router.push("/newsurvey");
+                },
+                error:function(jxr,scode){
+                    $("#ajaxloading").hide();
+                },
+                statusCode:{
+                    406:function(){
+
+                    },
+                    500:function(){
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500
+                        });
+                    },
+                    409:function(){
+
+                    }
+                }
             });
         }
     },

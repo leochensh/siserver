@@ -11,11 +11,13 @@ export var PersonItem = React.createClass({
         var id = this.props.id;
         var name = this.props.name;
         var ctime = this.props.ctime;
+        var email = this.props.email;
 
         return(
             <tr>
                 <td>{parseInt(id)+1}</td>
                 <td>{name}</td>
+                <td>{email}</td>
                 <td>{new Date(ctime).toLocaleString()}</td>
                 <td className="list_btn">
                     <input type="submit" name="reset" value="Reset Password"

@@ -268,6 +268,7 @@ class EditSurveyList extends Store{
                 }
             });
         }
+        /*
         else if(payload.actionType == Constant.TEMPLATETOSURVEY){
             var surveyid = payload.surveyid;
             var surveyname = payload.surveyname;
@@ -306,6 +307,7 @@ class EditSurveyList extends Store{
                 }
             });
         }
+        */
     }
 }
 
