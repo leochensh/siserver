@@ -1065,7 +1065,7 @@ aclHandler.registerWait(function(acl){
                     }
                     else{
                         res.status(200);
-                        successMsg.body = msg;
+                        successMsg.body = sur;
 
                         res.send(JSON.stringify(successMsg));
                     }

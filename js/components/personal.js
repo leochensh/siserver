@@ -185,10 +185,12 @@ export var Personal = React.createClass({
         var mlist = [];
         for(var i in this.props.personalList){
             var pli = this.props.personalList[i];
+
             mlist.push(<PersonItem
                 _id={pli._id}
                 id={i}
                 name={pli.name}
+                email={pli.email?pli.email:""}
                 ctime={pli.ctime}
                 key={pli._id}
                 resetClick={this.resetPassClick}
@@ -234,6 +236,7 @@ export var Personal = React.createClass({
                         <tr>
                             <th><span className="">##</span></th>
                             <th><span className="">User Name</span></th>
+                            <th><span className="">Email</span></th>
                             <th><span className="">Create Time</span></th>
                             <th><span className="">Operations</span></th>
                         </tr>
