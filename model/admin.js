@@ -1090,6 +1090,33 @@ Admin.stopSpider = function(callback){
     });
 };
 
+
+var getSpiderCountInfo = function(spiderid,cb){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("brand",function(err,collection){
+                collection.find({spiderid:spiderid}).count(function(err,bcount){
+
+                    db.collection("model",function(err,modelcollection){
+                        modelcollection.find({spiderid:spiderid}).count(function(err,mcount){
+                            mongoPool.release(db);
+                            cb(err,{
+                                brandCount:bcount,
+                                modelCount:mcount
+                            });
+                        })
+                    })
+
+
+                })
+            });
+        }
+    });
+};
+
 Admin.getSpiderList = function(sname,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -1099,7 +1126,16 @@ Admin.getSpiderList = function(sname,callback){
             db.collection("spider",function(err,collection){
                 collection.find({name:sname}).sort({ctime:-1}).toArray(function(err,sarray){
                     mongoPool.release(db);
-                    callback(err,sarray);
+                    
+                    async.map(sarray,function(item,cb){
+                        getSpiderCountInfo(item._id.toString(),function (err,countinfo) {
+                            item.brandcount = countinfo.brandCount;
+                            item.modelcount = countinfo.modelCount;
+                            cb(null,item);
+                        })
+                    },function (err,results) {
+                        callback(err,results);
+                    })
                 })
             });
         }
@@ -1143,6 +1179,22 @@ Admin.getSpiderActiveId = function(sname,callback){
         }
     });
 };
+
+Admin.getSpiderDetailData = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).sort({brand:1}).toArray(function(err,models){
+                    mongoPool.release(db);
+                    callback(err,models);
+                })
+            });
+        }
+    });
+}
 
 Admin.publishSurvey = function(orgid,surveyid,stafflist,callback){
     mongoPool.acquire(function(err,db){

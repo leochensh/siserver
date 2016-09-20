@@ -183,6 +183,20 @@ export var Edata2 = React.createClass({
             actionType: Constant.GETSPIDERLIST
         });
     },
+    exportClick(index){
+        var that = this;
+        var infunc = function(){
+            var spi = that.props.edata.spiderlist[that.props.edata.currentIndex][index];
+            if(spi.status == Constant.SPIDERSTATU_DONE){
+                SisDispatcher.dispatch({
+                    actionType: Constant.EXPORTSPIDERDATA,
+                    index:index
+                });
+            }
+            
+        };
+        return infunc;
+    },
     render() {
         var targeList = [];
         for(var ti in this.props.edata.targetList){
@@ -210,16 +224,45 @@ export var Edata2 = React.createClass({
         var spiderList = [];
 
         var clist = this.props.edata.spiderlist[this.props.edata.currentIndex];
-        console.log(clist);
         if(clist && clist.length>0){
             for(var spi in clist){
                 var stime = new Date(clist[spi].ctime).toLocaleString();
+                var displayClass = " alert alert-info";
+                if(clist[spi].status == Constant.SPIDERSTATU_ACTIVE){
+                    displayClass = " alert alert-danger";
+                }
+                var bdisabled = "";
+                if(clist[spi].status == Constant.SPIDERSTATU_ACTIVE){
+                    bdisabled = "disabled";
+                }
+                var downLink = "";
+                if(clist[spi].downlink){
+                    downLink = <a href={Constant.BASE_IMAGEURL+clist[spi].downlink}>
+                        Download
+                    </a>
+                }
+
                 spiderList.push(
                     <div className="panel panel-default">
                         <div className="panel-heading">
                             <div className="row">
                                 <div className="col-md-3">
                                     {stime}
+                                </div>
+                                <div className="col-md-4 col-md-offset-3">
+                                    <div className="btn-group" role="group">
+                                        <a className="btn btn-info"
+                                           disabled={bdisabled}
+                                           role="button">View Stastic</a>
+                                        <a className="btn btn-default"
+                                           onClick={this.exportClick(spi)}
+                                           disabled={bdisabled}
+                                           role="button">Export</a>
+                                    </div>
+
+                                </div>
+                                <div className="col-md-2">
+                                    {downLink}
                                 </div>
                             </div>
                         </div>
@@ -228,8 +271,45 @@ export var Edata2 = React.createClass({
                                 <div className="col-md-3">
                                     Status:
                                 </div>
-                                <div className="col-md-3">
+                                <div className={"col-md-3"+displayClass}>
                                     {spiderMap[clist[spi].status]}
+                                </div>
+
+                                <div className="col-md-2">
+
+
+
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-3">
+                                    Start time:
+                                </div>
+                                <div className="col-md-3 alert alert-info">
+                                    {new Date(clist[spi].ctime).toLocaleString()}
+                                </div>
+
+                                <div className="col-md-3">
+                                    End time:
+                                </div>
+                                <div className="col-md-3 alert alert-info">
+                                    {clist[spi].endtime?new Date(clist[spi].endtime).toLocaleString():""}
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                <div className="col-md-3">
+                                    Brand Number:
+                                </div>
+                                <div className="col-md-3 alert alert-info">
+                                    {clist[spi].brandcount}
+                                </div>
+
+                                <div className="col-md-3">
+                                    Model Number:
+                                </div>
+                                <div className="col-md-3 alert alert-info">
+                                    {clist[spi].modelcount}
                                 </div>
                             </div>
 

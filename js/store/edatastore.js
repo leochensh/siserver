@@ -84,6 +84,45 @@ class Edatastore extends Store{
                 }
             });
         }
+        else if(payload.actionType == Constant.EXPORTSPIDERDATA){
+            var sp = edata.spiderlist[edata.currentIndex][payload.index];
+            $("#pleaseWaitDialog").modal("show");
+            $.ajax({
+                url: Constant.BASE_URL+"sadmin/exportspider",
+                data: $.param({
+                    spidername:sp.name,
+                    spiderid:sp._id
+                }),
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#pleaseWaitDialog").modal("hide");
+                    var msg = JSON.parse(data);
+                    var fname = msg.body;
+                    sp.downlink = fname;
+                    SisDispatcher.dispatch({
+                        actionType: Constant.SPIDERLISTUPDATE
+                    });
+                },
+                error:function(jxr,scode){
+                    $("#pleaseWaitDialog").modal("hide");
+                },
+                statusCode:{
+                    406:function(){
+
+                    },
+                    500:function(){
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500
+                        });
+                    },
+                    409:function(){
+
+                    }
+                }
+            });
+            
+        }
     }
 }
 

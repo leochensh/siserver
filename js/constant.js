@@ -4,7 +4,6 @@ export var Constant = {
     STAFF_PERSONAL:"personal",
     STAFF_ORG:"orgstaff",
 
-
     LOGINSUCCESS:"loginsuccess",
     DELETELOG:"deletelog",
     DELETELOGOK:"deletelogok",
@@ -62,6 +61,7 @@ export var Constant = {
     CREATESPIDER:"createspider",
     GETSPIDERLIST:"getspiderlist",
     SPIDERLISTUPDATE:"spiderlistupdate",
+    EXPORTSPIDERDATA:"exportspiderdata",
 
 
     QTYPE_SINGLESELECT:"singleselect",//单选题

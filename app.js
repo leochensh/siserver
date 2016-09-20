@@ -1584,6 +1584,70 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+    var exportDomainList = {
+        "flipkart":[
+            "title","brand","color","keyfeature","price","simtype","pcamera","scamera",
+            "screen","Resolution","RAM","ROM","os","osversionnum","osversionname","battery",
+            "rating","avgrate","reviewNum"
+        ],
+        "amazonindia":[
+            "title","brand","color","specialfeature","price","Camera",
+            "RAM","os","battery",
+            "avgrate","reviewNum"
+        ]
+    };
+
+    app.post("/sadmin/exportspider",acl.middleware(1),function(req,res){
+        var sid = req.body.spiderid;
+        var sname = req.body.spidername;
+        if(sid && ObjectID.isValid(sid) && sname && (sname == "flipkart" || sname == "amazonindia")){
+
+            Admin.getSpiderDetailData(sid,function(err,models){
+                var data = [];
+                data.push(exportDomainList[sname]);
+                for(var mindex in models){
+                    var pitem = [];
+                    for (var tagindex in exportDomainList[sname]){
+                        if (models[mindex][exportDomainList[sname][tagindex]]){
+                            pitem.push(models[mindex][exportDomainList[sname][tagindex]]);
+                        }
+                        else{
+                            pitem.push("");
+                        }
+                    }
+                    data.push(pitem);
+                }
+                var name = sname+ new Date().toISOString() + ".xlsx";
+                var ws_name = "SheetJS";
+
+                function Workbook() {
+                    if(!(this instanceof Workbook)) return new Workbook();
+                    this.SheetNames = [];
+                    this.Sheets = {};
+                }
+
+                var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
+
+                /* add worksheet to workbook */
+                wb.SheetNames.push(ws_name);
+                wb.Sheets[ws_name] = ws;
+
+                /* write file */
+                XLSX.writeFile(wb, 'uploads/'+name);
+                successMsg.body = name;
+
+                res.send(JSON.stringify(successMsg));
+            })
+
+
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
     app.post("/admin/survey/publishtoall",acl.middleware(2),function(req,res){
         var surveyid = req.body.surveyid;
         var ownid = req.session.uid;

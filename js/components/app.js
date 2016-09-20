@@ -176,7 +176,7 @@ export var App = React.createClass({
             <div>
                 <nav className="navbar navbar-default navbar-fixed-top">
                     <div className="container-fluid">
-                        <div class="navbar-header">
+                        <div className="navbar-header">
                             <a style={{padding:0}} className="navbar-brand" href="#">
                                 <img style={{maxHeight:"50px"}} alt="Brand" src="image/logo_244px.png"/>
                             </a>
