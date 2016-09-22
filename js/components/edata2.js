@@ -197,6 +197,33 @@ export var Edata2 = React.createClass({
         };
         return infunc;
     },
+    statisticClick(index){
+        var that = this;
+        var infunc = function(){
+            var spi = that.props.edata.spiderlist[that.props.edata.currentIndex][index];
+            if(spi.status == Constant.SPIDERSTATU_DONE){
+                SisDispatcher.dispatch({
+                    actionType: Constant.SHOWSPIDERSTATISTIC,
+                    index:index
+                });
+
+                $("#spiderstatistic").modal("show");
+            }
+
+        };
+        return infunc;
+    },
+    cleaCanvas(){
+        var canvas  = document.getElementById("barcanvas");
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width,canvas.height);
+    },
+    stasticchange(event){
+        SisDispatcher.dispatch({
+            actionType: Constant.SPIDERSTASTICCHANGE,
+            value:event.target.value
+        });
+    },
     render() {
         var targeList = [];
         for(var ti in this.props.edata.targetList){
@@ -252,8 +279,9 @@ export var Edata2 = React.createClass({
                                 <div className="col-md-4 col-md-offset-3">
                                     <div className="btn-group" role="group">
                                         <a className="btn btn-info"
+                                           onClick={this.statisticClick(spi)}
                                            disabled={bdisabled}
-                                           role="button">View Stastic</a>
+                                           role="button">View Statistic</a>
                                         <a className="btn btn-default"
                                            onClick={this.exportClick(spi)}
                                            disabled={bdisabled}
@@ -320,52 +348,20 @@ export var Edata2 = React.createClass({
             }
         }
 
-        var brandNum = this.state.brandList.length;
-        var mnum = 0;
-        for(var bindex in this.state.brandList){
-            var cb = this.state.brandList[bindex];
-            for(var mindex in cb.modelList){
-                mnum+=1;
+        var spiderstatisticoptions = [];
+        for(var oi in Constant.SPIDERSTASTICMAP){
+            var optgrouplist = [];
+            for (var suboi in Constant.SPIDERSTASTICMAP[oi]){
+                optgrouplist.push(
+                    <option value={oi+"|"+suboi}>
+                        {Constant.SPIDERSTASTICMAP[oi][suboi].name}
+                    </option>
+                )
             }
-        }
-        var bchecklist = [];
-
-        var gcnum = 4;
-        var checkGroupNum = Math.ceil(brandNum/gcnum);
-
-        var widthclassname = "col-md-"+parseInt(12/gcnum);
-
-        var stasticItemOptions = [];
-        for(var oindex in stasticItems){
-            var csi = stasticItems[oindex];
-            stasticItemOptions.push(
-                <option value={oindex}>
-                    {csi}
-                </option>
-            )
-        }
-
-        for(var gitem=0;gitem<checkGroupNum;gitem++){
-            var sglist = [];
-            for(var sgitem=0;sgitem<gcnum;sgitem++){
-                if(gitem*gcnum+sgitem<brandNum){
-                    sglist.push(
-                        <div className={"checkbox "+widthclassname}>
-                            <label>
-                                <input
-                                    checked={_.indexOf(this.state.brandCheckList,(gitem*gcnum+sgitem))>=0}
-                                    onChange={this.brandCheck(gitem*gcnum+sgitem)}
-                                    type="checkbox" value=""/>
-                                {this.state.brandList[gitem*gcnum+sgitem].brand}
-                            </label>
-                        </div>
-                    )
-                }
-            }
-            bchecklist.push(
-                <div className="row">
-                    {sglist}
-                </div>
+            spiderstatisticoptions.push(
+                <optgroup label={oi}>
+                    {optgrouplist}
+                </optgroup>
             )
         }
         return (
@@ -405,6 +401,31 @@ export var Edata2 = React.createClass({
                             <div id="scrollright" className="col-md-12">
                                 {spiderList}
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="spiderstatistic" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog modal-lg" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" id="myModalLabel">Statistic</h4>
+                            </div>
+                            <div className="modal-body">
+                                <select
+                                    value={this.props.edata.currentstatistic}
+                                    onChange={this.stasticchange}
+                                    className="form-control">
+                                    {spiderstatisticoptions}
+                                </select>
+
+                                <canvas id="barcanvas" width="850px" height="700px" >
+                                    [No canvas support]
+                                </canvas>
+
+                            </div>
+
                         </div>
                     </div>
                 </div>

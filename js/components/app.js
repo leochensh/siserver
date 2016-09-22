@@ -252,6 +252,22 @@ export var App = React.createClass({
                         </div>
                     </div>
                 </div>
+                <div className="modal fade" id="pleaseWaitDialog"  tabIndex="100" role="dialog" >
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h1>Processing...</h1>
+                            </div>
+                            <div className="modal-body">
+                                <div className="progress progress-striped active">
+                                    <div className="bar" style={{width:"100%"}}></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
                 {
                     this.props.children && React.cloneElement(this.props.children,
                         {loginInfo:loginStore.getLoginInfo(),

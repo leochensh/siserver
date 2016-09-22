@@ -8,7 +8,66 @@ import async from "async"
 var edata = {
     targetList:["flipkart","amazonindia"],
     currentIndex:0,
-    spiderlist:[null,null]
+    spiderlist:[null,null],
+    currentstatistic:"Brands statistics|0",
+    statisticid:null
+}
+
+var getStatistic = function(){
+    var spiderid = edata.statisticid;
+
+    var sarray = edata.currentstatistic.split("|");
+    if(Constant.SPIDERSTASTICMAP[sarray[0]][sarray[1]].url){
+        $("#pleaseWaitDialog").modal("show");
+        var labeltag = Constant.SPIDERSTASTICMAP[sarray[0]][sarray[1]].labeltag;
+        var datatag = Constant.SPIDERSTASTICMAP[sarray[0]][sarray[1]].datatag;
+        var url = Constant.SPIDERSTASTICMAP[sarray[0]][sarray[1]].url+"/"+spiderid;
+        $.ajax({
+            url: Constant.BASE_URL+url,
+            type: 'GET',
+            success: function (data) {
+                $("#pleaseWaitDialog").modal("hide");
+                var msg = JSON.parse(data).body;
+                console.log(msg);
+                var dataA = [];
+                var labelA = [];
+                if(msg.total){
+                    labelA.push("Total");
+                    dataA.push(msg.total);
+                }
+                for(var i in msg.models){
+                    labelA.push(msg.models[i][labeltag].split("(")[0]);
+                    dataA.push(msg.models[i][datatag]);
+                }
+                console.log(dataA);
+                console.log(labelA);
+                var canvas  = document.getElementById("barcanvas");
+                var context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width,canvas.height);
+
+                new RGraph.Bar({
+                    id: "barcanvas",
+                    data: dataA,
+                    options: {
+                        gutterLeft:100,
+                        gutterBottom:100,
+                        labelsAbove:true,
+                        textAngle:30,
+                        labels: labelA,
+                        shadow: false,
+                        colors: ['red'],
+                        strokestyle: 'rgba(0,0,0,0)'
+                    }
+                }).draw();
+
+
+            },
+            error:function(jxr,scode){
+                $("#pleaseWaitDialog").modal("hide");
+            }
+        });
+    }
+
 }
 
 class Edatastore extends Store{
@@ -122,6 +181,17 @@ class Edatastore extends Store{
                 }
             });
             
+        }
+        else if(payload.actionType == Constant.SHOWSPIDERSTATISTIC){
+            var sp = edata.spiderlist[edata.currentIndex][payload.index];
+            edata.statisticid = sp._id;
+            getStatistic();
+        }
+        else if(payload.actionType == Constant.SPIDERSTASTICCHANGE){
+            var value = payload.value;
+            edata.currentstatistic = value;
+            this.__emitChange();
+            getStatistic();
         }
     }
 }

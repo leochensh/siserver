@@ -957,7 +957,7 @@ Admin.temproryChangeSurvey = function(callback){
                         collection.updateOne({_id:survey._id},
                             {$set:{publishstatus:dict.SURVEYPUBLISHSTATUS_PRIVATEPERSONAL}},function(err,res){
                                 cb()
-                        });
+                            });
                     },function(err){
                         mongoPool.release(db);
                         callback(err,"ok");
@@ -1126,7 +1126,7 @@ Admin.getSpiderList = function(sname,callback){
             db.collection("spider",function(err,collection){
                 collection.find({name:sname}).sort({ctime:-1}).toArray(function(err,sarray){
                     mongoPool.release(db);
-                    
+
                     async.map(sarray,function(item,cb){
                         getSpiderCountInfo(item._id.toString(),function (err,countinfo) {
                             item.brandcount = countinfo.brandCount;
@@ -1190,6 +1190,502 @@ Admin.getSpiderDetailData = function(sid,callback){
                 collection.find({spiderid:sid}).sort({brand:1}).toArray(function(err,models){
                     mongoPool.release(db);
                     callback(err,models);
+                })
+            });
+        }
+    });
+}
+
+Admin.getTop10modelnumForBrand = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.group(
+                    ["brand"],
+                    {"spiderid":{$eq:sid}},
+                    {"count":0},
+                    "function( curr, result ) {result.count += 1;}",
+
+                    function(err,modelgroup){
+                        console.log(modelgroup[0])
+                        collection.find({spiderid:sid}).count(function(err,modelcount){
+                            mongoPool.release(db);
+                            var sortedA = _.sortBy(modelgroup,function(item){
+                                return item.count
+                            });
+                            var rA = [];
+                            if(sortedA.length>0){
+
+                                var startPos = sortedA.length-1;
+                                var count = 10;
+                                while(startPos>=0 && count>0){
+                                    rA.push(sortedA[startPos]);
+                                    startPos-=1;
+                                    count-=1;
+                                }
+                            }
+                            callback(err,{
+                                total:modelcount,
+                                models:rA
+                            })
+                        })
+
+
+                    })
+            });
+        }
+    });
+};
+
+Admin.getTop10reviewnumForBrand = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.group(
+                    ["brand"],
+                    {"spiderid":{$eq:sid}},
+                    {"count":0},
+                    "function( curr, result ) {var rnum = curr.reviewNum; if(rnum==''||!rnum){rnum = 0;}else{rnum = parseInt(rnum);} result.count += rnum;}",
+
+                    function(err,modelgroup){
+                        mongoPool.release(db);
+
+                        var total = _.reduce(modelgroup,function(memo,item){
+                            return memo+item.count;
+                        },0);
+
+                        var sortedA = _.sortBy(modelgroup,function(item){
+                            return item.count
+                        });
+                        var rA = [];
+                        if(sortedA.length>0){
+
+                            var startPos = sortedA.length-1;
+                            var count = 10;
+                            while(startPos>=0 && count>0){
+                                rA.push(sortedA[startPos]);
+                                startPos-=1;
+                                count-=1;
+                            }
+                        }
+                        callback(err,{
+                            total:total,
+                            models:rA
+                        })
+
+
+                    })
+            });
+        }
+    });
+}
+
+Admin.getTop10salesamountForBrand = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.group(
+                    ["brand"],
+                    {"spiderid":{$eq:sid}},
+                    {"count":0},
+                    "function(curr,result){var rnum = parseInt(curr.reviewNum?curr.reviewNum:0);var price = parseInt(curr.price?curr.price:0);if(isNaN(rnum) || isNaN(price)){result.count += 0;}else{result.count += rnum*price; }}",
+                    function(err,modelgroup){
+                        mongoPool.release(db);
+
+                        var total = _.reduce(modelgroup,function(memo,item){
+                            return memo+item.count;
+                        },0);
+
+                        var sortedA = _.sortBy(modelgroup,function(item){
+                            return item.count
+                        });
+                        var rA = [];
+                        if(sortedA.length>0){
+
+                            var startPos = sortedA.length-1;
+                            var count = 10;
+                            while(startPos>=0 && count>0){
+                                rA.push(sortedA[startPos]);
+                                startPos-=1;
+                                count-=1;
+                            }
+                        }
+                        callback(err,{
+                            total:total,
+                            models:rA
+                        })
+
+
+                    })
+            });
+        }
+    });
+}
+
+Admin.getTop10avgpriceForBrand = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.group(
+                    ["brand"],
+                    {"spiderid":{$eq:sid}},
+                    {"count":0,"totalPrice":0,"avgPrice":0},
+                    "function(curr,result){result.count+=1;var price = parseInt(curr.price?curr.price:0);if(isNaN(price)){result.totalPrice+=0}else{result.totalPrice += price; }}",
+                    function(err,modelgroup){
+                        mongoPool.release(db);
+                        modelgroup = _.map(modelgroup,function(item){
+                            item.avgPrice = item.count?item.totalPrice/item.count:0;
+                            return item;
+                        })
+                        var sortedA = _.sortBy(modelgroup,function(item){
+                            return item.avgPrice
+                        });
+                        var rA = [];
+                        if(sortedA.length>0){
+
+                            var startPos = sortedA.length-1;
+                            var count = 10;
+                            while(startPos>=0 && count>0){
+                                rA.push(sortedA[startPos]);
+                                startPos-=1;
+                                count-=1;
+                            }
+                        }
+                        callback(err,{
+                            models:rA
+                        })
+
+
+                    })
+            });
+        }
+    });
+}
+
+Admin.getTop10reviewnumForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).sort({reviewNum:-1}).toArray(function(err,models){
+                    var gmodels = _.groupBy(models,function(item){
+                        return item.title.split("(")[0];
+                    })
+
+                    var count = 10;
+                    var result = [];
+                    for(var i in gmodels){
+                        if(count>0){
+                            result.push({
+                                title:i,
+                                reviewNum:gmodels[i][0].reviewNum
+                            });
+                            count -=1;
+                        }
+                    }
+                    mongoPool.release(db);
+                    callback(err,{
+                        models:result
+                    });
+                })
+            });
+        }
+    });
+}
+
+Admin.getTop10salesamountForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).toArray(function(err,models){
+                    var gmodels = _.groupBy(models,function(item){
+                        return item.title.split("(")[0];
+                    });
+
+                    var nextArray = [];
+                    for(var title in gmodels){
+                        var tmp = {
+                            title:title,
+                            reviewNum:gmodels[title][0].reviewNum?gmodels[title][0].reviewNum:0,
+                            price:gmodels[title][0].price?gmodels[title][0].price:0
+                        };
+                        tmp.smount = tmp.reviewNum*tmp.price;
+                        nextArray.push(tmp)
+                    }
+
+                    var sortarray = _.sortBy(nextArray,function(item){
+                        return item.smount
+                    })
+
+                    var count = 10;
+                    var countindex = sortarray.length-1;
+                    var result = [];
+
+                    while(countindex>=0 && count>0){
+                        result.push(sortarray[countindex]);
+                        countindex -= 1;
+                        count -= 1;
+                    }
+
+                    mongoPool.release(db);
+                    callback(err,{
+                        models:result
+                    });
+                })
+            });
+        }
+    });
+}
+
+Admin.getTop10priceForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).toArray(function(err,models){
+                    var gmodels = _.groupBy(models,function(item){
+                        return item.title.split("(")[0];
+                    });
+
+                    var nextArray = [];
+                    for(var title in gmodels){
+                        var tmp = {
+                            title:title,
+                            price:gmodels[title][0].price?gmodels[title][0].price:0,
+                        };
+                        nextArray.push(tmp)
+                    }
+
+                    var sortarray = _.sortBy(nextArray,function(item){
+                        return item.price
+                    })
+
+                    var count = 10;
+                    var countindex = sortarray.length-1;
+                    var result = [];
+
+                    while(countindex>=0 && count>0){
+                        result.push(sortarray[countindex]);
+                        countindex -= 1;
+                        count -= 1;
+                    }
+
+                    mongoPool.release(db);
+                    callback(err,{
+                        models:result
+                    });
+                })
+            });
+        }
+    });
+}
+
+Admin.getpricerangebynumForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).sort({price:1}).toArray(function(err,models){
+                    var total = models.length;
+                    var gmodels = _.groupBy(models,function(item){
+                        if(!item.price){
+                            return "Others";
+                        }
+                        else{
+                            var p = parseInt(item.price);
+                            if(p>0 && p<=10000){
+                                return "0~10000";
+                            }
+                            else if(p>10000 && p<=20000){
+                                return "10000~20000"
+                            }
+                            else if(p>20000 && p<=30000){
+                                return "20000~30000"
+                            }
+                            else if(p>30000 && p<=40000){
+                                return "30000~40000"
+                            }
+                            else if(p>40000 && p<=50000){
+                                return "40000~50000"
+                            }
+                            else if(p>50000){
+                                return "Above 50000"
+                            }
+                        }
+                    });
+
+                    var nextArray = [];
+                    for(var title in gmodels){
+                        var tmp = {
+                            pricerange:title,
+                            modelnum:gmodels[title].length,
+                        };
+                        nextArray.push(tmp)
+                    }
+
+
+                    mongoPool.release(db);
+                    callback(err,{
+                        models:nextArray,
+                        total:total
+                    });
+                })
+            });
+        }
+    });
+}
+
+Admin.getpricerangebyreviewnumForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).sort({price:1}).toArray(function(err,models){
+                    var total = 0;
+                    for(var mi in models){
+                        if(models[mi].reviewNum){
+                            total += parseInt(models[mi].reviewNum)
+                        }
+                    }
+                    var gmodels = _.groupBy(models,function(item){
+                        if(!item.price){
+                            return "Others";
+                        }
+                        else{
+                            var p = parseInt(item.price);
+                            if(p>0 && p<=10000){
+                                return "0~10000";
+                            }
+                            else if(p>10000 && p<=20000){
+                                return "10000~20000"
+                            }
+                            else if(p>20000 && p<=30000){
+                                return "20000~30000"
+                            }
+                            else if(p>30000 && p<=40000){
+                                return "30000~40000"
+                            }
+                            else if(p>40000 && p<=50000){
+                                return "40000~50000"
+                            }
+                            else if(p>50000){
+                                return "Above 50000"
+                            }
+                        }
+                    });
+
+                    var nextArray = [];
+                    for(var title in gmodels){
+                        var rnum = 0;
+                        for(var m in gmodels[title]){
+                            rnum += gmodels[title][m].reviewNum?parseInt(gmodels[title][m].reviewNum):0
+                        }
+
+                        var tmp = {
+                            pricerange:title,
+                            reviewnum:rnum,
+                        };
+                        nextArray.push(tmp)
+                    }
+
+
+                    mongoPool.release(db);
+                    callback(err,{
+                        models:nextArray,
+                        total:total
+                    });
+                })
+            });
+        }
+    });
+};
+
+Admin.getpricerangebysalesamountForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).sort({price:1}).toArray(function(err,models){
+                    var total = 0;
+                    for(var mi in models){
+                        if(models[mi].reviewNum && models[mi].price){
+                            total += parseInt(models[mi].reviewNum)*parseInt(models[mi].price)
+                        }
+                    }
+                    var gmodels = _.groupBy(models,function(item){
+                        if(!item.price){
+                            return "Others";
+                        }
+                        else{
+                            var p = parseInt(item.price);
+                            if(p>0 && p<=10000){
+                                return "0~10000";
+                            }
+                            else if(p>10000 && p<=20000){
+                                return "10000~20000"
+                            }
+                            else if(p>20000 && p<=30000){
+                                return "20000~30000"
+                            }
+                            else if(p>30000 && p<=40000){
+                                return "30000~40000"
+                            }
+                            else if(p>40000 && p<=50000){
+                                return "40000~50000"
+                            }
+                            else if(p>50000){
+                                return "Above 50000"
+                            }
+                        }
+                    });
+
+                    var nextArray = [];
+                    for(var title in gmodels){
+                        var amount = 0;
+                        for(var m in gmodels[title]){
+                            var rnum = gmodels[title][m].reviewNum?parseInt(gmodels[title][m].reviewNum):0
+                            var pr = gmodels[title][m].price?parseInt(gmodels[title][m].price):0
+                            amount += rnum*pr;
+                        }
+
+                        var tmp = {
+                            pricerange:title,
+                            salesamount:amount,
+                        };
+                        nextArray.push(tmp)
+                    }
+
+
+                    mongoPool.release(db);
+                    callback(err,{
+                        models:nextArray,
+                        total:total
+                    });
                 })
             });
         }

@@ -1648,6 +1648,186 @@ aclHandler.registerWait(function(acl){
         }
     });
 
+    app.get("/sadmin/spiderstatistics/brand/top10modelnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10modelnumForBrand(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/brand/top10reviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10reviewnumForBrand(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/brand/top10salesamount/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10salesamountForBrand(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/brand/top10avgprice/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10avgpriceForBrand(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/top10reviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10reviewnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/top10salesamount/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10salesamountForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/top10price/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10priceForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/pricerangebynum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getpricerangebynumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/pricerangebyreviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getpricerangebyreviewnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/pricerangebysalesamount/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getpricerangebysalesamountForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
     app.post("/admin/survey/publishtoall",acl.middleware(2),function(req,res){
         var surveyid = req.body.surveyid;
         var ownid = req.session.uid;

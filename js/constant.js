@@ -62,6 +62,8 @@ export var Constant = {
     GETSPIDERLIST:"getspiderlist",
     SPIDERLISTUPDATE:"spiderlistupdate",
     EXPORTSPIDERDATA:"exportspiderdata",
+    SHOWSPIDERSTATISTIC:"showspiderstatistic",
+    SPIDERSTASTICCHANGE:"spiderstasticchange",
 
 
     QTYPE_SINGLESELECT:"singleselect",//单选题
@@ -132,10 +134,77 @@ export var Constant = {
     SPIDERSTATU_ACTIVE:"spiderstatuactive",
     SPIDERSTATU_DONE:"spiderstatudone",
 
+    SPIDERSTASTICMAP:{
+        "Brands statistics":[
+            {
+                name:"Top 10 brands by model number",
+                url:"sadmin/spiderstatistics/brand/top10modelnum",
+                labeltag:"brand",
+                datatag:"count"
+            },
+            {
+                name:"Top 10 brands by model sales review number(~ sales volumn)",
+                url:"sadmin/spiderstatistics/brand/top10reviewnum",
+                labeltag:"brand",
+                datatag:"count"
+            },
+            {
+                name:"Top 10 brands by model sales amount (review number times price)",
+                url:"sadmin/spiderstatistics/brand/top10salesamount",
+                labeltag:"brand",
+                datatag:"count"
+            },
+            {
+                name:"Top 10 brands by model average price",
+                url:"sadmin/spiderstatistics/brand/top10avgprice",
+                labeltag:"brand",
+                datatag:"avgPrice"
+            }
+        ],
+        "Models Statistics":[
+            {
+                name:"Top 10 models by model sales review number(~ sales volumn)",
+                url:"sadmin/spiderstatistics/model/top10reviewnum",
+                labeltag:"title",
+                datatag:"reviewNum"
+            },
+            {
+                name:"Top 10 models by model sales amount(review number times price)",
+                url:"sadmin/spiderstatistics/model/top10salesamount",
+                labeltag:"title",
+                datatag:"smount"
+            },
+            {
+                name:"Top 10 models by model price",
+                url:"sadmin/spiderstatistics/model/top10price",
+                labeltag:"title",
+                datatag:"price"
+            },
+            {
+                name:"Models price range by model number",
+                url:"sadmin/spiderstatistics/model/pricerangebynum",
+                labeltag:"pricerange",
+                datatag:"modelnum"
+            },
+            {
+                name:"Models price range by review number",
+                url:"sadmin/spiderstatistics/model/pricerangebyreviewnum",
+                labeltag:"pricerange",
+                datatag:"reviewnum"
+            },
+            {
+                name:"Models price range by sales amount",
+                url:"sadmin/spiderstatistics/model/pricerangebysalesamount",
+                labeltag:"pricerange",
+                datatag:"salesamount"
+            },
+        ]
+    },
+
     BASE_FULL:"http://www.ouresa.com/si/public/#/",
     BASE_URL:"/si/",
     BASE_IMAGEURL:"/si/uploads/"
-     //BASE_FULL:"http://localhost:8080/public/#/",
-     //BASE_URL:"/",
-     //BASE_IMAGEURL:"/uploads/"
+     // BASE_FULL:"http://localhost:8080/public/#/",
+     // BASE_URL:"/",
+     // BASE_IMAGEURL:"/uploads/"
 };
