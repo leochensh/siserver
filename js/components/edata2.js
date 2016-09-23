@@ -183,6 +183,66 @@ export var Edata2 = React.createClass({
             actionType: Constant.GETSPIDERLIST
         });
     },
+    exportClick(index){
+        var that = this;
+        var infunc = function(){
+            var spi = that.props.edata.spiderlist[that.props.edata.currentIndex][index];
+            if(spi.status == Constant.SPIDERSTATU_DONE){
+                SisDispatcher.dispatch({
+                    actionType: Constant.EXPORTSPIDERDATA,
+                    index:index
+                });
+            }
+            
+        };
+        return infunc;
+    },
+    statisticClick(index){
+        var that = this;
+        var infunc = function(){
+            var spi = that.props.edata.spiderlist[that.props.edata.currentIndex][index];
+            if(spi.status == Constant.SPIDERSTATU_DONE){
+                SisDispatcher.dispatch({
+                    actionType: Constant.SHOWSPIDERSTATISTIC,
+                    index:index
+                });
+
+                $("#spiderstatistic").modal("show");
+            }
+
+        };
+        return infunc;
+    },
+    deleteClick(index){
+        var that = this;
+        var infunc = function(){
+            var spi = that.props.edata.spiderlist[that.props.edata.currentIndex][index];
+            if(spi.status == Constant.SPIDERSTATU_DONE){
+                that.state.deleteSpiderId = index;
+                $("#deletespidermodal").modal("show");
+            }
+        };
+        return infunc;
+
+    },
+    gotoDeleteSpider(){
+        $("#deletespidermodal").modal("hide");
+        SisDispatcher.dispatch({
+            actionType: Constant.DELETESPIDER,
+            index:this.state.deleteSpiderId
+        });
+    },
+    cleaCanvas(){
+        var canvas  = document.getElementById("barcanvas");
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width,canvas.height);
+    },
+    stasticchange(event){
+        SisDispatcher.dispatch({
+            actionType: Constant.SPIDERSTASTICCHANGE,
+            value:event.target.value
+        });
+    },
     render() {
         var targeList = [];
         for(var ti in this.props.edata.targetList){
@@ -210,16 +270,50 @@ export var Edata2 = React.createClass({
         var spiderList = [];
 
         var clist = this.props.edata.spiderlist[this.props.edata.currentIndex];
-        console.log(clist);
         if(clist && clist.length>0){
             for(var spi in clist){
                 var stime = new Date(clist[spi].ctime).toLocaleString();
+                var displayClass = " alert alert-info";
+                if(clist[spi].status == Constant.SPIDERSTATU_ACTIVE){
+                    displayClass = " alert alert-danger";
+                }
+                var bdisabled = "";
+                if(clist[spi].status == Constant.SPIDERSTATU_ACTIVE){
+                    bdisabled = "disabled";
+                }
+                var downLink = "";
+                if(clist[spi].downlink){
+                    downLink = <a href={Constant.BASE_IMAGEURL+clist[spi].downlink}>
+                        Download
+                    </a>
+                }
+
                 spiderList.push(
                     <div className="panel panel-default">
                         <div className="panel-heading">
                             <div className="row">
-                                <div className="col-md-3">
+                                <div className="col-md-2">
                                     {stime}
+                                </div>
+                                <div className="col-md-5 col-md-offset-3">
+                                    <div className="btn-group" role="group">
+                                        <a className="btn btn-info"
+                                           onClick={this.statisticClick(spi)}
+                                           disabled={bdisabled}
+                                           role="button">View Statistic</a>
+                                        <a className="btn btn-danger"
+                                           onClick={this.deleteClick(spi)}
+                                           disabled={bdisabled}
+                                           role="button">Delete</a>
+                                        <a className="btn btn-default"
+                                           onClick={this.exportClick(spi)}
+                                           disabled={bdisabled}
+                                           role="button">Export</a>
+                                    </div>
+
+                                </div>
+                                <div className="col-md-2">
+                                    {downLink}
                                 </div>
                             </div>
                         </div>
@@ -228,8 +322,45 @@ export var Edata2 = React.createClass({
                                 <div className="col-md-3">
                                     Status:
                                 </div>
-                                <div className="col-md-3">
+                                <div className={"col-md-3"+displayClass}>
                                     {spiderMap[clist[spi].status]}
+                                </div>
+
+                                <div className="col-md-2">
+
+
+
+                                </div>
+                            </div>
+                            <div className="row">
+                                <div className="col-md-3">
+                                    Start time:
+                                </div>
+                                <div className="col-md-3 alert alert-info">
+                                    {new Date(clist[spi].ctime).toLocaleString()}
+                                </div>
+
+                                <div className="col-md-3">
+                                    End time:
+                                </div>
+                                <div className="col-md-3 alert alert-info">
+                                    {clist[spi].endtime?new Date(clist[spi].endtime).toLocaleString():""}
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                <div className="col-md-3">
+                                    Brand Number:
+                                </div>
+                                <div className="col-md-3 alert alert-info">
+                                    {clist[spi].brandcount}
+                                </div>
+
+                                <div className="col-md-3">
+                                    Model Number:
+                                </div>
+                                <div className="col-md-3 alert alert-info">
+                                    {clist[spi].modelcount}
                                 </div>
                             </div>
 
@@ -240,52 +371,20 @@ export var Edata2 = React.createClass({
             }
         }
 
-        var brandNum = this.state.brandList.length;
-        var mnum = 0;
-        for(var bindex in this.state.brandList){
-            var cb = this.state.brandList[bindex];
-            for(var mindex in cb.modelList){
-                mnum+=1;
+        var spiderstatisticoptions = [];
+        for(var oi in Constant.SPIDERSTASTICMAP){
+            var optgrouplist = [];
+            for (var suboi in Constant.SPIDERSTASTICMAP[oi]){
+                optgrouplist.push(
+                    <option value={oi+"|"+suboi}>
+                        {Constant.SPIDERSTASTICMAP[oi][suboi].name}
+                    </option>
+                )
             }
-        }
-        var bchecklist = [];
-
-        var gcnum = 4;
-        var checkGroupNum = Math.ceil(brandNum/gcnum);
-
-        var widthclassname = "col-md-"+parseInt(12/gcnum);
-
-        var stasticItemOptions = [];
-        for(var oindex in stasticItems){
-            var csi = stasticItems[oindex];
-            stasticItemOptions.push(
-                <option value={oindex}>
-                    {csi}
-                </option>
-            )
-        }
-
-        for(var gitem=0;gitem<checkGroupNum;gitem++){
-            var sglist = [];
-            for(var sgitem=0;sgitem<gcnum;sgitem++){
-                if(gitem*gcnum+sgitem<brandNum){
-                    sglist.push(
-                        <div className={"checkbox "+widthclassname}>
-                            <label>
-                                <input
-                                    checked={_.indexOf(this.state.brandCheckList,(gitem*gcnum+sgitem))>=0}
-                                    onChange={this.brandCheck(gitem*gcnum+sgitem)}
-                                    type="checkbox" value=""/>
-                                {this.state.brandList[gitem*gcnum+sgitem].brand}
-                            </label>
-                        </div>
-                    )
-                }
-            }
-            bchecklist.push(
-                <div className="row">
-                    {sglist}
-                </div>
+            spiderstatisticoptions.push(
+                <optgroup label={oi}>
+                    {optgrouplist}
+                </optgroup>
             )
         }
         return (
@@ -328,6 +427,51 @@ export var Edata2 = React.createClass({
                         </div>
                     </div>
                 </div>
+
+                <div className="modal fade" id="spiderstatistic" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog modal-lg" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" id="myModalLabel">Statistic</h4>
+                            </div>
+                            <div className="modal-body">
+                                <select
+                                    value={this.props.edata.currentstatistic}
+                                    onChange={this.stasticchange}
+                                    className="form-control">
+                                    {spiderstatisticoptions}
+                                </select>
+
+                                <canvas id="barcanvas" width="850px" height="750px" >
+                                    [No canvas support]
+                                </canvas>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div id="deletespidermodal" className="modal fade" tabindex="-1" role="dialog">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title">Delete Spider</h4>
+                            </div>
+                            <div className="modal-body">
+                                <p>Are you sure to delete this spider and all reated data?</p>
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button"
+                                   onClick={this.gotoDeleteSpider}
+                                   className="btn btn-primary">Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         )
     }

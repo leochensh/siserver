@@ -12,6 +12,9 @@ var XLSX = require('xlsx');
 var  path = require('path');
 var nodemailer= require('nodemailer');
 var avconv = require("avconv");
+var Emailchecker = require("./emailcheck")
+var async = require("async");
+var zlib = require('zlib');
 
 
 
@@ -1546,6 +1549,23 @@ aclHandler.registerWait(function(acl){
 
     });
 
+    app.delete("/sadmin/deletespider",acl.middleware(1),function(req,res){
+        var sid = req.body.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+            Admin.deleteSpider(sid,function(err,msg){
+                res.status(200);
+                successMsg.body = "ok";
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+    });
+
     app.get("/sadmin/spiderlist/:spidername",acl.middleware(1),function(req,res){
         var sname = req.params.spidername;
         if(sname){
@@ -1570,12 +1590,364 @@ aclHandler.registerWait(function(acl){
         })
     });
 
-    app.delete("/sadmin/delete",acl.middleware(1),function(req,res){
+    // app.delete("/sadmin/delete",acl.middleware(1),function(req,res){
+    //     var sid = req.body.spiderid;
+    //     if(sid && ObjectID.isValid(sid)){
+    //         Admin.deleteSpider(sid,function(err,msg){
+    //             res.status(200);
+    //             successMsg.body = "ok";
+    //             res.send(JSON.stringify(successMsg));
+    //         })
+    //     }
+    //     else{
+    //         res.status(406);
+    //         errorMsg.code = "wrong";
+    //         res.send(JSON.stringify(errorMsg));
+    //     }
+    // });
+
+    var exportDomainList = {
+        "flipkart":[
+            "title","brand","color","keyfeature","price","simtype","pcamera","scamera",
+            "screen","Resolution","RAM","ROM","os","osversionnum","osversionname","battery",
+            "rating","avgrate","reviewNum"
+        ],
+        "amazonindia":[
+            "title","brand","color","specialfeature","price","Camera",
+            "RAM","os","battery",
+            "avgrate","reviewNum"
+        ]
+    };
+
+    app.post("/sadmin/exportspider",acl.middleware(1),function(req,res){
         var sid = req.body.spiderid;
+        var sname = req.body.spidername;
+        if(sid && ObjectID.isValid(sid) && sname && (sname == "flipkart" || sname == "amazonindia")){
+
+            Admin.getSpiderDetailData(sid,function(err,models){
+                var data = [];
+                data.push(exportDomainList[sname]);
+                for(var mindex in models){
+                    var pitem = [];
+                    for (var tagindex in exportDomainList[sname]){
+                        if (models[mindex][exportDomainList[sname][tagindex]]){
+                            pitem.push(models[mindex][exportDomainList[sname][tagindex]]);
+                        }
+                        else{
+                            pitem.push("");
+                        }
+                    }
+                    data.push(pitem);
+                }
+                var name = sname+ new Date().toISOString() + ".xlsx";
+                var ws_name = "SheetJS";
+
+                function Workbook() {
+                    if(!(this instanceof Workbook)) return new Workbook();
+                    this.SheetNames = [];
+                    this.Sheets = {};
+                }
+
+                var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
+
+                /* add worksheet to workbook */
+                wb.SheetNames.push(ws_name);
+                wb.Sheets[ws_name] = ws;
+
+                /* write file */
+                XLSX.writeFile(wb, 'uploads/'+name);
+                successMsg.body = name;
+
+                res.send(JSON.stringify(successMsg));
+            })
+
+
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/brand/top10modelnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
         if(sid && ObjectID.isValid(sid)){
-            Admin.deleteSpider(sid,function(err,msg){
+
+            Admin.getTop10modelnumForBrand(sid,function(err,result){
+
                 res.status(200);
-                successMsg.body = "ok";
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/brand/top10reviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10reviewnumForBrand(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/brand/top10salesamount/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10salesamountForBrand(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/brand/top10avgprice/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10avgpriceForBrand(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/top10reviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10reviewnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/top10salesamount/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10salesamountForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/top10price/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getTop10priceForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/pricerangebynum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getpricerangebynumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/pricerangebyreviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getpricerangebyreviewnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/pricerangebysalesamount/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getpricerangebysalesamountForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/colormodelnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getcolorbymodelnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/colorreviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getcolorbyreviewnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/coloravgprice/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getcolorbyavgpriceForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/batterymodelnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getbatterybymodelnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/batteryreviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getbatterybyreviewnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/batteryaverageprice/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getbatterybyavgpriceForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
                 res.send(JSON.stringify(successMsg));
             })
         }
@@ -2249,29 +2621,314 @@ aclHandler.registerWait(function(acl){
     }
 
     app.post("/admin/exportxlsx",acl.middleware(2),function(req,res){
-        //var data = [[1,2,3],[true, false, null, "sheetjs"],["foo","bar",new Date("2014-02-19T14:30Z"), "0.3"], ["baz", null, "qux"]]
-        var data = req.body.data;
-        var name = req.body.name?req.body.name:"test";
-        name = name.replace(/\s+/g,"_") + ".xlsx";
-        var ws_name = "SheetJS";
+        var surveyid = req.body.surveyid;
+        var name = req.body.name;
 
-        function Workbook() {
-            if(!(this instanceof Workbook)) return new Workbook();
-            this.SheetNames = [];
-            this.Sheets = {};
+        if(surveyid && ObjectID.isValid(surveyid) && name){
+            var survey = null;
+            var answerlistArray = null;
+
+            async.series([function(cb){
+                Staff.getSurveyDetail(surveyid,function(err,nsurvey){
+                    survey = nsurvey;
+                    for(var qindex in survey.questionlist){
+                        var cq = survey.questionlist[qindex];
+                        if(cq.selectlist){
+                            if(_.isString(cq.selectlist)){
+                                cq.selectlist = Emailchecker.safeJsonParse(cq.selectlist,[]);
+                            }
+                        }
+
+                    }
+                    console.log("staff end")
+                    cb()
+                });
+            },function(cb){
+
+                Admin.getSurveyAnswerList(surveyid,function(err,alist){
+                    answerlistArray = alist;
+                    for(var i in answerlistArray){
+                        var answerlist = answerlistArray[i].answerlist;
+                        if(_.isString(answerlist)){
+                            answerlistArray[i].answerlist = Emailchecker.safeJsonParse(answerlist,[]);
+                        }
+                    }
+                    console.log("admin end")
+                    console.log("array length is "+answerlistArray.length)
+                    cb();
+                });
+
+            }],function(err){
+                console.log("enter final")
+                var qout = [];
+                var firstQ = [ "No.","duration","Interviewer","Visit Date",
+                    "Country","City","Customer","Male","Female"];
+
+                for(var qindex in survey.questionlist){
+                    var q = survey.questionlist[qindex];
+                    var base_str = "Q"+(parseInt(qindex)+1);
+                    if(q.type == dict.QTYPE_MULTISELECT ||
+                        q.type == dict.QTYPE_SINGLESELECT ||
+                        q.type == dict.QTYPE_MULTISELECT_RECORD_TEXT ||
+                        q.type == dict.QTYPE_MULTISELECT_TEXT ||
+                        q.type == dict.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                        q.type == dict.QTYPE_SINGLESELECT_TEXT){
+                        for(var j in q.selectlist){
+                            firstQ.push(base_str+"_"+(parseInt(j)+1))
+                        }
+
+                    }
+                    else if(q.type == dict.QTYPE_SCORE){
+                        var scoreStart = 0;
+                        var scoreEnd = 10;
+                        var scoreStep = 1;
+
+                        if(q.scorelist && _.isArray(q.scorelist)){
+                            scoreStart = parseInt(q.scorelist[0].start);
+                            scoreEnd = parseInt(q.scorelist[0].end);
+                            scoreStep = parseInt(q.scorelist[0].step);
+                        }
+
+                        for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                            firstQ.push(base_str+"_"+(parseInt(i)))
+                        }
+                    }
+
+                    else if(q.type == dict.QTYPE_SEQUENCE){
+                        for(var j in q.selectlist){
+                            firstQ.push(base_str+"_"+(parseInt(j)+1))
+                        }
+                    }
+                    else{
+                        firstQ.push(base_str);
+                    }
+
+
+                }
+
+                qout.push(firstQ);
+
+                for(var aindex in answerlistArray){
+                    var currentA = answerlistArray[aindex];
+                    var calist = currentA.answerlist;
+                    var dstring = ""
+
+                    var country = "";
+                    var city = "";
+                    var customer = "";
+                    var male = "";
+                    var female = "";
+                    var duration = "";
+
+                    if(currentA.begintime && currentA.endtime){
+                        var stime = new Date(currentA.begintime);
+                        var etime = new Date(currentA.endtime);
+                        if(stime && etime){
+                            duration = (etime-stime)/(1000*60);
+                        }
+                    }
+
+                    var aNameList = currentA.name.split("_");
+                    var bias = 0;
+                    if(aNameList[0] != name){
+                        bias = 1;
+                    }
+                    if(aNameList[2-bias]){
+                        var nd=new Date(aNameList[2-bias]);
+                        var year = nd.getFullYear();
+                        var month = nd.getMonth()+1;
+                        var date = nd.getDate();
+                        dstring = year+"/"+month+"/"+date;
+                    }
+                    country = aNameList[3-bias]?aNameList[3-bias]:"";
+                    city = aNameList[4-bias]?aNameList[4-bias]:"";
+                    customer = aNameList[5-bias]?aNameList[5-bias]:"";
+                    if(aNameList[6-bias]){
+                        if(aNameList[6-bias] == "male"){
+                            male = "1";
+                        }
+                        else if(aNameList[6-bias] == "female"){
+                            female = "1";
+                        }
+                    }
+
+                    firstQ = [(parseInt(aindex)+1),duration,currentA.investigatorname?currentA.investigatorname:"",
+                        dstring,country,city,customer,male,female];
+
+
+                    for(var qindex in survey.questionlist){
+                        var q = survey.questionlist[qindex];
+                        if(q.type == dict.QTYPE_MULTISELECT ||
+                            q.type == dict.QTYPE_SINGLESELECT ||
+                            q.type == dict.QTYPE_MULTISELECT_RECORD_TEXT ||
+                            q.type == dict.QTYPE_MULTISELECT_TEXT ||
+                            q.type == dict.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                            q.type == dict.QTYPE_SINGLESELECT_TEXT){
+                            var tempList = [];
+                            for(var j in q.selectlist){
+                                tempList.push("")
+                            }
+                            var qfi = _.findIndex(calist,function(item){
+                                return item.questionid == q._id;
+                            });
+                            if(qfi>=0){
+                                var slist = calist[qfi].selectindexlist;
+                                for(var sindex in slist){
+                                    tempList[slist[sindex]] = 1;
+                                    if(calist[qfi].selectextra && calist[qfi].selectextra.length>0){
+                                        var seindex = _.findIndex(calist[qfi].selectextra,function(item){
+                                            return item.index == slist[sindex];
+                                        })
+                                        if(seindex>=0 && calist[qfi].selectextra[seindex].text){
+                                            tempList[slist[sindex]] = calist[qfi].selectextra[seindex].text;
+                                        }
+                                    }
+                                }
+                            }
+                            for(var tindex in tempList){
+                                firstQ.push(tempList[tindex]);
+                            }
+
+                        }
+                        else if(q.type == dict.QTYPE_SCORE){
+                            var scoreStart = 0;
+                            var scoreEnd = 10;
+                            var scoreStep = 1;
+                            var tempList = [];
+                            if(q.scorelist && _.isArray(q.scorelist)){
+                                scoreStart = parseInt(q.scorelist[0].start);
+                                scoreEnd = parseInt(q.scorelist[0].end);
+                                scoreStep = parseInt(q.scorelist[0].step);
+                            }
+
+                            var qfi = _.findIndex(calist,function(item){
+                                return item.questionid == q._id;
+                            });
+                            if(qfi>=0){
+                                if(calist[qfi].scorelist){
+                                    var sfi = _.findIndex(calist[qfi].scorelist,function(item){
+                                        return item.index == 0;
+                                    })
+                                    if(sfi>=0){
+                                        for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                                            if(i == calist[qfi].scorelist[sfi].score){
+                                                tempList.push(1);
+                                            }
+                                            else{
+                                                tempList.push("")
+                                            }
+
+                                        }
+                                    }
+                                    else{
+                                        for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                                            tempList.push("")
+                                        }
+                                    }
+
+                                }
+                                else{
+                                    for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                                        tempList.push("")
+                                    }
+                                }
+
+
+                            }
+                            else{
+                                for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                                    tempList.push("")
+                                }
+                            }
+                            for(var tindex in tempList){
+                                firstQ.push(tempList[tindex]);
+                            }
+                        }
+                        else if(q.type == dict.QTYPE_SEQUENCE){
+                            var sortlist = [];
+                            var qfi = _.findIndex(calist,function(item){
+                                return item.questionid == q._id;
+                            });
+                            if(qfi>=0){
+                                if(calist[qfi].sortlist){
+                                    var sorted = _.sortBy(calist[qfi].sortlist,function(item){
+                                        return item.sort
+                                    })
+
+                                    for(var qi in sorted){
+                                        /*
+                                         var nub =parseInt(sorted[qi].index)+1;
+                                         sortlist[qi] = nub.toString();
+                                         */
+                                        sortlist[qi] = parseInt(sorted[qi].index)+1;
+                                    }
+                                }
+                            }
+
+                            for(var tindex in sortlist){
+                                firstQ.push(sortlist[tindex]);
+                            }
+
+                            //    firstQ.push(sortlist);
+
+                        }
+                        else{
+                            var qfi = _.findIndex(calist,function(item){
+                                return item.questionid == q._id;
+                            });
+                            if(qfi>=0){
+                                firstQ.push(calist[qfi].text?calist[qfi].text:"");
+                            }
+                            else{
+                                firstQ.push("");
+                            }
+                        }
+
+
+                    }
+
+                    qout.push(firstQ);
+
+
+
+
+
+                }
+                var filename = name.replace(/\s+/g,"_") + ".xlsx";
+                var ws_name = "SheetJS";
+
+                function Workbook() {
+                    if(!(this instanceof Workbook)) return new Workbook();
+                    this.SheetNames = [];
+                    this.Sheets = {};
+                }
+
+                var wb = new Workbook(), ws = sheet_from_array_of_arrays(qout);
+
+                /* add worksheet to workbook */
+                wb.SheetNames.push(ws_name);
+                wb.Sheets[ws_name] = ws;
+
+                /* write file */
+                XLSX.writeFile(wb, 'uploads/'+filename);
+                var gzip = zlib.createGzip();
+                var inp = fs.createReadStream('uploads/'+filename);
+                var out = fs.createWriteStream('uploads/'+filename+".gz");
+
+                inp.pipe(gzip).pipe(out);
+                res.status(200);
+                successMsg.body = filename+".gz";
+
+                res.send(JSON.stringify(successMsg));
+            });
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
         }
 
-        var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
 
-        /* add worksheet to workbook */
-        wb.SheetNames.push(ws_name);
-        wb.Sheets[ws_name] = ws;
-
-        /* write file */
-        XLSX.writeFile(wb, 'uploads/'+name);
-        successMsg.body = name;
-
-        res.send(JSON.stringify(successMsg));
 
     });
 

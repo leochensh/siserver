@@ -18,8 +18,8 @@ body {
   background-color: lightgrey; }
 .imgrow{
   background-image:url("../image/background.png");
+  background-size:contain;
   Height: 900px;
-  width:1420px;
 }
 
 .loginalert {
