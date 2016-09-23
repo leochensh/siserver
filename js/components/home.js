@@ -74,6 +74,7 @@ export var Home = React.createClass({
             newsurveyDisable = "";
             surveyManageDisable = "";
         }
+
         return (
             <div>
                 <div className="row" style={style}>

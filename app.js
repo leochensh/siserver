@@ -151,7 +151,8 @@ app.post("/admin/login",function(req,res){
                 res.status(200);
                 successMsg.body = {
                     role:msg.role,
-                    id:msg._id
+                    id:msg._id,
+                    name:msg.name
                 };
                 req.session.userId = msg.name;
                 if(msg.orgid){
@@ -188,7 +189,8 @@ app.post("/staff/login",function(req,res){
                 res.status(200);
                 successMsg.body = {
                     role:msg.role,
-                    id:msg._id
+                    id:msg._id,
+                    name:msg.name
                 };
                 req.session.userId = msg.name;
                 req.session.orgid = msg.orgid;
@@ -1913,6 +1915,33 @@ aclHandler.registerWait(function(acl){
 
     });
 
+    var anonymousImageUploadHandle = imageupload.single("file");
+    app.post('/anonymous/upload/image',function (req, res) {
+
+        anonymousImageUploadHandle(req, res, function (err) {
+            if (err) {
+                res.status(406);
+                console.log(err);
+                res.send("filename error")
+            }
+            else{
+
+                var newFname = req.file.path.split(".")[0]+"_small.jpg";
+
+
+                im.convert([req.file.path,"-quality","30",req.file.path],function(err,fout){
+
+                    successMsg.body = req.file.filename;
+
+                    res.send(JSON.stringify(successMsg));
+                })
+
+
+            }
+        });
+
+    });
+
     var avuploadHandler = videoaudioupload.single("file");
     app.post('/staff/upload/audio',acl.middleware(2),function (req, res) {
 
@@ -2071,7 +2100,32 @@ aclHandler.registerWait(function(acl){
             res.send(JSON.stringify(errorMsg));
         }
     });
+    app.post("/anonymous/feedback",function(req,res){
+        var name = req.body.name;
+        var platform = req.body.platform;
+        var content = req.body.content;
+        var image = req.body.image;
+        var email = req.body.email;
+        var phone = req.body.phone;
+        var fdata = {
+            name:name,
+            phone:phone,
+            email:email,
+            content:content,
+            image:image,
+            platform:platform
+        }
+        Staff.addanonymousfb(fdata,function(err,msg){
+            logger.logger.log("info","anonymous add feedback",{
+                anonymousname:req.body.name
+            });
+            res.status(200);
+            successMsg.body = msg;
 
+            res.send(JSON.stringify(successMsg));
+
+        })
+    });
     app.post("/investigator/feedback",acl.middleware(2),function(req,res){
         var staffid = req.session.uid;
         var platform = req.body.platform;

@@ -846,6 +846,23 @@ Staff.addFeedback = function(feeddata,callback){
         }
     });
 };
+Staff.addanonymousfb =function(feeddata,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("anonymousfeedbacks",function(err,collection){
+                feeddata.ctime = new Date();
+                collection.insertOne(feeddata,function(err,insresult){
+                    mongoPool.release(db);
+                    callback(err,insresult.insertedId);
+                });
+            });
+        }
+    });
+
+};
 
 Staff.getVersionInfo = function(platform,callback){
     mongoPool.acquire(function(err,db){

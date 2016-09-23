@@ -196,7 +196,7 @@ export var Register = React.createClass({
         var emailButtonText = "Get verified code";
         if(this.state.ifemailsend){
             emailCheckButtonClass = "btn btn-default disabled"
-            emailButtonText = "Resend email after "+this.state.secondcount + " seconds"
+            emailButtonText = "Resend email after"+this.state.seeecondcount + "seconds"
         }
         return (
             <div className="row">

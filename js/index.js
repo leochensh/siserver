@@ -24,7 +24,8 @@ import {Forgetpass} from "./components/forgetpass"
 import {Resetpass} from "./components/resetpass"
 import {Feedback} from "./components/feedback"
 import {Template} from "./components/template"
-
+import {Faq} from "./components/faq"
+import {Addfeedback} from "./components/addfeedback"
 var main = document.getElementsByTagName('main')[0];
 
 
@@ -43,6 +44,8 @@ ReactDom.render(
             <Route path="stastic/:id" component={Stastic} />
             <Route path="ads" component={Ads} />
             <Route path="org" component={Org} />
+            <Route path="faq" component={Faq} />
+            <Route path="addfeedback" component={Addfeedback} />
             <Route path="settings" component={Settings} />
             <Route path="edata" component={Edata} />
             <Route path="edata2" component={Edata2} />

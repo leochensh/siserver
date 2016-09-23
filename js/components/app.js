@@ -14,6 +14,7 @@ import {edataStore} from "../store/edatastore";
 import {feedbackStore} from '../store/feedbackstore';
 import {templateStore} from '../store/templatestore';
 import crypto from "crypto"
+import {Emailcheck} from "./emailcheck"
 export var App = React.createClass({
     contextTypes: {
         router: React.PropTypes.object.isRequired,
@@ -22,9 +23,24 @@ export var App = React.createClass({
         return{
             password1st:"",
             password2nd:"",
+            username:"",
+            password:"",
             ifpassnotequal:false,
-            iffail:false
-        }
+            iferrors:false,
+            iffail:false,
+            email:"",
+            capcha:"",
+            verifiedcode:"",
+            usernamee:"",
+            passwordd:"",
+            repassword:"",
+            iferror:false,
+            errorstr:"",
+            newcapcha:1,
+            ifemailsend:false,
+            secondcount:60
+
+    }
     },
     componentDidMount(){
         this.token=loginStore.addListener(this._onChange);
@@ -55,22 +71,105 @@ export var App = React.createClass({
     handleChange(name,event){
         var newstate = {};
         newstate[name] = event.target.value;
+        newstate.iferrors = false;
         newstate.ifpassnotequal = false;
         this.setState(newstate);
     },
-    homeclick(){
+    keypress(event){
+        //event.stopPropagation();
+        if(event.key == "Enter"){
+            this.handleClick(event);
+        }
+    },
+    handleClick(event){
+        if(!this.state.username || !this.state.password){
+            this.setState({iferrors:true});
+        }
+        else{
+            $("#ajaxloading").show();
+            var hash = crypto.createHash("md5");
+            hash.update(this.state.password);
+            var that = this;
+            $.ajax({
+                url: Constant.BASE_URL+"admin/login",
+                data: $.param({
+                    username:that.state.username,
+                    password:hash.digest("hex")
+                }),
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#loginsmodal").modal("hide");
+                    var msg = JSON.parse(data);
+                    $("#ajaxloading").hide();
+                    that.context.router.push("/home");
+                    SisDispatcher.dispatch({
+                        actionType: Constant.LOGINSUCCESS,
+                        role:msg.body.role,
+                        id:msg.body.id,
+                        name:msg.body.name
+                    });
+
+
+                },
+                error:function(){
+                    $("#ajaxloading").hide();
+                    that.setState({iferrors:true});
+                }
+            });
+        }
+    },
+    handleRegisterClick(){
+        $("#loginsmodal").modal("hide");
+        var newstate = {};
+        newstate.capcha ="";
+        newstate.verifiedcode ="";
+        newstate.usernamee ="";
+        newstate.passwordd ="";
+        newstate.repassword ="";
+        newstate.iferror =false;
+        newstate.errorstr ="";
+        newstate.newcapcha ="";
+        newstate.ifemailsend =false;
+        newstate.secondcount =60;
+        this.setState(newstate);
+        $("#zzlregistermodal").modal("show");
+       //this.context.router.push("/register");
+    },
+    forgetpassword(){
+        $("#loginsmodal").modal("hide");
+        this.context.router.push("/forgetpass");
+    },
+    feedbackzzlclick(){
+        /*
         var cpath = this.props.routes[this.props.routes.length-1]['path']
         if(cpath!="home" && cpath!="login"){
             this.context.router.push("/home");
         }
+        */
+        this.context.router.push("/addfeedback");
+    },
+    homeclick(){
+        this.context.router.push("/home");
     },
     loginclick(){
-        this.context.router.push("/frontpage");
+        var newstate = {};
+        newstate.iferrors = false;
+        newstate.username = "";
+        newstate.password = "";
+        this.setState(newstate);
+        $("#loginsmodal").modal("show");
+        //this.context.router.push("/login");
     },
+    faqclick(){
+        this.context.router.push("/faq");
+    },
+
     _onChange() {
         var loginInfo = loginStore.getLoginInfo();
         if(!loginInfo.ifLogin){
-            this.context.router.push("/login");
+           // this.context.router.push("/login");
+            this.context.router.push("/frontpage");
         }
         this.setState({a:1});
     },
@@ -158,11 +257,172 @@ export var App = React.createClass({
             }
         });
     },
+    capchaClick(){
+        this.setState({
+            newcapcha:this.state.newcapcha+1
+        })
+    },
+    getVerifiedCode(){
+        if(!this.state.capcha){
+            this.setState({
+                errorstr:"Please input capcha code first.",
+                iferror:true
+            })
+        }
+        else{
+            $("#ajaxloading").show();
+            var that = this;
+            this.setState({
+                ifemailsend:true
+            });
+            var intervalId = setInterval(function(){
+                that.setState({
+                    secondcount:parseInt(that.state.secondcount)-10
+                })
+            },10000);
+            setTimeout(function(){
+                clearInterval(intervalId);
+                that.setState({
+                    ifemailsend:false,
+                    secondcount:60
+                })
+            },60000);
+            $.ajax({
+                url: Constant.BASE_URL+"checkcapcha",
+                data: $.param({
+                    capchacode:that.state.capcha
+                }),
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+
+                    $("#ajaxloading").hide();
+                    if(that.state.email && Emailcheck.validateEmail(that.state.email)){
+                        $("#ajaxloading").show();
+                        $.ajax({
+                            url: Constant.BASE_URL+"sendverifiedcode",
+                            data: $.param({
+                                email:that.state.email,
+                                capchacode:that.state.capcha
+                            }),
+                            type: 'POST',
+                            contentType: 'application/x-www-form-urlencoded',
+                            success: function (data) {
+
+                                var msg = JSON.parse(data);
+                                $("#ajaxloading").hide();
+                                that.setState({
+                                    iferror:true,
+                                    errorstr:"A email containing verified code already was send to your email. Please check your inbox or spam folder."
+                                })
+                            },
+                            error:function(){
+                                $("#ajaxloading").hide();
+                                that.setState({
+                                    iferror:true,
+                                    errorstr:"Internal server error. Please try again later or contact administrator."
+                                });
+                            }
+                        });
+                    }
+                    else{
+                        that.setState({
+                            iferror:true,
+                            errorstr:"You should input a valid email address to receive verified code."
+                        })
+                    }
+                },
+                error:function(){
+                    $("#ajaxloading").hide();
+                    clearInterval(intervalId);
+                    that.setState({
+                        ifemailsend:false,
+                        secondcount:60
+                    })
+                },
+                statusCode:{
+                    404:function(){
+                        that.setState({
+                            iferror:true,
+                            errorstr:"Capcha code error."});
+                    }
+                }
+            });
+
+        }
+
+    },
+    handlejoinClick(event){
+        if(!this.state.usernamee ||
+            !this.state.passwordd ||
+            !this.state.repassword||
+            !this.state.email ||
+            !this.state.verifiedcode){
+            this.setState({
+                iferror:true,
+                errorstr:"Form input can not be empty"});
+        }
+        else{
+            if(this.state.passwordd!=this.state.repassword){
+                this.setState({
+                    iferror:true,
+                    errorstr:"Reenter password should be same as password."});
+            }
+            else{
+                $("#ajaxloading").show();
+                var hash = crypto.createHash("md5");
+                hash.update(this.state.passwordd);
+                var that = this;
+                $.ajax({
+                    url: Constant.BASE_URL+"addpersonalfree",
+                    data: $.param({
+                        name:that.state.usernamee,
+                        password:hash.digest("hex"),
+                        email:that.state.email,
+                        verifiedcode:that.state.verifiedcode
+                    }),
+                    type: 'POST',
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function (data) {
+                        $("#zzlregistermodal").modal("hide");
+                        var msg = JSON.parse(data);
+                        $("#ajaxloading").hide();
+
+                    },
+                    error:function(){
+                        $("#ajaxloading").hide();
+                    },
+                    statusCode:{
+                        404:function(){
+                            that.setState({
+                                iferror:true,
+                                errorstr:"Verified code error."});
+                        },
+                        500:function(){
+                            SisDispatcher.dispatch({
+                                actionType: Constant.ERROR500
+                            });
+                        },
+                        409:function(){
+                            that.setState({
+                                iferror:true,
+                                errorstr:"User name or email duplicated."});
+                        }
+                    }
+                });
+            }
+
+        }
+    },
     render() {
         var logoutStyle = {display:"none"};
+        var iflogoutStyle = {};
+        var loginer ="";
         var loginInfo = loginStore.getLoginInfo();
         if(loginInfo.ifLogin){
             logoutStyle = {};
+            iflogoutStyle = {display:"none"};
+            loginer = loginInfo.name + " is logged in";
         }
         var notequalpassstyle = {display:"none"};
         if(this.state.ifpassnotequal){
@@ -172,26 +432,34 @@ export var App = React.createClass({
         if(this.state.iffail){
             failerror = {}
         }
+        var disStyle = this.state.iferrors?{}:{display:"none"};
+        var disStylee = this.state.iferror?{}:{display:"none"};
+        var emailCheckButtonClass = "btn btn-info";
+        var emailButtonText = "Get verified code";
+        if(this.state.ifemailsend){
+            emailCheckButtonClass = "btn btn-info disabled"
+            emailButtonText = "Resend after "+this.state.secondcount
+        }
         return (
             <div>
-                <nav className="navbar navbar-default navbar-fixed-top">
+                <nav className="navbar navbar-default navbar-fixed-top" style={{background:"#FFFFFF"}}>
                     <div className="container-fluid">
-                        <div class="navbar-header">
-                            <a style={{padding:0}} className="navbar-brand" href="#">
-                                <img style={{maxHeight:"50px"}} alt="Brand" src="image/logo_244px.png"/>
-                            </a>
-                            <a style={{fontSize:"40px",fontWeight:"bolder"}} className="navbar-brand" href="#">Ouresa</a>
-                        </div>
-                        <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                        <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style={{position:"relative"}}>
                             <ul className="nav navbar-nav">
 
-                                <li><a onClick={this.loginclick}>Home</a></li>
-                                <li><a onClick={this.homeclick}>Entries</a></li>
+                                <li><a onClick={this.faqclick}>FAQ</a></li>
+                                <li><a onClick={this.feedbackzzlclick}>Feedback</a></li>
+                                <li style={logoutStyle}><a onClick={this.homeclick}>Home</a></li>
                             </ul>
-
+                            <div>
+                                <a style={{position:"absolute",top:"15px",left:"900px"}}><marquee style={{color:"red",width:"200", height:"40", scrolldelay:"10", scrollamount:"2"}} >{loginer}</marquee></a>
+                            </div>
                             <ul className="nav navbar-nav navbar-right">
                                 <li style={logoutStyle}><a onClick={this.resetpassClick}>Setting</a></li>
                                 <li style={logoutStyle}><a onClick={this.logoutClick}>Logout</a></li>
+                                <li style={iflogoutStyle}><a onClick={this.loginclick}>Login</a></li>
+                                <li style={iflogoutStyle}><a type="button" onClick={this.handleRegisterClick} className="btn btn-info" >Register</a></li>
                             </ul>
 
                         </div>
@@ -212,6 +480,191 @@ export var App = React.createClass({
                                    onClick={this.gotologout}
                                    className="btn btn-primary">Confirm</a>
                                 <a type="button" className="btn btn-default" data-dismiss="modal">Close</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal fade" id="loginsmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <div className="col-sm-offset-4 col-sm-10">
+                                <a>
+                                    <img  src="image/LOGO.png"/>
+                                </a>
+                            </div>
+                            <form className="form-horizontal">
+                                <div className="form-group form-group-lg">
+                                    <div className="col-sm-offset-1 col-sm-10">
+                                        <input type="text"
+                                               className="form-control"
+                                               placeholder="Username"
+                                               value={this.state.username}
+                                               onChange={this.handleChange.bind(this,"username")}
+                                            />
+                                    </div>
+                                </div>
+                                <div className="form-group form-group-lg">
+
+                                    <div className="col-sm-offset-1 col-sm-10">
+                                        <input type="password"
+                                               ref="nameInput"
+                                               onKeyPress={this.keypress}
+                                               className="form-control"
+                                               placeholder="Password"
+                                               value={this.state.password}
+                                               onChange={this.handleChange.bind(this,"password")}
+                                            />
+                                    </div>
+                                </div>
+                                <div className="form-group form-group-lg">
+
+                                    <div className="col-sm-offset-1 col-sm-10">
+
+                                        <div className="checkbox">
+                                                <label>
+                                                    <a
+                                                        onClick={this.forgetpassword}
+                                                        >Forget password?</a>
+                                                </label>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div className="form-group form-group-lg">
+                                    <div className="col-sm-offset-1 col-sm-10">
+                                        <p> <a type="button"
+                                               onClick={this.handleClick}
+                                               className="btn btn-info"
+                                               style={{width:"495px",height:"40px"}}
+                                            >Login</a></p>
+                                    </div>
+                                </div>
+
+                                <div className="form-group form-group-lg">
+                                    <div className="col-sm-offset-1 col-sm-10">
+                                        <p><a type="button"
+                                              className="btn btn-default"
+                                              style={{width:"495px",height:"40px"}}
+                                              onClick={this.handleRegisterClick}
+                                            >Register</a></p>
+                                    </div>
+                                </div>
+                            </form>
+                            <div className="alert alert-danger loginalert" role="alert" style={disStyle}>
+                                Username/Password error
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="modal fade" id="zzlregistermodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <div className="col-sm-offset-5 col-sm-10">
+                                <a>
+                                    <img style={{width:"80px",height:"80px"}} src="image/LOGO.png"/>
+                                </a>
+                            </div>
+                            <form className="form-horizontal">
+                                <div className="form-group form-group-lg">
+
+                                    <div className="col-sm-10 col-sm-offset-1">
+                                        <input type="email"
+                                               style={{height:"40px"}}
+                                               className="form-control"
+                                               placeholder="Email"
+                                               value={this.state.email}
+                                               onChange={this.handleChange.bind(this,"email")}
+                                            />
+                                    </div>
+                                </div>
+                                <div className="form-group form-group-lg">
+
+                                    <div className="col-sm-7 col-sm-offset-1">
+                                        <input type="text"
+                                               style={{height:"40px"}}
+                                               className="form-control"
+                                               placeholder="Capcha"
+                                               value={this.state.capcha}
+                                               onChange={this.handleChange.bind(this,"capcha")}
+                                            />
+                                    </div>
+                                    <div className="col-sm-3">
+                                        <img style={{width:"126px",height:"40px"}}onClick={this.capchaClick} src={Constant.BASE_URL+"getcapcha"+"?"+this.state.newcapcha} />
+                                    </div>
+                                </div>
+                                <div className="form-group form-group-lg">
+
+                                    <div className="col-sm-7 col-sm-offset-1">
+                                        <input type="text"
+                                               style={{height:"40px"}}
+                                               className="form-control"
+                                               placeholder="Verified code"
+                                               value={this.state.verifiedcode}
+                                               onChange={this.handleChange.bind(this,"verifiedcode")}
+                                            />
+                                    </div>
+                                    <div className="col-sm-1">
+                                        <a
+                                            style={{width:"126px",height:"40px"}}
+                                            className={emailCheckButtonClass}
+                                            onClick={this.getVerifiedCode}
+                                            >{emailButtonText}</a>
+                                    </div>
+                                </div>
+                                <div className="form-group form-group-lg">
+
+                                    <div className="col-sm-10 col-sm-offset-1">
+                                        <input type="text"
+                                               className="form-control"
+                                               style={{height:"40px"}}
+                                               placeholder="Username"
+                                               value={this.state.usernamee}
+                                               onChange={this.handleChange.bind(this,"usernamee")}
+                                            />
+                                    </div>
+                                </div>
+                                <div className="form-group form-group-lg">
+
+                                    <div className="col-sm-10 col-sm-offset-1">
+                                        <input type="password"
+                                               className="form-control"
+                                               style={{height:"40px"}}
+                                               placeholder="Password"
+                                               value={this.state.passwordd}
+                                               onChange={this.handleChange.bind(this,"passwordd")}
+                                            />
+                                    </div>
+                                </div>
+                                <div className="form-group form-group-lg">
+
+                                    <div className="col-sm-10 col-sm-offset-1">
+                                        <input type="password"
+                                               className="form-control"
+                                               style={{height:"40px"}}
+                                               placeholder="Retype password"
+                                               value={this.state.repassword}
+                                               onChange={this.handleChange.bind(this,"repassword")}
+                                            />
+                                    </div>
+                                </div>
+
+                                <div className="form-group form-group-lg">
+                                    <div className="col-sm-10 col-sm-offset-1">
+                                        <a
+                                            type="button"
+                                            onClick={this.handlejoinClick}
+                                            className="btn btn-info"
+                                            style={{width:"495px",height:"40px"}}
+                                            >Confirm</a>
+                                    </div>
+
+                                </div>
+                            </form>
+                            <div className="alert alert-danger loginalert" role="alert" style={disStylee}>
+                                {this.state.errorstr}
                             </div>
                         </div>
                     </div>

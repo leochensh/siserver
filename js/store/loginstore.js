@@ -18,18 +18,21 @@ class LoginStore extends Store{
             loginInfo.ifLogin = true;
             loginInfo.role = payload.role;
             loginInfo.id = payload.id;
+            loginInfo.name = payload.name;
             this.__emitChange();
         }
         else if(payload.actionType == Constant.ERROR500){
             loginInfo.ifLogin = false;
             loginInfo.role = null;
             loginInfo.id = null;
+            loginInfo.name = null;
             this.__emitChange();
         }
         else if(payload.actionType == Constant.LOGOUT){
             loginInfo.ifLogin = false;
             loginInfo.role = null;
             loginInfo.id = null;
+            loginInfo.name = null;
             this.__emitChange();
         }
     }

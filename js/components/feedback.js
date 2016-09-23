@@ -129,7 +129,7 @@ export var Feedback = React.createClass({
         var loginInfo = this.props.loginInfo;
         if(loginInfo.role == null)
         {
-            this.context.router.push("/login");
+            this.context.router.push("/");
         }
         var llist = this.props.feedbackList;
         var that=this;

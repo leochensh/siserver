@@ -17,56 +17,51 @@ export var Frontpage = React.createClass({
 
         }
     },
-    handleChange(name,event){
-        var newstate = {};
-        newstate[name] = event.target.value;
-        newstate.iferror = false;
-        newstate.iffberror = false;
-        this.setState(newstate);
-    },
 
-    handleRegisterClick(){
-        this.context.router.push("/register");
-    },
-    handleLoginClick(){
-        this.context.router.push("/login");
-    },
     render() {
-        var disStyle = this.state.iferror?{}:{display:"none"};
-        var fbdisstyle = this.state.iffberror?{}:{display:"none"};
+
         return (
-            <div className="row"  style={{background:"#789928",minHeight:"700px",padding:"100px"}}>
-                <div className="col-md-8">
-                    <div className="jumbotron"  style={{background:"#789928",
-                                        textAlign:"center",
-                                        color:"#fff",
-                                        textShadow:"0 -1px 1px rgba(0,0,0,0.8)",
-                                        display:"block"}}>
-                        <h1 style={{fontSize:"50px"}}>Survey Details,  Insight Future</h1>
-                        <h3>You can scan QR code via mobile phone or press download buttun to experience android version right now.</h3>
-                        <p style={{marginTop:"30px"}}>
-                            <button type="button" onClick={this.handleLoginClick} className="btn btn-primary btn-lg" style={{marginRight:"15px"}}>Login</button>
-                            <button type="button" onClick={this.handleRegisterClick} className="btn btn-default btn-lg">Register</button>
-                        </p>
-
+            <div  className="imgrow" >
+                <div className="row" >
+                    <div className="col-md-2 col-md-offset-5">
+                        <a>
+                            <img  src="image/LOGO.png"/>
+                        </a>
                     </div>
 
                 </div>
-                <div className="col-md-4">
-                    <div className="row" style={{textAlign:"center",display:"block"}}>
-                        <a className="col-md-offset-2 col-md-8"
-                           href={Constant.BASE_URL+"downloadapk"}>
-                            <img style={{marginTop:"50px",maxWidth:"200px"}} src="image/dfa.png"/>
-                        </a>
+                <div className="row" >
+                    <div className="col-md-6" style={{position:"relative"}}>
+                        <img style={{position:"absolute",top:"300px",width:"765px",height:"100px"}} src="image/blue background.png"/>
 
-                    </div>
-                    <div className="row" style={{textAlign:"center",display:"block"}}>
+                        <div style={{position:"absolute",top:"320px",left:"200px"}}>
 
-                        <a className="col-md-offset-2 col-md-8">
-                            <img style={{marginTop:"50px",maxWidth:"200px"}} src="image/0e549f74a0110310e75ad351b98f403b.png"/>
-                        </a>
+                           <h1 style={{color:"#FFFFFF"}}>Survey Details<strong> | Insight Future</strong></h1>
+                        </div>
                     </div>
                 </div>
+                <div className="row">
+                    <div className="col-md-1 col-md-offset-9" style={{position:"relative"}}>
+                        <img style={{position:"absolute",top:"450px"}} src="image/Scan or Click background.png"/>
+                            <div>
+                                <div style={{position:"absolute",top:"450px",left:"50px"}} >
+                                    <h3 style={{color:"#FFFFFF"}}><strong>SCAN</strong></h3>
+                                </div>
+                                <div style={{position:"absolute",top:"490px",left:"100px"}}>
+                                    <h3 style={{color:"#FFFFFF"}}>or</h3>
+                                </div>
+                                <div style={{position:"absolute",top:"530px",left:"50px"}}>
+                                    <h3 style={{color:"#FFFFFF"}}><strong>CLICK</strong></h3>
+                                </div>
+                            </div>
+                            <div style={{position:"absolute",top:"470px",left:"150px"}} >
+                                <img  src="image/QR code.png"/>
+                            </div>
+
+
+                    </div>
+                </div>
+
 
             </div>
         )
