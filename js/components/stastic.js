@@ -26,246 +26,246 @@ export var Stastic = React.createClass({
     },
     exportxlsx(){
         $("#ajaxloading").show();
-        var qout = [];
-        var firstQ = [ "No.","duration","Interviewer","Visit Date",
-                       "Country","City","Customer","Male","Female"];
-
-        for(var qindex in this.state.survey.questionlist){
-            var q = this.state.survey.questionlist[qindex];
-            var base_str = "Q"+(parseInt(qindex)+1);
-            if(q.type == Constant.QTYPE_MULTISELECT ||
-                q.type == Constant.QTYPE_SINGLESELECT ||
-                q.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
-                q.type == Constant.QTYPE_MULTISELECT_TEXT ||
-                q.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
-                q.type == Constant.QTYPE_SINGLESELECT_TEXT){
-                for(var j in q.selectlist){
-                    firstQ.push(base_str+"_"+(parseInt(j)+1))
-                }
-
-            }
-            else if(q.type == Constant.QTYPE_SCORE){
-                var scoreStart = 0;
-                var scoreEnd = 10;
-                var scoreStep = 1;
-
-                if(q.scorelist && _.isArray(q.scorelist)){
-                    scoreStart = parseInt(q.scorelist[0].start);
-                    scoreEnd = parseInt(q.scorelist[0].end);
-                    scoreStep = parseInt(q.scorelist[0].step);
-                }
-
-                for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                    firstQ.push(base_str+"_"+(parseInt(i)))
-                }
-            }
-
-            else if(q.type == Constant.QTYPE_SEQUENCE){
-                for(var j in q.selectlist){
-                    firstQ.push(base_str+"_"+(parseInt(j)+1))
-                }
-            }
-            else{
-                firstQ.push(base_str);
-            }
-
-
-        }
-
-        qout.push(firstQ);
-
-        for(var aindex in this.state.answerlist){
-            var currentA = this.state.answerlist[aindex];
-            var calist = currentA.answerlist;
-            var dstring = ""
-
-            var country = "";
-            var city = "";
-            var customer = "";
-            var male = "";
-            var female = "";
-            var duration = "";
-
-            if(currentA.begintime && currentA.endtime){
-                var stime = new Date(currentA.begintime);
-                var etime = new Date(currentA.endtime);
-                if(stime && etime){
-                    duration = (etime-stime)/(1000*60);
-                }
-            }
-
-            var aNameList = currentA.name.split("_");
-            var bias = 0;
-            if(aNameList[0] != this.state.survey.name){
-                bias = 1;
-            }
-            if(aNameList[2-bias]){
-                var nd=new Date(aNameList[2-bias]);
-                var year = nd.getFullYear();
-                var month = nd.getMonth()+1;
-                var date = nd.getDate();
-                dstring = year+"/"+month+"/"+date;
-            }
-            country = aNameList[3-bias]?aNameList[3-bias]:"";
-            city = aNameList[4-bias]?aNameList[4-bias]:"";
-            customer = aNameList[5-bias]?aNameList[5-bias]:"";
-            if(aNameList[6-bias]){
-                if(aNameList[6-bias] == "male"){
-                    male = "1";
-                }
-                else if(aNameList[6-bias] == "female"){
-                    female = "1";
-                }
-            }
-
-            firstQ = [(parseInt(aindex)+1),duration,currentA.investigatorname?currentA.investigatorname:"",
-                      dstring,country,city,customer,male,female];
-
-
-            for(var qindex in this.state.survey.questionlist){
-                var q = this.state.survey.questionlist[qindex];
-                if(q.type == Constant.QTYPE_MULTISELECT ||
-                    q.type == Constant.QTYPE_SINGLESELECT ||
-                    q.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
-                    q.type == Constant.QTYPE_MULTISELECT_TEXT ||
-                    q.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
-                    q.type == Constant.QTYPE_SINGLESELECT_TEXT){
-                    var tempList = [];
-                    for(var j in q.selectlist){
-                        tempList.push("")
-                    }
-                    var qfi = _.findIndex(calist,function(item){
-                        return item.questionid == q._id;
-                    });
-                    if(qfi>=0){
-                        var slist = calist[qfi].selectindexlist;
-                        for(var sindex in slist){
-                            tempList[slist[sindex]] = 1;
-                            if(calist[qfi].selectextra && calist[qfi].selectextra.length>0){
-                                var seindex = _.findIndex(calist[qfi].selectextra,function(item){
-                                    return item.index == slist[sindex];
-                                })
-                                if(seindex>=0 && calist[qfi].selectextra[seindex].text){
-                                    tempList[slist[sindex]] = calist[qfi].selectextra[seindex].text;
-                                }
-                            }
-                        }
-                    }
-                    for(var tindex in tempList){
-                        firstQ.push(tempList[tindex]);
-                    }
-
-                }
-                else if(q.type == Constant.QTYPE_SCORE){
-                    var scoreStart = 0;
-                    var scoreEnd = 10;
-                    var scoreStep = 1;
-                    var tempList = [];
-                    if(q.scorelist && _.isArray(q.scorelist)){
-                        scoreStart = parseInt(q.scorelist[0].start);
-                        scoreEnd = parseInt(q.scorelist[0].end);
-                        scoreStep = parseInt(q.scorelist[0].step);
-                    }
-
-                    var qfi = _.findIndex(calist,function(item){
-                        return item.questionid == q._id;
-                    });
-                    if(qfi>=0){
-                        if(calist[qfi].scorelist){
-                            var sfi = _.findIndex(calist[qfi].scorelist,function(item){
-                                return item.index == 0;
-                            })
-                            if(sfi>=0){
-                                for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                                    if(i == calist[qfi].scorelist[sfi].score){
-                                        tempList.push(1);
-                                    }
-                                    else{
-                                        tempList.push("")
-                                    }
-
-                                }
-                            }
-                            else{
-                                for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                                    tempList.push("")
-                                }
-                            }
-
-                        }
-                        else{
-                            for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                                tempList.push("")
-                            }
-                        }
-
-
-                    }
-                    else{
-                        for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                            tempList.push("")
-                        }
-                    }
-                    for(var tindex in tempList){
-                        firstQ.push(tempList[tindex]);
-                    }
-                }
-                else if(q.type == Constant.QTYPE_SEQUENCE){
-                    var sortlist = [];
-                    var qfi = _.findIndex(calist,function(item){
-                        return item.questionid == q._id;
-                    });
-                    if(qfi>=0){
-                        if(calist[qfi].sortlist){
-                            var sorted = _.sortBy(calist[qfi].sortlist,function(item){
-                                return item.sort
-                            })
-
-                            for(var qi in sorted){
-                                /*
-                                var nub =parseInt(sorted[qi].index)+1;
-                                sortlist[qi] = nub.toString();
-                                */
-                                sortlist[qi] = parseInt(sorted[qi].index)+1;
-                            }
-                        }
-                    }
-
-                    for(var tindex in sortlist){
-                        firstQ.push(sortlist[tindex]);
-                    }
-
-                    //    firstQ.push(sortlist);
-
-                }
-                else{
-                    var qfi = _.findIndex(calist,function(item){
-                        return item.questionid == q._id;
-                    });
-                    if(qfi>=0){
-                        firstQ.push(calist[qfi].text?calist[qfi].text:"");
-                    }
-                    else{
-                        firstQ.push("");
-                    }
-                }
-
-
-            }
-
-            qout.push(firstQ);
-
-
-
-        }
+        // var qout = [];
+        // var firstQ = [ "No.","duration","Interviewer","Visit Date",
+        //                "Country","City","Customer","Male","Female"];
+        //
+        // for(var qindex in this.state.survey.questionlist){
+        //     var q = this.state.survey.questionlist[qindex];
+        //     var base_str = "Q"+(parseInt(qindex)+1);
+        //     if(q.type == Constant.QTYPE_MULTISELECT ||
+        //         q.type == Constant.QTYPE_SINGLESELECT ||
+        //         q.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+        //         q.type == Constant.QTYPE_MULTISELECT_TEXT ||
+        //         q.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+        //         q.type == Constant.QTYPE_SINGLESELECT_TEXT){
+        //         for(var j in q.selectlist){
+        //             firstQ.push(base_str+"_"+(parseInt(j)+1))
+        //         }
+        //
+        //     }
+        //     else if(q.type == Constant.QTYPE_SCORE){
+        //         var scoreStart = 0;
+        //         var scoreEnd = 10;
+        //         var scoreStep = 1;
+        //
+        //         if(q.scorelist && _.isArray(q.scorelist)){
+        //             scoreStart = parseInt(q.scorelist[0].start);
+        //             scoreEnd = parseInt(q.scorelist[0].end);
+        //             scoreStep = parseInt(q.scorelist[0].step);
+        //         }
+        //
+        //         for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+        //             firstQ.push(base_str+"_"+(parseInt(i)))
+        //         }
+        //     }
+        //
+        //     else if(q.type == Constant.QTYPE_SEQUENCE){
+        //         for(var j in q.selectlist){
+        //             firstQ.push(base_str+"_"+(parseInt(j)+1))
+        //         }
+        //     }
+        //     else{
+        //         firstQ.push(base_str);
+        //     }
+        //
+        //
+        // }
+        //
+        // qout.push(firstQ);
+        //
+        // for(var aindex in this.state.answerlist){
+        //     var currentA = this.state.answerlist[aindex];
+        //     var calist = currentA.answerlist;
+        //     var dstring = ""
+        //
+        //     var country = "";
+        //     var city = "";
+        //     var customer = "";
+        //     var male = "";
+        //     var female = "";
+        //     var duration = "";
+        //
+        //     if(currentA.begintime && currentA.endtime){
+        //         var stime = new Date(currentA.begintime);
+        //         var etime = new Date(currentA.endtime);
+        //         if(stime && etime){
+        //             duration = (etime-stime)/(1000*60);
+        //         }
+        //     }
+        //
+        //     var aNameList = currentA.name.split("_");
+        //     var bias = 0;
+        //     if(aNameList[0] != this.state.survey.name){
+        //         bias = 1;
+        //     }
+        //     if(aNameList[2-bias]){
+        //         var nd=new Date(aNameList[2-bias]);
+        //         var year = nd.getFullYear();
+        //         var month = nd.getMonth()+1;
+        //         var date = nd.getDate();
+        //         dstring = year+"/"+month+"/"+date;
+        //     }
+        //     country = aNameList[3-bias]?aNameList[3-bias]:"";
+        //     city = aNameList[4-bias]?aNameList[4-bias]:"";
+        //     customer = aNameList[5-bias]?aNameList[5-bias]:"";
+        //     if(aNameList[6-bias]){
+        //         if(aNameList[6-bias] == "male"){
+        //             male = "1";
+        //         }
+        //         else if(aNameList[6-bias] == "female"){
+        //             female = "1";
+        //         }
+        //     }
+        //
+        //     firstQ = [(parseInt(aindex)+1),duration,currentA.investigatorname?currentA.investigatorname:"",
+        //               dstring,country,city,customer,male,female];
+        //
+        //
+        //     for(var qindex in this.state.survey.questionlist){
+        //         var q = this.state.survey.questionlist[qindex];
+        //         if(q.type == Constant.QTYPE_MULTISELECT ||
+        //             q.type == Constant.QTYPE_SINGLESELECT ||
+        //             q.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+        //             q.type == Constant.QTYPE_MULTISELECT_TEXT ||
+        //             q.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+        //             q.type == Constant.QTYPE_SINGLESELECT_TEXT){
+        //             var tempList = [];
+        //             for(var j in q.selectlist){
+        //                 tempList.push("")
+        //             }
+        //             var qfi = _.findIndex(calist,function(item){
+        //                 return item.questionid == q._id;
+        //             });
+        //             if(qfi>=0){
+        //                 var slist = calist[qfi].selectindexlist;
+        //                 for(var sindex in slist){
+        //                     tempList[slist[sindex]] = 1;
+        //                     if(calist[qfi].selectextra && calist[qfi].selectextra.length>0){
+        //                         var seindex = _.findIndex(calist[qfi].selectextra,function(item){
+        //                             return item.index == slist[sindex];
+        //                         })
+        //                         if(seindex>=0 && calist[qfi].selectextra[seindex].text){
+        //                             tempList[slist[sindex]] = calist[qfi].selectextra[seindex].text;
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //             for(var tindex in tempList){
+        //                 firstQ.push(tempList[tindex]);
+        //             }
+        //
+        //         }
+        //         else if(q.type == Constant.QTYPE_SCORE){
+        //             var scoreStart = 0;
+        //             var scoreEnd = 10;
+        //             var scoreStep = 1;
+        //             var tempList = [];
+        //             if(q.scorelist && _.isArray(q.scorelist)){
+        //                 scoreStart = parseInt(q.scorelist[0].start);
+        //                 scoreEnd = parseInt(q.scorelist[0].end);
+        //                 scoreStep = parseInt(q.scorelist[0].step);
+        //             }
+        //
+        //             var qfi = _.findIndex(calist,function(item){
+        //                 return item.questionid == q._id;
+        //             });
+        //             if(qfi>=0){
+        //                 if(calist[qfi].scorelist){
+        //                     var sfi = _.findIndex(calist[qfi].scorelist,function(item){
+        //                         return item.index == 0;
+        //                     })
+        //                     if(sfi>=0){
+        //                         for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+        //                             if(i == calist[qfi].scorelist[sfi].score){
+        //                                 tempList.push(1);
+        //                             }
+        //                             else{
+        //                                 tempList.push("")
+        //                             }
+        //
+        //                         }
+        //                     }
+        //                     else{
+        //                         for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+        //                             tempList.push("")
+        //                         }
+        //                     }
+        //
+        //                 }
+        //                 else{
+        //                     for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+        //                         tempList.push("")
+        //                     }
+        //                 }
+        //
+        //
+        //             }
+        //             else{
+        //                 for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+        //                     tempList.push("")
+        //                 }
+        //             }
+        //             for(var tindex in tempList){
+        //                 firstQ.push(tempList[tindex]);
+        //             }
+        //         }
+        //         else if(q.type == Constant.QTYPE_SEQUENCE){
+        //             var sortlist = [];
+        //             var qfi = _.findIndex(calist,function(item){
+        //                 return item.questionid == q._id;
+        //             });
+        //             if(qfi>=0){
+        //                 if(calist[qfi].sortlist){
+        //                     var sorted = _.sortBy(calist[qfi].sortlist,function(item){
+        //                         return item.sort
+        //                     })
+        //
+        //                     for(var qi in sorted){
+        //                         /*
+        //                         var nub =parseInt(sorted[qi].index)+1;
+        //                         sortlist[qi] = nub.toString();
+        //                         */
+        //                         sortlist[qi] = parseInt(sorted[qi].index)+1;
+        //                     }
+        //                 }
+        //             }
+        //
+        //             for(var tindex in sortlist){
+        //                 firstQ.push(sortlist[tindex]);
+        //             }
+        //
+        //             //    firstQ.push(sortlist);
+        //
+        //         }
+        //         else{
+        //             var qfi = _.findIndex(calist,function(item){
+        //                 return item.questionid == q._id;
+        //             });
+        //             if(qfi>=0){
+        //                 firstQ.push(calist[qfi].text?calist[qfi].text:"");
+        //             }
+        //             else{
+        //                 firstQ.push("");
+        //             }
+        //         }
+        //
+        //
+        //     }
+        //
+        //     qout.push(firstQ);
+        //
+        //
+        //
+        // }
         var that = this;
         $.ajax({
             url: Constant.BASE_URL+"admin/exportxlsx",
-            data: JSON.stringify({
+            data: $.param({
                 name:that.state.survey.name,
-                data:qout
+                surveyid:that.state.survey._id
             }),
-            contentType: 'application/json; charset=utf-8',
+            contentType: 'application/x-www-form-urlencoded',
             type: 'POST',
             success: function (data) {
                 $("#ajaxloading").hide();
