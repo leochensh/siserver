@@ -1544,6 +1544,23 @@ aclHandler.registerWait(function(acl){
 
     });
 
+    app.delete("/sadmin/deletespider",acl.middleware(1),function(req,res){
+        var sid = req.body.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+            Admin.deleteSpider(sid,function(err,msg){
+                res.status(200);
+                successMsg.body = "ok";
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+
+    });
+
     app.get("/sadmin/spiderlist/:spidername",acl.middleware(1),function(req,res){
         var sname = req.params.spidername;
         if(sname){
@@ -1568,21 +1585,21 @@ aclHandler.registerWait(function(acl){
         })
     });
 
-    app.delete("/sadmin/delete",acl.middleware(1),function(req,res){
-        var sid = req.body.spiderid;
-        if(sid && ObjectID.isValid(sid)){
-            Admin.deleteSpider(sid,function(err,msg){
-                res.status(200);
-                successMsg.body = "ok";
-                res.send(JSON.stringify(successMsg));
-            })
-        }
-        else{
-            res.status(406);
-            errorMsg.code = "wrong";
-            res.send(JSON.stringify(errorMsg));
-        }
-    });
+    // app.delete("/sadmin/delete",acl.middleware(1),function(req,res){
+    //     var sid = req.body.spiderid;
+    //     if(sid && ObjectID.isValid(sid)){
+    //         Admin.deleteSpider(sid,function(err,msg){
+    //             res.status(200);
+    //             successMsg.body = "ok";
+    //             res.send(JSON.stringify(successMsg));
+    //         })
+    //     }
+    //     else{
+    //         res.status(406);
+    //         errorMsg.code = "wrong";
+    //         res.send(JSON.stringify(errorMsg));
+    //     }
+    // });
 
     var exportDomainList = {
         "flipkart":[
@@ -1815,6 +1832,114 @@ aclHandler.registerWait(function(acl){
         if(sid && ObjectID.isValid(sid)){
 
             Admin.getpricerangebysalesamountForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/colormodelnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getcolorbymodelnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/colorreviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getcolorbyreviewnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/coloravgprice/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getcolorbyavgpriceForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/batterymodelnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getbatterybymodelnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/batteryreviewnum/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getbatterybyreviewnumForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/model/batteryaverageprice/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getbatterybyavgpriceForModel(sid,function(err,result){
 
                 res.status(200);
                 successMsg.body = result;

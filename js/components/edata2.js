@@ -213,6 +213,25 @@ export var Edata2 = React.createClass({
         };
         return infunc;
     },
+    deleteClick(index){
+        var that = this;
+        var infunc = function(){
+            var spi = that.props.edata.spiderlist[that.props.edata.currentIndex][index];
+            if(spi.status == Constant.SPIDERSTATU_DONE){
+                that.state.deleteSpiderId = index;
+                $("#deletespidermodal").modal("show");
+            }
+        };
+        return infunc;
+
+    },
+    gotoDeleteSpider(){
+        $("#deletespidermodal").modal("hide");
+        SisDispatcher.dispatch({
+            actionType: Constant.DELETESPIDER,
+            index:this.state.deleteSpiderId
+        });
+    },
     cleaCanvas(){
         var canvas  = document.getElementById("barcanvas");
         var context = canvas.getContext('2d');
@@ -273,15 +292,19 @@ export var Edata2 = React.createClass({
                     <div className="panel panel-default">
                         <div className="panel-heading">
                             <div className="row">
-                                <div className="col-md-3">
+                                <div className="col-md-2">
                                     {stime}
                                 </div>
-                                <div className="col-md-4 col-md-offset-3">
+                                <div className="col-md-5 col-md-offset-3">
                                     <div className="btn-group" role="group">
                                         <a className="btn btn-info"
                                            onClick={this.statisticClick(spi)}
                                            disabled={bdisabled}
                                            role="button">View Statistic</a>
+                                        <a className="btn btn-danger"
+                                           onClick={this.deleteClick(spi)}
+                                           disabled={bdisabled}
+                                           role="button">Delete</a>
                                         <a className="btn btn-default"
                                            onClick={this.exportClick(spi)}
                                            disabled={bdisabled}
@@ -420,7 +443,7 @@ export var Edata2 = React.createClass({
                                     {spiderstatisticoptions}
                                 </select>
 
-                                <canvas id="barcanvas" width="850px" height="700px" >
+                                <canvas id="barcanvas" width="850px" height="750px" >
                                     [No canvas support]
                                 </canvas>
 
@@ -429,6 +452,26 @@ export var Edata2 = React.createClass({
                         </div>
                     </div>
                 </div>
+
+                <div id="deletespidermodal" className="modal fade" tabindex="-1" role="dialog">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title">Delete Spider</h4>
+                            </div>
+                            <div className="modal-body">
+                                <p>Are you sure to delete this spider and all reated data?</p>
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button" className="btn btn-default" data-dismiss="modal">Cancel</a>
+                                <a type="button"
+                                   onClick={this.gotoDeleteSpider}
+                                   className="btn btn-primary">Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         )
     }

@@ -39,8 +39,9 @@ var getStatistic = function(){
                     labelA.push(msg.models[i][labeltag].split("(")[0]);
                     dataA.push(msg.models[i][datatag]);
                 }
-                console.log(dataA);
-                console.log(labelA);
+                console.log(labeltag);
+                console.log(datatag);
+                console.log(msg.models);
                 var canvas  = document.getElementById("barcanvas");
                 var context = canvas.getContext('2d');
                 context.clearRect(0, 0, canvas.width,canvas.height);
@@ -50,11 +51,11 @@ var getStatistic = function(){
                     data: dataA,
                     options: {
                         gutterLeft:100,
-                        gutterBottom:100,
+                        gutterBottom:150,
                         labelsAbove:true,
                         textAngle:30,
                         labels: labelA,
-                        shadow: false,
+                        shadow: true,
                         colors: ['red'],
                         strokestyle: 'rgba(0,0,0,0)'
                     }
@@ -192,6 +193,42 @@ class Edatastore extends Store{
             edata.currentstatistic = value;
             this.__emitChange();
             getStatistic();
+        }
+        else if(payload.actionType == Constant.DELETESPIDER){
+            var sp = edata.spiderlist[edata.currentIndex][payload.index];
+            $("#pleaseWaitDialog").modal("show");
+            $.ajax({
+                url: Constant.BASE_URL+"sadmin/deletespider",
+                data: $.param({
+                    spiderid:sp._id
+                }),
+                type: 'DELETE',
+                contentType: 'application/x-www-form-urlencoded',
+                success: function (data) {
+                    $("#pleaseWaitDialog").modal("hide");
+                    var msg = JSON.parse(data);
+                    
+                    SisDispatcher.dispatch({
+                        actionType: Constant.GETSPIDERLIST
+                    });
+                },
+                error:function(jxr,scode){
+                    $("#pleaseWaitDialog").modal("hide");
+                },
+                statusCode:{
+                    406:function(){
+
+                    },
+                    500:function(){
+                        SisDispatcher.dispatch({
+                            actionType: Constant.ERROR500
+                        });
+                    },
+                    409:function(){
+
+                    }
+                }
+            });
         }
     }
 }

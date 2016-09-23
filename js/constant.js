@@ -64,6 +64,7 @@ export var Constant = {
     EXPORTSPIDERDATA:"exportspiderdata",
     SHOWSPIDERSTATISTIC:"showspiderstatistic",
     SPIDERSTASTICCHANGE:"spiderstasticchange",
+    DELETESPIDER:"deletespider",
 
 
     QTYPE_SINGLESELECT:"singleselect",//单选题
@@ -197,6 +198,42 @@ export var Constant = {
                 url:"sadmin/spiderstatistics/model/pricerangebysalesamount",
                 labeltag:"pricerange",
                 datatag:"salesamount"
+            },
+            {
+                name:"Top 10 Models color by model number",
+                url:"sadmin/spiderstatistics/model/colormodelnum",
+                labeltag:"color",
+                datatag:"count"
+            },
+            {
+                name:"Top 10 Models color by review number",
+                url:"sadmin/spiderstatistics/model/colorreviewnum",
+                labeltag:"color",
+                datatag:"count"
+            },
+            {
+                name:"Top 10 Models color by average price",
+                url:"sadmin/spiderstatistics/model/coloravgprice",
+                labeltag:"color",
+                datatag:"count"
+            },
+            {
+                name:"Models battery range by model number",
+                url:"sadmin/spiderstatistics/model/batterymodelnum",
+                labeltag:"batteryrange",
+                datatag:"count"
+            },
+            {
+                name:"Models battery range by review number",
+                url:"sadmin/spiderstatistics/model/batteryreviewnum",
+                labeltag:"batteryrange",
+                datatag:"count"
+            },
+            {
+                name:"Models battery range by average price",
+                url:"sadmin/spiderstatistics/model/batteryaverageprice",
+                labeltag:"batteryrange",
+                datatag:"count"
             },
         ]
     },

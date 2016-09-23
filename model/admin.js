@@ -1065,6 +1065,8 @@ Admin.createSpider = function(sname,callback){
     });
 };
 
+
+
 Admin.stopSpider = function(callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -1148,12 +1150,21 @@ Admin.deleteSpider = function(sid,callback){
 
         }
         else{
-            db.collection("spider",function(err,collection){
-                collection.deleteOne({_id:ObjectID(sid)},function(err,res){
-                    mongoPool.release(db);
-                    callback(err,res);
+            db.collection("brand",function(err,brandcollection){
+                brandcollection.deleteMany({spiderid:sid},function(err,res){
+                    db.collection("model",function(err,modelcollection){
+                        modelcollection.deleteMany({spiderid:sid},function(err,res){
+                            db.collection("spider",function(err,collection){
+                                collection.deleteOne({_id:ObjectID(sid)},function(err,res){
+                                    mongoPool.release(db);
+                                    callback(err,res);
+                                })
+                            });
+                        })
+                    })
                 })
             });
+
         }
     });
 };
@@ -1690,6 +1701,284 @@ Admin.getpricerangebysalesamountForModel = function(sid,callback){
             });
         }
     });
+};
+
+Admin.getcolorbymodelnumForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).toArray(function(err,models){
+                    mongoPool.release(db);
+
+                    var rval = groupAndSort(models,true,function(data){
+                        return data.length;
+                    },function(item){
+                        if(!item.color){
+                            return "Others";
+                        }
+                        else{
+                            return item.color;
+                        }
+                    },function(item,title){
+                        return {
+                            color:title,
+                            count:item.length
+                        };
+                    },null,true);
+                    callback(err,rval);
+                })
+            });
+        }
+    });
+};
+
+Admin.getcolorbyreviewnumForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).toArray(function(err,models){
+                    mongoPool.release(db);
+
+                    var rval = groupAndSort(models,true,function(data){
+                        var total = 0;
+                        for(var mi in data){
+                            if(data[mi].reviewNum){
+                                total += parseInt(data[mi].reviewNum)
+                            }
+                        }
+                        return total;
+                    },function(item){
+                        if(!item.color){
+                            return "Others";
+                        }
+                        else{
+                            return item.color;
+                        }
+                    },function(item,title){
+                        var amount = 0;
+                        for(var mi in item){
+                            amount += item[mi].reviewNum?parseInt(item[mi].reviewNum):0
+                        }
+                        return {
+                            color:title,
+                            count:amount
+                        };
+                    },null,true);
+                    callback(err,rval);
+                })
+            });
+        }
+    });
+};
+
+Admin.getcolorbyavgpriceForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).toArray(function(err,models){
+
+                    mongoPool.release(db);
+
+                    var rval = groupAndSort(models,false,null,function(item){
+                        if(!item.color){
+                            return "Others";
+                        }
+                        else{
+                            return item.color;
+                        }
+                    },function(item,title){
+                        var amount = 0;
+                        var mcount = 0;
+                        for(var mi in item){
+                            if(item[mi].price){
+                                var p = parseInt(item[mi].price);
+                                amount += p;
+                                mcount += 1;
+                            }
+                        }
+                        return {
+                            color:title,
+                            count:amount/mcount
+                        };
+                    },null,true);
+                    callback(err,rval);
+                })
+            });
+        }
+    });
+};
+
+function batteryTag(item){
+    if(!item.battery){
+        return "Others";
+    }
+    else{
+        var match = item.battery.match(/(\d+)/);
+        if (match){
+            var intb = parseInt(match[1]);
+            if(intb>=0 && intb<1000){
+                return "0~1000mAh"
+            }
+            else if(intb>=1000 && intb<2000){
+                return "1000~2000mAh"
+            }
+            else if(intb>=2000 && intb<3000){
+                return "1000~2000mAh"
+            }
+            else if(intb>=3000){
+                return "Above 3000mAh"
+            }
+        }
+        else{
+            return "Others"
+        }
+    }
+}
+
+Admin.getbatterybymodelnumForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).toArray(function(err,models){
+                    mongoPool.release(db);
+
+                    var rval = groupAndSort(models,true,function(data){
+                        return data.length;
+                    },function(item){
+                        return batteryTag(item);
+                    },function(item,title){
+                        return {
+                            batteryrange:title,
+                            count:item.length
+                        };
+                    },null,true);
+                    callback(err,rval);
+                })
+            });
+        }
+    });
+};
+
+Admin.getbatterybyreviewnumForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).toArray(function(err,models){
+                    mongoPool.release(db);
+
+                    var rval = groupAndSort(models,true,function(data){
+                        var total = 0;
+                        for(var mi in data){
+                            if(data[mi].reviewNum){
+                                total += parseInt(data[mi].reviewNum);
+                            }
+                        }
+                        return total;
+                    },function(item){
+                        return batteryTag(item);
+                    },function(item,title){
+                        var amount = 0;
+                        for(var mi in item){
+                            if(item[mi].reviewNum){
+                                amount += parseInt(item[mi].reviewNum)
+                            }
+                        }
+
+                        return {
+                            batteryrange:title,
+                            count:amount
+                        };
+                    },null,true);
+                    callback(err,rval);
+                })
+            });
+        }
+    });
+};
+
+Admin.getbatterybyavgpriceForModel = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("model",function(err,collection){
+                collection.find({spiderid:sid}).toArray(function(err,models){
+                    mongoPool.release(db);
+
+                    var rval = groupAndSort(models,false,null,function(item){
+                        return batteryTag(item);
+                    },function(item,title){
+                        var amount = 0;
+                        var count = 0;
+                        for(var mi in item){
+                            if(item[mi].price){
+                                amount += parseInt(item[mi].price);
+                                count += 1;
+                            }
+                        }
+
+                        return {
+                            batteryrange:title,
+                            count:amount/count
+                        };
+                    },null,true);
+                    callback(err,rval);
+                })
+            });
+        }
+    });
+};
+
+function groupAndSort(data,iftotal,totalfunc,groupcallback,grouptoarray,sortcallback,ifslice){
+    var total = 0;
+    if(iftotal){
+        total = totalfunc(data)
+    }
+
+    var groupOut = _.groupBy(data,function(item){
+        return groupcallback(item);
+    });
+    var nextArray = [];
+    for(var title in groupOut){
+        var tmp = grouptoarray(groupOut[title],title);
+        nextArray.push(tmp)
+    }
+    var result = _.sortBy(nextArray,function(item){
+        if(sortcallback){
+            return sortcallback(item);
+        }
+        else{
+            return (-1)*item.count;
+        }
+
+    })
+    if(ifslice){
+        result = result.slice(0,10);
+    }
+
+    var returval = {
+        models:result
+    }
+    if(iftotal){
+        returval.total = total;
+    }
+    return returval;
 }
 
 Admin.publishSurvey = function(orgid,surveyid,stafflist,callback){
