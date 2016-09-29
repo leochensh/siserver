@@ -516,7 +516,7 @@ export var Quest = React.createClass({
                             )
                             startI+=scoreStep;
                         }
-                        slist.push(<h3>({si}). {currentQ.scorelist[si].title}</h3>)
+                        slist.push(<h3>({parseInt(si)+1})  {this.splitEnglish(currentQ.scorelist[si].title)}</h3>)
                         slist.push(
                             <select
                                 style={{marginTop:"30px"}}
@@ -551,7 +551,7 @@ export var Quest = React.createClass({
                             <div className="row">
                                 <a onClick={this.sortClick(si,currentQ.selectlist.length)} className="col-md-10">
                                     <div className="alert alert-info" role="alert">
-                                        {this.splitEnglish(currentQ.selectlist[si].title)}
+                                        ({parseInt(si)+1}) {this.splitEnglish(currentQ.selectlist[si].title)}
                                     </div>
                                 </a>
                                 <div className="col-md-2">
