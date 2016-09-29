@@ -339,6 +339,16 @@ export var Quest = React.createClass({
             }
         });
     },
+    changeCLTextToHtml(ihtml){
+        var lines = ihtml.split("\n");
+        var result = [];
+        for(var line in lines){
+            result.push(
+                <p>{lines[line]}</p>
+            )
+        }
+        return result;
+    },
     render(){
         if(this.state.survey){
             var metalist = [];
@@ -360,7 +370,7 @@ export var Quest = React.createClass({
 
             if(alertIndex>=0){
                 beforeAlert = <div className="alert alert-success" role="alert">
-                    {metalist[alertIndex].text}
+                    {this.changeCLTextToHtml(metalist[alertIndex].text)}
                 </div>
             }
 
@@ -371,7 +381,7 @@ export var Quest = React.createClass({
 
             if(endalertIndex>=0){
                 endAlert = <div className="alert alert-success" role="alert">
-                    {metalist[endalertIndex].text}
+                    {this.changeCLTextToHtml(metalist[endalertIndex].text)}
                 </div>
             }
 
@@ -541,7 +551,7 @@ export var Quest = React.createClass({
                             <div className="row">
                                 <a onClick={this.sortClick(si,currentQ.selectlist.length)} className="col-md-10">
                                     <div className="alert alert-info" role="alert">
-                                        {currentQ.selectlist[si].title}
+                                        {this.splitEnglish(currentQ.selectlist[si].title)}
                                     </div>
                                 </a>
                                 <div className="col-md-2">
