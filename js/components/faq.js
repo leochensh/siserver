@@ -22,11 +22,14 @@ export var Faq = React.createClass({
         return(
                 <div className="row" style={{position:"relative"}}>
                     <div className="col-md-3">
-                        <img style={{position:"absolute",top:"20px",left:"100px",width:"150px",height:"80px"}} src="image/blue background.png"/>
-                        <div style={{position:"absolute",top:"20px",left:"150px"}}>
-                            <h1 style={{color:"#FFFFFF"}}>FAQ</h1>
+                        <div className="row"style={{position:"absolute",top:"20px",left:"150px",width:"150px",height:"80px",backgroundColor:"#00c7ff"}}>
+                            <div className="row"style={{position:"absolute",left:"50px"}}>
+                                <h1 style={{color:"#FFFFFF"}}>FAQ</h1>
 
+                            </div>
                         </div>
+
+
 
 
                     </div>

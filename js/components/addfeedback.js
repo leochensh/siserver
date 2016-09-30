@@ -5,6 +5,7 @@ import React from 'react';
 import {Constant} from "../constant"
 import {SisDispatcher} from "../dispatcher";
 import crypto from "crypto"
+import {Emailcheck} from "./emailcheck"
 var Dropzone = require('react-dropzone');
 export var Addfeedback = React.createClass({
     contextTypes: {
@@ -38,39 +39,45 @@ export var Addfeedback = React.createClass({
     zzlconfirmerrorclick(){
         $("#zzlconfirmerrormodal").modal("hide");
     },
+    zzlconfirmemailclick(){
+        $("#zzlemailvalid").modal("hide");
+    },
     handleClick(event){
-        if(!this.state.description ||!this.state.zzlname||!this.state.zzlemail||!this.state.zzlphone||!this.state.newimage){
+        if(!this.state.zzldescription ||!this.state.zzlname||!this.state.zzlemail||!this.state.zzlphone||!this.state.newimage){
             $("#zzlconfirmerrormodal").modal("show");
         }else{
-
-            $("#ajaxloading").show();
             var that = this;
-            $.ajax({
-                url: Constant.BASE_URL+"anonymous/feedback",
-                data: $.param({
-                    name:that.state.zzlname,
-                    phone:that.state.zzlphone,
-                    email:that.state.zzlemail,
-                    content:that.state.zzldescription,
-                    image:that.state.newimage,
-                    platform:"web"
-                }),
-                type: 'POST',
-                contentType: 'application/x-www-form-urlencoded',
-                success: function (data) {
-                    var msg = JSON.parse(data);
-                    $("#ajaxloading").hide();
-                    $("#zzladdfbmodal").modal("show");
+            if(Emailcheck.validateEmail(that.state.zzlemail) && Emailcheck.validatePhone(that.state.zzlphone) ){
+                $("#ajaxloading").show();
+                $.ajax({
+                    url: Constant.BASE_URL + "anonymous/feedback",
+                    data: $.param({
+                        name: that.state.zzlname,
+                        phone: that.state.zzlphone,
+                        email: that.state.zzlemail,
+                        content: that.state.zzldescription,
+                        image: that.state.newimage,
+                        platform: "web"
+                    }),
+                    type: 'POST',
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function (data) {
+                        var msg = JSON.parse(data);
+                        $("#ajaxloading").hide();
+                        $("#zzladdfbmodal").modal("show");
 
 
+                    },
+                    error: function () {
+                        $("#ajaxloading").hide();
+                        $("#zzladdfbmodalfail").modal("show");
 
-                },
-                error:function(){
-                    $("#ajaxloading").hide();
-                    $("#zzladdfbmodalfail").modal("show");
+                    }
+                });
 
-                }
-            });
+            }else{
+                $("#zzlemailvalid").modal("show");
+            }
         }
     },
     onDropimage: function (files) {
@@ -108,17 +115,17 @@ export var Addfeedback = React.createClass({
         return(
             <div className="row" style={{position:"relative"}}>
                 <div className="col-md-3">
-                    <img style={{position:"absolute",top:"20px",left:"50px",width:"300px",height:"120px"}} src="image/blue background.png"/>
-                    <div style={{position:"absolute",top:"20px",left:"120px"}}>
-                        <h2 style={{color:"#FFFFFF"}}>Thank you  for</h2>
+                    <div className="row"style={{position:"absolute",top:"20px",left:"100px",width:"300px",height:"120px",backgroundColor:"#00c7ff"}}>
+                    <div style={{position:"absolute",top:"10px",left:"60px"}}>
+                        <h2 style={{color:"#FFFFFF"}}>Thank you for</h2>
 
                     </div>
-                    <div style={{position:"absolute",top:"50px",left:"100px"}}>
-                        <h2 style={{color:"#FFFFFF"}}>your<b>Feedback.</b></h2>
+                    <div style={{position:"absolute",top:"40px",left:"40px"}}>
+                        <h2 style={{color:"#FFFFFF"}}>your<b> Feedback.</b></h2>
                     </div>
-
+                    </div>
                 </div>
-                <div className="col-md-3 col-md-offset-1" style={{position:"absolute",top:"20px",left:"300px"}}>
+                <div className="col-md-3 col-md-offset-1" style={{position:"absolute",top:"20px",left:"330px"}}>
                     <form className="form-horizontal">
                         <div className="form-group form-group-lg">
                             <div className="row" >
@@ -128,13 +135,14 @@ export var Addfeedback = React.createClass({
                                 <div >
                                     <h4><b>Description</b></h4>
                                 </div>
-                                <input type="text"
+                                <textarea
+                                       rows="10"
                                        style={{width:"600px",height:"100px"}}
                                        className="form-control"
                                        placeholder="Please write your complaint or five us more suggestion..."
-                                       value={this.state.description}
-                                       onChange={this.handleChange.bind(this,"description")}
-                                    />
+                                       value={this.state.zzldescription}
+                                       onChange={this.handleChange.bind(this,"zzldescription")}>
+                                </textarea>
                             </div>
                         </div>
                         <div className="form-group form-group-lg">
@@ -190,9 +198,7 @@ export var Addfeedback = React.createClass({
                         </div>
                         <div className="form-group form-group-lg">
                             <div className="row">
-
-                                <a type="button" onClick={this.handleClick} className="btn btn-primary">Submit</a>
-
+                                <input type="button" onClick={this.handleClick} className="btn" style={{backgroundColor:"#00c7ff",color:"#FFFFFF"}} value={"Submit"}/>
 
                             </div>
 
@@ -254,6 +260,25 @@ export var Addfeedback = React.createClass({
                         </div>
                     </div>
                 </div>
+                <div id="zzlemailvalid" className="modal fade" tabindex="-1" role="dialog">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title">Email error</h4>
+                            </div>
+                            <div className="modal-body">
+                                <p>error: You should input a valid email or phone.</p>
+
+                            </div>
+                            <div className="modal-footer">
+                                <a type="button"
+                                   onClick={this.zzlconfirmemailclick}
+                                   className="btn btn-primary">Confirm</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
 

@@ -17,52 +17,137 @@ export var Frontpage = React.createClass({
 
         }
     },
+    zzlregisterClick(){
+        $("#zzldownloadddmodal").modal("hide");
+        $("#zzlregistermodal").modal("show");
+    },
+    DownloadClick(){
 
+    },
+    handleLoginClick(){
+        $("#zzldownloadddmodal").modal("hide");
+        $("#loginsmodal").modal("show");
+    },
+    handleClick(){
+        $("#zzldownloadddmodal").modal("show");
+    },
     render() {
 
         return (
             <div  className="imgrow" >
-                <div className="row" >
+                <div className="row" style={{position:"relative"}}>
                     <div className="col-md-2 col-md-offset-5">
-                        <a>
-                            <img  src="image/LOGO.png"/>
+                        <a style={{position:"absolute",top:"20px"}}>
+                            <img style={{width:"100px",height:"100px"}} src="image/LOGO.png"/>
                         </a>
                     </div>
 
                 </div>
                 <div className="row" >
-                    <div className="col-md-6" style={{position:"relative"}}>
-                        <img style={{position:"absolute",top:"300px",width:"765px",height:"100px"}} src="image/blue background.png"/>
+                    <div  style={{position:"relative"}}>
+                        <img style={{position:"absolute",top:"200px",width:"680px",height:"80px"}} src="image/blue background.png"/>
 
-                        <div style={{position:"absolute",top:"320px",left:"200px"}}>
+                        <div style={{position:"absolute",top:"200px",left:"150px"}}>
 
-                           <h1 style={{color:"#FFFFFF"}}>Survey Details<strong> | Insight Future</strong></h1>
+                           <p><h1 style={{color:"#FFFFFF"}}>Survey Details<strong> | Insight Future</strong></h1></p>
                         </div>
+                    </div>
+
+                </div>
+                <div calssName="row" >
+                    <div className="col-md-4 col-md-offset-8" style={{position:"relative"}}>
+                    <a
+                        type="button"
+                        href="../uploads/Ouresa用户手册.rar"
+                        style={{position:"absolute",top:"300px",left:"160px"}}
+                        ><h3 style={{color:"#FFFFFF"}}><strong>Download Manual</strong></h3></a>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col-md-1 col-md-offset-9" style={{position:"relative"}}>
-                        <img style={{position:"absolute",top:"450px"}} src="image/Scan or Click background.png"/>
+                        <img style={{position:"absolute",top:"350px"}} src="image/Scan or Click background.png"/>
                             <div>
-                                <div style={{position:"absolute",top:"450px",left:"50px"}} >
+                                <div style={{position:"absolute",top:"350px",left:"50px"}} >
                                     <h3 style={{color:"#FFFFFF"}}><strong>SCAN</strong></h3>
                                 </div>
-                                <div style={{position:"absolute",top:"490px",left:"100px"}}>
+                                <div style={{position:"absolute",top:"390px",left:"100px"}}>
                                     <h3 style={{color:"#FFFFFF"}}>or</h3>
                                 </div>
-                                <div style={{position:"absolute",top:"530px",left:"50px"}}>
+                                <div style={{position:"absolute",top:"430px",left:"50px"}}>
                                     <h3 style={{color:"#FFFFFF"}}><strong>CLICK</strong></h3>
                                 </div>
                             </div>
-                            <div style={{position:"absolute",top:"470px",left:"150px"}} >
-                                <img  src="image/QR code.png"/>
+                            <div style={{position:"absolute",top:"370px",left:"150px"}} >
+                               <a
+                                   type="button"
+                                   onClick={this.handleClick}
+                                   ><img  src="image/QR code.png"/></a>
                             </div>
-
-
                     </div>
                 </div>
+                <div className="row" style={{position:"relative"}}>
+                        <div style={{position:"absolute",top:"495px",left:"520px"}} >
+                           <h6 style={{color:"#FFFFFF"}}>© Copyright 2016 Ouresa. All rights reserved.</h6>
+                        </div>
+                </div>
 
+                <div className="modal fade bs-example-modal-sm" id="zzldownloadddmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog modal-sm" role="document">
+                        <div className="modal-content">
+                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 
+                            <div className="row" style={{marginTop:"20px"}}>
+                                <div className="col-sm-3 col-sm-offset-2">
+
+                                        <img style={{width:"80px",height:"80px"}} src="image/LOGO.png"/>
+
+                                </div>
+                                <div className="col-sm-3 col-sm-offset-1">
+
+                                        <img style={{width:"80px",height:"80px"}} src="image/QR code.png"/>
+
+                                </div>
+                            </div>
+
+                            <form className="form-horizontal" >
+                                <div className="form-group form-group-lg" style={{marginTop:"40px",marginBottom:"50px"}}>
+                                    <div className="col-sm-10 col-sm-offset-1">
+                                        <a
+                                            type="button"
+                                            onClick={this.DownloadClick}
+                                            className="btn btn-info"
+                                            style={{width:"240px",height:"40px"}}
+                                            >Download for Android</a>
+                                    </div>
+
+                                </div>
+                                <div className="form-group form-group-lg">
+                                    <div className="col-sm-10 col-sm-offset-1">
+                                        <a
+                                            type="button"
+                                            onClick={this.handleLoginClick}
+                                            className="btn btn-info"
+                                            style={{width:"240px",height:"40px"}}
+                                            >Login</a>
+                                    </div>
+
+                                </div>
+
+                                <div className="form-group form-group-lg">
+                                    <div className="col-sm-10 col-sm-offset-1">
+                                        <a
+                                            type="button"
+                                            onClick={this.zzlregisterClick}
+                                            className="btn btn-default"
+                                            style={{width:"240px",height:"40px"}}
+                                            >Register</a>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }

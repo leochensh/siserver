@@ -15,6 +15,7 @@ import {feedbackStore} from '../store/feedbackstore';
 import {templateStore} from '../store/templatestore';
 import crypto from "crypto"
 import {Emailcheck} from "./emailcheck"
+
 export var App = React.createClass({
     contextTypes: {
         router: React.PropTypes.object.isRequired,
@@ -122,6 +123,7 @@ export var App = React.createClass({
     handleRegisterClick(){
         $("#loginsmodal").modal("hide");
         var newstate = {};
+        newstate.email ="";
         newstate.capcha ="";
         newstate.verifiedcode ="";
         newstate.usernamee ="";
@@ -442,7 +444,7 @@ export var App = React.createClass({
         }
         return (
             <div>
-                <nav className="navbar navbar-default navbar-fixed-top" style={{background:"#FFFFFF"}}>
+                <nav className="navbar navbar-default navbar-fixed-top" style={{backgroundColor:"#FFFFFF"}}>
                     <div className="container-fluid">
                         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style={{position:"relative"}}>
                             <ul className="nav navbar-nav">
@@ -458,7 +460,7 @@ export var App = React.createClass({
                                 <li style={logoutStyle}><a onClick={this.resetpassClick}>Setting</a></li>
                                 <li style={logoutStyle}><a onClick={this.logoutClick}>Logout</a></li>
                                 <li style={iflogoutStyle}><a onClick={this.loginclick}>Login</a></li>
-                                <li style={iflogoutStyle}><a type="button" onClick={this.handleRegisterClick} className="btn btn-info" >Register</a></li>
+                                <li style={iflogoutStyle}><a type="button" onClick={this.handleRegisterClick} className="btn" style={{backgroundColor:"#00c7ff",color:"#FFFFFF"}} >Register</a></li>
                             </ul>
 
                         </div>
@@ -483,13 +485,13 @@ export var App = React.createClass({
                         </div>
                     </div>
                 </div>
-                <div className="modal fade" id="loginsmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
-                    <div className="modal-dialog" role="document">
+                <div className="modal fade bs-example-modal-sm" id="loginsmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog modal-sm" role="document">
                         <div className="modal-content">
                             <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <div className="col-sm-offset-4 col-sm-10">
+                            <div className="col-sm-offset-4 col-sm-10" style={{marginTop:"20px",marginBottom:"20px"}}>
                                 <a>
-                                    <img  src="image/LOGO.png"/>
+                                    <img style={{width:"80px",height:"80px"}} src="image/LOGO.png"/>
                                 </a>
                             </div>
                             <form className="form-horizontal">
@@ -498,6 +500,7 @@ export var App = React.createClass({
                                         <input type="text"
                                                className="form-control"
                                                placeholder="Username"
+                                               style={{height:"40px"}}
                                                value={this.state.username}
                                                onChange={this.handleChange.bind(this,"username")}
                                             />
@@ -511,6 +514,7 @@ export var App = React.createClass({
                                                onKeyPress={this.keypress}
                                                className="form-control"
                                                placeholder="Password"
+                                               style={{height:"40px"}}
                                                value={this.state.password}
                                                onChange={this.handleChange.bind(this,"password")}
                                             />
@@ -536,7 +540,7 @@ export var App = React.createClass({
                                         <p> <a type="button"
                                                onClick={this.handleClick}
                                                className="btn btn-info"
-                                               style={{width:"495px",height:"40px"}}
+                                               style={{width:"240px",height:"40px"}}
                                             >Login</a></p>
                                     </div>
                                 </div>
@@ -545,7 +549,7 @@ export var App = React.createClass({
                                     <div className="col-sm-offset-1 col-sm-10">
                                         <p><a type="button"
                                               className="btn btn-default"
-                                              style={{width:"495px",height:"40px"}}
+                                              style={{width:"240px",height:"40px"}}
                                               onClick={this.handleRegisterClick}
                                             >Register</a></p>
                                     </div>
@@ -557,11 +561,13 @@ export var App = React.createClass({
                         </div>
                     </div>
                 </div>
-                <div className="modal fade" id="zzlregistermodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
-                    <div className="modal-dialog" role="document">
+
+                <div className="modal fade " id="zzlregistermodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div className="modal-dialog " role="document">
                         <div className="modal-content">
-                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <div className="col-sm-offset-5 col-sm-10">
+                            <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
+
+                            <div className="col-sm-offset-5 col-sm-10" style={{marginTop:"20px",marginBottom:"20px"}}>
                                 <a>
                                     <img style={{width:"80px",height:"80px"}} src="image/LOGO.png"/>
                                 </a>
@@ -569,7 +575,7 @@ export var App = React.createClass({
                             <form className="form-horizontal">
                                 <div className="form-group form-group-lg">
 
-                                    <div className="col-sm-10 col-sm-offset-1">
+                                    <div className="col-sm-8 col-sm-offset-2">
                                         <input type="email"
                                                style={{height:"40px"}}
                                                className="form-control"
@@ -581,7 +587,7 @@ export var App = React.createClass({
                                 </div>
                                 <div className="form-group form-group-lg">
 
-                                    <div className="col-sm-7 col-sm-offset-1">
+                                    <div className="col-sm-5 col-sm-offset-2">
                                         <input type="text"
                                                style={{height:"40px"}}
                                                className="form-control"
@@ -590,13 +596,13 @@ export var App = React.createClass({
                                                onChange={this.handleChange.bind(this,"capcha")}
                                             />
                                     </div>
-                                    <div className="col-sm-3">
+                                    <div className="col-sm-1">
                                         <img style={{width:"126px",height:"40px"}}onClick={this.capchaClick} src={Constant.BASE_URL+"getcapcha"+"?"+this.state.newcapcha} />
                                     </div>
                                 </div>
                                 <div className="form-group form-group-lg">
 
-                                    <div className="col-sm-7 col-sm-offset-1">
+                                    <div className="col-sm-5 col-sm-offset-2">
                                         <input type="text"
                                                style={{height:"40px"}}
                                                className="form-control"
@@ -615,7 +621,7 @@ export var App = React.createClass({
                                 </div>
                                 <div className="form-group form-group-lg">
 
-                                    <div className="col-sm-10 col-sm-offset-1">
+                                    <div className="col-sm-8 col-sm-offset-2">
                                         <input type="text"
                                                className="form-control"
                                                style={{height:"40px"}}
@@ -627,7 +633,7 @@ export var App = React.createClass({
                                 </div>
                                 <div className="form-group form-group-lg">
 
-                                    <div className="col-sm-10 col-sm-offset-1">
+                                    <div className="col-sm-8 col-sm-offset-2">
                                         <input type="password"
                                                className="form-control"
                                                style={{height:"40px"}}
@@ -639,7 +645,7 @@ export var App = React.createClass({
                                 </div>
                                 <div className="form-group form-group-lg">
 
-                                    <div className="col-sm-10 col-sm-offset-1">
+                                    <div className="col-sm-8 col-sm-offset-2">
                                         <input type="password"
                                                className="form-control"
                                                style={{height:"40px"}}
@@ -651,13 +657,13 @@ export var App = React.createClass({
                                 </div>
 
                                 <div className="form-group form-group-lg">
-                                    <div className="col-sm-10 col-sm-offset-1">
+                                    <div className="col-sm-8 col-sm-offset-2">
                                         <a
                                             type="button"
                                             onClick={this.handlejoinClick}
                                             className="btn btn-info"
-                                            style={{width:"495px",height:"40px"}}
-                                            >Confirm</a>
+                                            style={{width:"388px",height:"40px"}}
+                                            >Create Account</a>
                                     </div>
 
                                 </div>

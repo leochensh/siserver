@@ -494,8 +494,9 @@ export var Settings = React.createClass({
                                             {pageButtonGrp}
                                             <li className="">
                                                 <input type="number"
-                                                    placeholder="jump page"
-                                                    onChange={this.jumpChange}/>
+                                                       placeholder="jump page"
+                                                       min="1"
+                                                       onChange={this.jumpChange}/>
                                             </li>
                                             <li className="">
                                                 <button type="submit" className="btn btn-default"onClick={this.goclick}>Go</button>

@@ -19,7 +19,7 @@ body {
 .imgrow{
   background-image:url("../image/background.png");
   background-size:contain;
-  Height: 900px;
+  Height: 550px;
 }
 
 .loginalert {
