@@ -683,10 +683,11 @@ export var Newsurvey = React.createClass({
                             Meta text:
                         </label>
                         <div className="col-sm-10">
-                            <input type="text"
-                                   value={cm.text}
+                            <textarea type="text"
                                    onChange = {this.metatextchange(i)}
-                                   className="form-control"/>
+                                   className="form-control">
+                                {cm.text}
+                            </textarea>
                         </div>
                     </div>
                     <div className="row">

@@ -2727,8 +2727,8 @@ aclHandler.registerWait(function(acl){
                             duration = (etime-stime)/(1000*60);
                         }
                     }
-
-                    var aNameList = currentA.name.split("_");
+                    var namestring = currentA.namestatic?currentA.namestatic:currentA.name;
+                    var aNameList = namestring.split("_");
                     var bias = 0;
                     if(aNameList[0] != name){
                         bias = 1;
