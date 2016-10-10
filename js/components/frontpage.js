@@ -58,7 +58,7 @@ export var Frontpage = React.createClass({
                     <div className="col-md-4 col-md-offset-8" style={{position:"relative"}}>
                     <a
                         type="button"
-                        href="../uploads/Ouresa用户手册.rar"
+                        href={Constant.BASE_IMAGEURL+"Ouresa用户手册.rar"}
                         style={{position:"absolute",top:"300px",left:"160px"}}
                         ><h3 style={{color:"#FFFFFF"}}><strong>Download Manual</strong></h3></a>
                     </div>
