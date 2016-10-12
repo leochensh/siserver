@@ -2033,7 +2033,7 @@ aclHandler.registerWait(function(acl){
         console.log("DEBUG +++++++++++++++++++++++++++++++++++")
         if(surveyid && ObjectID.isValid(surveyid)){
             Admin.getSurveyAnswerList(surveyid,function(err,answers){
-                console.log("ANSERS IS ++++++++++++++++");
+                console.log("ANSWERS IS ++++++++++++++++");
                 console.log(answers);
                 successMsg.body = answers;
                 res.send(JSON.stringify(successMsg));

@@ -2308,6 +2308,9 @@ Admin.getSurveyAnswerList = function(surveyid,callback){
         else{
             db.collection("answers",function(err,collection){
                 collection.find({surveyid:surveyid}).sort({ctime:-1}).toArray(function(err,sus){
+                    console.log("SUVEYID IS "+surveyid);
+                    console.log("sus is");
+                    console.log(sus);
 
                     async.each(sus,function(item,cb){
                         if(item.investigatorid){
