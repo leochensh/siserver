@@ -2030,8 +2030,11 @@ aclHandler.registerWait(function(acl){
 
     app.get("/admin/survey/answer/list/:surveyid",function(req,res){
         var surveyid = req.params.surveyid;
+        console.log("DEBUG +++++++++++++++++++++++++++++++++++")
         if(surveyid && ObjectID.isValid(surveyid)){
             Admin.getSurveyAnswerList(surveyid,function(err,answers){
+                console.log("ANSERS IS ++++++++++++++++");
+                console.log(answers);
                 successMsg.body = answers;
                 res.send(JSON.stringify(successMsg));
             })
