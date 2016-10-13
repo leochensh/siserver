@@ -10,10 +10,12 @@ import re
 class modelSpider(Spider):
     name = "modelspider"
 
-    baseUrl = "http://www.flipkart.com/lc/pr/pv1/spotList1/spot1/productList?sid=tyy,4io&filterNone=true&acamp=false&plaOffset=0&start="
-    tailUrl = "&ajax=true&_=1473814010323"
+    # baseUrl = "http://www.flipkart.com/lc/pr/pv1/spotList1/spot1/productList?sid=tyy,4io&filterNone=true&acamp=false&plaOffset=0&start="
+    baseUrl = "https://www.flipkart.com/mobiles/pr?otracker=categorytree&page="
+    # tailUrl = "&ajax=true&_=1473814010323"
+    tailUrl = "&sid=tyy%2C4io"
     currentStart = 1
-    parseStep = 20
+    parseStep = 1
     rc = re.compile("[0-9,]+")
 
     colorRe = re.compile("\(([^()]*(Gold|White|Black|Grey|Silver|Blue|Orange|Champagne|Yellow|Red|Carbon|Green|Mint|Midnight|Cyan|Brown)[^()]*)\)")
@@ -26,62 +28,132 @@ class modelSpider(Spider):
         oldurl=response.url
         infos = []
 
-        productList = response.xpath('//div[contains(@class,"gd-row")]/div[contains(@class,"gd-col")]/div[contains(@class,"product-unit")]/div[contains(@class,"pu-details")]')
+        # productList = response.xpath('//div[contains(@class,"gd-row")]/div[contains(@class,"gd-col")]/div[contains(@class,"product-unit")]/div[contains(@class,"pu-details")]')
+        productList = response.xpath('//div[contains(@class,"col") and contains(@class,"zZCdz4")]')
 
         for product in productList:
 
 
-            productTitleSel = product.xpath('div[contains(@class,"pu-title")]/a[contains(@class,"fk-display-block")]')
-            productRatingSel = product.xpath('div[contains(@class,"pu-rating")]/text()')
-            productPriceSel = product.xpath('div[contains(@class,"pu-price")]/div/div/span[contains(@class,"fk-font-17")]/text()')
-            keyfeaturelist = product.xpath('div[contains(@class,"pu-border-top")]/ul[contains(@class,"pu-usp")]/li/span/text()')
+            # productTitleSel = product.xpath('div[contains(@class,"pu-title")]/a[contains(@class,"fk-display-block")]')
+            productTitleSel = product.xpath('a/div/div/div[contains(@class,"_3wU53n")]/text()')
+            productHrefSel = product.xpath('a[contains(@class,"_1UoZlX")]/@href')
 
-            featureStr = ""
-            flist = []
-            for feature in keyfeaturelist:
-                flist.append(feature.extract().strip())
-            featureStr = ";".join(flist)
+            # productRatingSel = product.xpath('div[contains(@class,"pu-rating")]/text()')
+            productRatingSel = product.xpath('a/div/div/div/span[contains(@class,"_38sUEc")]/span/span/text()')
+
+            # productPriceSel = product.xpath('div[contains(@class,"pu-price")]/div/div/span[contains(@class,"fk-font-17")]/text()')
+            productPriceSel = product.xpath('a/div/div/div/div/div[contains(@class,"_1vC4OE")]/text()')
+            # keyfeaturelist = product.xpath('div[contains(@class,"pu-border-top")]/ul[contains(@class,"pu-usp")]/li/span/text()')
+
+            avgrateSel = product.xpath('a/div/div/div/span/div/span/text()')
+
+            featureListSel = product.xpath('a/div/div/div/ul[contains(@class,"vFw0gD")]/li[contains(@class,"tVe95H")]/text()')
 
 
-            ptitle = productTitleSel.xpath('@title')
-            phref = productTitleSel.xpath('@href')
+            brand = ""
+            realnum = 0
+            reviewNum = 0
+            ptitle = ""
+            color = ""
+            phref = ""
+            price = 0
+            avgrate = ""
+            ram = ""
+            rom = ""
+            ext = ""
+            screen = ""
+            main = ""
+            front = ""
+            battery = ""
+            processor = ""
 
-            for pindex,title in enumerate(ptitle):
-                if pindex<len(phref) and len(productRatingSel)>=2 and pindex<len(productPriceSel):
-                    rnum = self.rc.search(productRatingSel[1].extract().strip())
-                    price = self.rc.search(productPriceSel[pindex].extract().strip())
-                    if rnum and price:
-                        realnum = int(rnum.group(0).replace(',',""))
-                        realprice = int(price.group(0).replace(',',''))
-                        titleText = title.extract().strip();
+            if len(productTitleSel)>0:
+                # print productTitleSel[0].extract().strip()
+                tmptitle = productTitleSel[0].extract().strip()
+                ptitle = tmptitle
+                brand = tmptitle.split(" ")[0].strip()
+                tmatch = self.colorRe.search(tmptitle)
+                if tmatch:
+                    color = tmatch.group(1).split(',')[0].strip()
 
-                        color = ""
+            if len(productHrefSel)>0:
+                # print productHrefSel[0].extract().strip()
+                phref = productHrefSel[0].extract().strip()
 
-                        tmatch = self.colorRe.search(titleText)
+            if len(productRatingSel)>0:
+                # print productRatingSel[0].extract().strip() #rating number
+                tmprating = productRatingSel[0].extract().strip()
+                ratingnumber = self.rc.search(tmprating)
+                if ratingnumber:
+                    realnum = int(ratingnumber.group(0).replace(',',''))
 
-                        brand = ""
 
-                        tarray = titleText.split(" ")
-                        if len(tarray)>0:
-                            brand = tarray[0].strip()
+            if len(productRatingSel)>=3:
+                # print productRatingSel[2].extract().strip() #reviewNum
+                tmprating = productRatingSel[2].extract().strip()
+                reviewn = self.rc.search(tmprating)
+                if reviewn:
+                    reviewNum = int(reviewn.group(0).replace(',',''))
 
-                        if tmatch:
-                            mtxt = tmatch.group(1)
-                            mtxtList = mtxt.split(",")
-                            color = mtxtList[0].strip()
+            if len(productPriceSel)>=2:
+                tmpprice = productPriceSel[1].extract().strip()
+                pricen = self.rc.search(tmpprice)
+                if pricen:
+                    price = int(pricen.group(0).replace(',',''))
 
-                        info = {
-                            'brand':brand,
-                            'title':titleText,
-                            'href':phref[pindex].extract().strip(),
-                            'rating': realnum,
-                            'price': realprice,
-                            "keyfeature":featureStr,
-                            "color":color
-                        }
-                        infos.append(info) 
+            if len(avgrateSel)>0:
+                avgrate =  avgrateSel[0].extract().strip()
 
-        
+            for featureItem in featureListSel:
+                fstr = featureItem.extract().strip()
+                stroragema = re.search("(ROM|RAM)",fstr)
+                screenma = re.search("[0-9.]\s*inch",fstr)
+                camerama = re.search("Camera",fstr)
+                batteryma = re.search("[0-9.]+\s*mAh",fstr)
+                processorma = re.search(".*Processor",fstr)
+                if stroragema:
+                    rammatch = re.search("([0-9.]+\s*GB)\s*RAM",fstr)
+                    if rammatch:
+                        ram = rammatch.group(1).strip()
+                    rommatch = re.search("([0-9.]+\s*GB)\s*ROM",fstr)
+                    if rommatch:
+                        rom = rommatch.group(1).strip()
+                    extmatch = re.search("Expandable[^|]*([0-9.]+\s*GB)",fstr)    
+                    if extmatch:
+                        ext = extmatch.group(1).strip()
+                elif screenma:
+                    screen = screenma.group(0)
+                elif camerama:
+                    fcma = re.search("([0-9.]+\s*MP)\s*Primary",fstr)
+                    if fcma:
+                        main = fcma.group(1)
+                    bcma = re.search("([0-9.]+\s*MP)\s*Front",fstr)
+                    if bcma:
+                        front = bcma.group(1)
+                elif batteryma:
+                    battery = batteryma.group(0)
+                elif processorma:
+                    processor = processorma.group(0).strip()
+
+            info = {
+                "brand":brand,
+                "title":ptitle,
+                "color":color,
+                "href":phref,
+                "rating":realnum,
+                "avgrate":avgrate,
+                "reviewNum":reviewNum,
+                "RAM":ram,
+                "ROM":rom,
+                "EXT":ext,
+                "screen":screen,
+                "pcamera":main,
+                "scamera":front,
+                "battery":battery,
+                "processor":processor
+            }
+            infos.append(info)
+ 
         if len(infos) == 0:
             return
         else:
