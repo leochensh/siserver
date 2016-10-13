@@ -118,7 +118,7 @@ class modelSpider(Spider):
                     rommatch = re.search("([0-9.]+\s*GB)\s*ROM",fstr)
                     if rommatch:
                         rom = rommatch.group(1).strip()
-                    extmatch = re.search("Expandable[^|]*([0-9.]+\s*GB)",fstr)    
+                    extmatch = re.search("Expandable[^|0-9]*([0-9.]+\s*GB)",fstr)    
                     if extmatch:
                         ext = extmatch.group(1).strip()
                 elif screenma:
@@ -150,7 +150,8 @@ class modelSpider(Spider):
                 "pcamera":main,
                 "scamera":front,
                 "battery":battery,
-                "processor":processor
+                "processor":processor,
+                "price":price
             }
             infos.append(info)
  
