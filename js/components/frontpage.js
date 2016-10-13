@@ -34,8 +34,9 @@ export var Frontpage = React.createClass({
     render() {
 
         return (
-            <div  className="imgrow" >
-                <div className="row" style={{position:"relative"}}>
+            <div  className="row" style={{position:"relative"}} >
+                <img style={{position:"absolute",top:"px",width:"1400px",height:"580px"}}src="image/background.png"/>
+                <div className="row" >
                     <div className="col-md-2 col-md-offset-5">
                         <a style={{position:"absolute",top:"20px"}}>
                             <img style={{width:"100px",height:"100px"}} src="image/LOGO.png"/>
@@ -44,10 +45,10 @@ export var Frontpage = React.createClass({
 
                 </div>
                 <div className="row" >
-                    <div  style={{position:"relative"}}>
-                        <img style={{position:"absolute",top:"200px",width:"680px",height:"80px"}} src="image/blue background.png"/>
+                    <div  >
+                        <img style={{position:"absolute",top:"250px",width:"680px",height:"80px"}} src="image/blue background.png"/>
 
-                        <div style={{position:"absolute",top:"200px",left:"150px"}}>
+                        <div style={{position:"absolute",top:"250px",left:"150px"}}>
 
                            <p><h1 style={{color:"#FFFFFF"}}>Survey Details<strong> | Insight Future</strong></h1></p>
                         </div>
@@ -55,29 +56,29 @@ export var Frontpage = React.createClass({
 
                 </div>
                 <div calssName="row" >
-                    <div className="col-md-4 col-md-offset-8" style={{position:"relative"}}>
+                    <div className="col-md-4 col-md-offset-8"      >
                     <a
                         type="button"
                         href="../uploads/Ouresa用户手册.rar"
-                        style={{position:"absolute",top:"300px",left:"160px"}}
+                        style={{position:"absolute",top:"320px",left:"160px"}}
                         ><h3 style={{color:"#FFFFFF"}}><strong>Download Manual</strong></h3></a>
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-md-1 col-md-offset-9" style={{position:"relative"}}>
-                        <img style={{position:"absolute",top:"350px"}} src="image/Scan or Click background.png"/>
+                    <div className="col-md-1 col-md-offset-9"    >
+                        <img style={{position:"absolute",top:"370px"}} src="image/Scan or Click background.png"/>
                             <div>
-                                <div style={{position:"absolute",top:"350px",left:"50px"}} >
+                                <div style={{position:"absolute",top:"370px",left:"50px"}} >
                                     <h3 style={{color:"#FFFFFF"}}><strong>SCAN</strong></h3>
                                 </div>
-                                <div style={{position:"absolute",top:"390px",left:"100px"}}>
+                                <div style={{position:"absolute",top:"410px",left:"100px"}}>
                                     <h3 style={{color:"#FFFFFF"}}>or</h3>
                                 </div>
-                                <div style={{position:"absolute",top:"430px",left:"50px"}}>
+                                <div style={{position:"absolute",top:"450px",left:"50px"}}>
                                     <h3 style={{color:"#FFFFFF"}}><strong>CLICK</strong></h3>
                                 </div>
                             </div>
-                            <div style={{position:"absolute",top:"370px",left:"150px"}} >
+                            <div style={{position:"absolute",top:"390px",left:"150px"}} >
                                <a
                                    type="button"
                                    onClick={this.handleClick}
@@ -85,8 +86,8 @@ export var Frontpage = React.createClass({
                             </div>
                     </div>
                 </div>
-                <div className="row" style={{position:"relative"}}>
-                        <div style={{position:"absolute",top:"495px",left:"520px"}} >
+                <div className="row"     >
+                        <div style={{position:"absolute",top:"555px",left:"520px"}} >
                            <h6 style={{color:"#FFFFFF"}}>© Copyright 2016 Ouresa. All rights reserved.</h6>
                         </div>
                 </div>

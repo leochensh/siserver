@@ -2,7 +2,7 @@
 @import url(./checkradio.css);
 body {
   padding-top: 50px;
-  padding-bottom: 70px; }
+  padding-bottom: 20px; }
 
 .paddingpanel {
   padding: 30px; }
@@ -18,8 +18,9 @@ body {
   background-color: lightgrey; }
 .imgrow{
   background-image:url("../image/background.png");
+  background-repeat: no-repeat;
   background-size:contain;
-  Height: 550px;
+  Height: 570px;
 }
 
 .loginalert {
