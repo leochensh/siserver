@@ -2030,11 +2030,8 @@ aclHandler.registerWait(function(acl){
 
     app.get("/admin/survey/answer/list/:surveyid",function(req,res){
         var surveyid = req.params.surveyid;
-        console.log("DEBUG +++++++++++++++++++++++++++++++++++")
         if(surveyid && ObjectID.isValid(surveyid)){
             Admin.getSurveyAnswerList(surveyid,function(err,answers){
-                console.log("ANSWERS IS ++++++++++++++++");
-                console.log(answers);
                 successMsg.body = answers;
                 res.send(JSON.stringify(successMsg));
             })
@@ -2690,10 +2687,17 @@ aclHandler.registerWait(function(acl){
                             scoreStart = parseInt(q.scorelist[0].start);
                             scoreEnd = parseInt(q.scorelist[0].end);
                             scoreStep = parseInt(q.scorelist[0].step);
-                        }
 
-                        for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                            firstQ.push(base_str+"_"+(parseInt(i)))
+                            for(var scoreIndex in q.scorelist){
+                                var curentScore = q.scorelist[scoreIndex];
+                                scoreStart = parseInt(curentScore.start);
+                                scoreEnd = parseInt(curentScore.end);
+                                scoreStep = parseInt(curentScore.step);
+
+                                for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
+                                    firstQ.push(base_str+"_"+(parseInt(scoreIndex)+1)+"_"+(parseInt(i)));
+                                }
+                            }
                         }
                     }
 
@@ -2799,22 +2803,41 @@ aclHandler.registerWait(function(acl){
                             var scoreStep = 1;
                             var tempList = [];
                             if(q.scorelist && _.isArray(q.scorelist)){
+                                // console.log("DEBUG+++++++++++++++++");
+
+
                                 scoreStart = parseInt(q.scorelist[0].start);
                                 scoreEnd = parseInt(q.scorelist[0].end);
                                 scoreStep = parseInt(q.scorelist[0].step);
-                            }
 
-                            var qfi = _.findIndex(calist,function(item){
-                                return item.questionid == q._id;
-                            });
-                            if(qfi>=0){
-                                if(calist[qfi].scorelist){
-                                    var sfi = _.findIndex(calist[qfi].scorelist,function(item){
-                                        return item.index == 0;
-                                    })
+                                var qfi = _.findIndex(calist,function(item){
+                                    return item.questionid == q._id;
+                                });
+
+                                // console.log("qfi+++++++++++++++++++++")
+                                // console.log(qfi);
+                                // console.log(q.scorelist)
+
+                                for(var scoreIndex in q.scorelist){
+                                    var currentScore = q.scorelist[scoreIndex];
+                                    scoreStart = parseInt(currentScore.start);
+                                    scoreEnd = parseInt(currentScore.end);
+                                    scoreStep = parseInt(currentScore.step);
+                                    var sfi = null;
+                                    if(qfi>=0){
+                                        sfi = _.findIndex(calist[qfi].scorelist,function(item){
+                                            return parseInt(item.index) == scoreIndex;
+                                        })
+                                    }
+                                    // console.log("sfi+++++++++++++++++++++++++++")
+                                    // console.log(sfi)
                                     if(sfi>=0){
                                         for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                                            if(i == calist[qfi].scorelist[sfi].score){
+                                            // console.log("qscore is "+i);
+                                            // console.log("real score is "+calist[qfi].scorelist[sfi].score)
+
+                                            if(i == parseInt(calist[qfi].scorelist[sfi].score)){
+                                                // console.log("MATTTTTTTTTTTTTTTTTTTTT")
                                                 tempList.push(1);
                                             }
                                             else{
@@ -2829,19 +2852,9 @@ aclHandler.registerWait(function(acl){
                                         }
                                     }
 
-                                }
-                                else{
-                                    for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                                        tempList.push("")
-                                    }
+
                                 }
 
-
-                            }
-                            else{
-                                for(var i=scoreStart;i<=scoreEnd;i+=scoreStep){
-                                    tempList.push("")
-                                }
                             }
                             for(var tindex in tempList){
                                 firstQ.push(tempList[tindex]);
