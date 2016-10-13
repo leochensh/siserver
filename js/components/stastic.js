@@ -530,21 +530,7 @@ export var Stastic = React.createClass({
             </a>;
         }
         qlist.push(
-            <div className="row" style={{margin:"15px"}}>
-                <div className="col-md-4">
-                    <a
-                        type="button"
-
-                        onClick={this.exportxlsx}
-                        className="btn btn-primary">
-                        <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span> Export to file
-                    </a>
-                </div>
-                <div className="col-md-8">
-                    {elink}
-                </div>
-            </div>
-
+            ""
         );
         var filterRenderList = [];
         if(this.state.survey){
@@ -864,24 +850,28 @@ export var Stastic = React.createClass({
         var mlist = [];
         for(var i in this.state.answerlist){
             var a = this.state.answerlist[i];
+            var deleteButton = "";
+            if(this.props.loginInfo.ifLogin){
+                deleteButton = <a
+                    type="button"
+                    onClick={this.deleteAnswerClick(i)}
+                    className="btn btn-danger">Delete</a>;
+            }
             mlist.push(
-                <tr>
-                    <td>{(parseInt(i)+1)}</td>
-                    <td>{a.name?a.name:""}</td>
-                    <td>{new Date(a.ctime).toLocaleString()}</td>
-                    <td>{a.investigatorid?"Android Client":"Web"}</td>
-                    <td className="list_btn">
+                <tr className="row">
+                    <td className="col-md-1">{(parseInt(i)+1)}</td>
+                    <td className="col-md-5">{a.name?a.name:""}</td>
+                    <td className="col-md-2">{new Date(a.ctime).toLocaleString()}</td>
+                    <td className="col-md-1">{a.investigatorid?"Android Client":"Web"}</td>
+                    <td className="list_btn col-md-3">
                         <div className="btn-group" role="group" >
                             <a
                                 type="button"
                                 onClick={this.viewdetail(i)}
                                 className="btn btn-info">View</a>
 
+                            {deleteButton}
 
-                            <a
-                                type="button"
-                                onClick={this.deleteAnswerClick(i)}
-                                className="btn btn-danger">Delete</a>
                         </div>
                     </td>
                 </tr>
@@ -1136,31 +1126,50 @@ export var Stastic = React.createClass({
                     </h3>
                 </div>
                 <ul className="nav nav-tabs" role="tablist">
-                    <li role="presentation" className="active"><a href="#answerdetail" aria-controls="answerdetail" role="tab" data-toggle="tab"><h4>Survey Answers List </h4></a></li>
-                    <li role="presentation"><a  href="#collapseExample" aria-controls="collapseExample" role="tab" data-toggle="tab"><h4>Toggle Survey Answers General Info</h4></a></li>
+                    <li role="presentation" className="active"><a href="#collapseExample" aria-controls="answerdetail" role="tab" data-toggle="tab"><h4>Survey Answers General Info </h4></a></li>
+                    <li role="presentation"><a  href="#answerdetail" aria-controls="collapseExample" role="tab" data-toggle="tab"><h4>Survey Answers List</h4></a></li>
                 </ul>
                 <div className="tab-content">
-                    <div role="tabpanel" className="tab-pane active" id="answerdetail">
-                        <div className="panel panel-default paddingpanel">
-                            <table  className="table" >
-                                <thead>
-                                <tr>
-                                    <th><span className="">##</span></th>
-                                    <th><span className="">Answer Name</span></th>
-                                    <th><span className="">Create Time</span></th>
-                                    <th><span className="">Source</span></th>
-                                    <th><span className="">Operations</span></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {mlist}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div role="tabpanel" className="tab-pane" id="collapseExample">
+
+                    <div role="tabpanel" className="tab-pane active" id="collapseExample">
                         <div className="panel panel-default paddingpanel">
                             {qlist}
+                        </div>
+                    </div>
+                    <div role="tabpanel" className="tab-pane" id="answerdetail">
+                        <div className="panel panel-default paddingpanel">
+                            <div className="row" style={{margin:"15px"}}>
+                                <div className="col-md-4">
+                                    <a
+                                        type="button"
+
+                                        onClick={this.exportxlsx}
+                                        className="btn btn-primary">
+                                        <span className="glyphicon glyphicon-new-window" aria-hidden="true"></span> Export original data
+                                    </a>
+                                </div>
+                                <div className="col-md-8">
+                                    {elink}
+                                </div>
+                            </div>
+                            <div className="table-responsive">
+
+                                <table  className="table" >
+                                    <thead>
+                                    <tr className="row">
+                                        <th className="col-md-1"><span className="">##</span></th>
+                                        <th className="col-md-5"><span className="">Answer Name</span></th>
+                                        <th className="col-md-2"><span className="">Create Time</span></th>
+                                        <th className="col-md-1"><span className="">Source</span></th>
+                                        <th className="col-md-3"><span className="">Operations</span></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {mlist}
+                                    </tbody>
+                                </table>
+                            </div>
+
                         </div>
                     </div>
                 </div>

@@ -75,7 +75,13 @@ export var Quest = React.createClass({
         return infunc;
     },
     splitEnglish(v){
-        return v.split("/@/")[0];
+        if(v){
+            return v.split("/@/")[0];
+        }
+        else{
+            return ""
+        }
+
     },
     nextq(direction){
         var qsize = this.state.survey.questionlist.length;
