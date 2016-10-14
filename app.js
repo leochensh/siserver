@@ -2823,7 +2823,7 @@ aclHandler.registerWait(function(acl){
                                     scoreStart = parseInt(currentScore.start);
                                     scoreEnd = parseInt(currentScore.end);
                                     scoreStep = parseInt(currentScore.step);
-                                    var sfi = null;
+                                    var sfi = -1;
                                     if(qfi>=0){
                                         sfi = _.findIndex(calist[qfi].scorelist,function(item){
                                             return parseInt(item.index) == scoreIndex;
