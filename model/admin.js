@@ -1049,15 +1049,28 @@ Admin.createSpider = function(sname,callback){
                         callback(err,"BUSY");
                     }
                     else{
-                        var ns = {
-                            name:sname,
-                            ctime:new Date(),
-                            status:dict.SPIDERSTATU_ACTIVE
-                        };
-                        collection.insertOne(ns,function(err,result){
-                            mongoPool.release(db);
-                            callback(err,result.insertedId);
+                        collection.find({name:sname}).sort({ctime:-1}).limit(1).next(function (err,newspider){
+                            if(newspider){
+                                var tdiff = new Date() - new Date(newspider.ctime);
+                                if(tdiff<=3600*1000*24){
+                                    mongoPool.release(db);
+                                    callback(err,"QUICK");
+                                }
+                                else{
+                                    var ns = {
+                                        name:sname,
+                                        ctime:new Date(),
+                                        status:dict.SPIDERSTATU_ACTIVE
+                                    };
+                                    collection.insertOne(ns,function(err,result){
+                                        mongoPool.release(db);
+                                        callback(err,result.insertedId);
+                                    })
+                                }
+                            }
+
                         })
+
                     }
                 })
             });

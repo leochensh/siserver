@@ -140,6 +140,9 @@ class Edatastore extends Store{
 
                         window.alert("There is a active spider running. You can not create another spider now.")
 
+                    },
+                    416:function(){
+                        window.alert("For preventing from banned by site administrator, you can not create spider too frequently.")
                     }
                 }
             });

@@ -983,32 +983,32 @@ aclHandler.registerWait(function(acl){
     app.get("/editor/survey/list",acl.middleware(2),function(req,res){
         var editorid = req.session.uid;
 
-            Staff.getEditorSurveyList(editorid,function(err,ss){
-                if(!ss){
-                    ss = [];
-                }
-                logger.logger.log("info","editor get survey list",{
-                    editorid:req.session.uid});
-                res.status(200);
-                successMsg.body = ss;
+        Staff.getEditorSurveyList(editorid,function(err,ss){
+            if(!ss){
+                ss = [];
+            }
+            logger.logger.log("info","editor get survey list",{
+                editorid:req.session.uid});
+            res.status(200);
+            successMsg.body = ss;
 
-                res.send(JSON.stringify(successMsg));
-            });
+            res.send(JSON.stringify(successMsg));
+        });
 
 
     });
 
     app.get("/sadmin/survey/list",acl.middleware(1),function(req,res){
 
-            Staff.getSAdminSurveyList(function(err,ss){
+        Staff.getSAdminSurveyList(function(err,ss){
 
-                logger.logger.log("info","admin get survey list",{
-                    editorid:req.session.uid});
-                res.status(200);
-                successMsg.body = ss;
+            logger.logger.log("info","admin get survey list",{
+                editorid:req.session.uid});
+            res.status(200);
+            successMsg.body = ss;
 
-                res.send(JSON.stringify(successMsg));
-            });
+            res.send(JSON.stringify(successMsg));
+        });
 
 
 
@@ -1090,17 +1090,17 @@ aclHandler.registerWait(function(acl){
     app.get("/admin/survey/list",acl.middleware(2),function(req,res){
         var orgid = req.session.orgid;
 
-            Staff.getAdminSurveyList(orgid,function(err,ss){
-                if(!ss){
-                    ss = [];
-                }
-                logger.logger.log("info","admin get survey list",{
-                    editorid:req.session.uid});
-                res.status(200);
-                successMsg.body = ss;
+        Staff.getAdminSurveyList(orgid,function(err,ss){
+            if(!ss){
+                ss = [];
+            }
+            logger.logger.log("info","admin get survey list",{
+                editorid:req.session.uid});
+            res.status(200);
+            successMsg.body = ss;
 
-                res.send(JSON.stringify(successMsg));
-            });
+            res.send(JSON.stringify(successMsg));
+        });
 
 
 
@@ -1508,6 +1508,11 @@ aclHandler.registerWait(function(acl){
                 if(msg == "BUSY"){
                     res.status(409);
                     errorMsg.code = "busy";
+                    res.send(JSON.stringify(errorMsg));
+                }
+                else if(msg == "QUICK"){
+                    res.status(416);
+                    errorMsg.code = "quick";
                     res.send(JSON.stringify(errorMsg));
                 }
                 else{
