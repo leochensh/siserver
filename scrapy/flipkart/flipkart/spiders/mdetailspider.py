@@ -55,16 +55,14 @@ class modelDetailSpider(Spider):
 
 
         dfeaturemap = {
-            "featureTag":[["SIM","Type"],["Operating","System"],
-                          
-                          ["Network", "Type"],
+            "featureTag":[["SIM","Type"],["Operating","System"],["Model","Number"],
+                          ["Network", "Type"],["Browse","Type"],["Processor","Clock","Speed"],
                           ["Resolution"]],
-            "displayTag":["simtype","os",
-                          
-                          "network",
+            "displayTag":["simtype","os","modelnumber",
+                          "network","browsetype","processorclock",
                           "Resolution"],
-            "value":["","",
-                     "",
+            "value":["","","",
+                     "","","",
                      ""]
         }
 

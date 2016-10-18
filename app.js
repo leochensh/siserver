@@ -1613,9 +1613,9 @@ aclHandler.registerWait(function(acl){
 
     var exportDomainList = {
         "flipkart":[
-            "title","brand","color","keyfeature","price","simtype","pcamera","scamera",
-            "screen","Resolution","RAM","ROM","os","osversionnum","osversionname","battery",
-            "rating","avgrate","reviewNum"
+            "title","brand","modelnumber","color","keyfeature","price","simtype","pcamera","scamera",
+            "screen","Resolution","RAM","ROM","ext","os","osversionnum","osversionname","battery",
+            "rating","avgrate","reviewNum","processor","processorclock","browsetype"
         ],
         "amazonindia":[
             "title","brand","color","specialfeature","price","Camera",
