@@ -2068,12 +2068,6 @@ aclHandler.registerWait(function(acl){
                     id:req.session.uid
                 });
 
-                for(var surveyIndex in msg){
-                    if(msg[surveyIndex].questionlist){
-                        msg[surveyIndex].questionCount = msg[surveyIndex].questionlist.length;
-                    }
-                }
-
                 res.status(200);
                 successMsg.body = msg;
 

@@ -532,10 +532,14 @@ Staff.getStaffSurveyList = function(staffid,orgid,role,callback){
                         publishstatus:dict.SURVEYPUBLISHSTATUS_PUBLICPERSONAL,
                         type:dict.TYPE_SURVEY
                     }]},{
-                        orgid:0,questionlist:0,editorid:0
+                        orgid:0,editorid:0
                     }).sort({ctime:-1}).toArray(function(err,surveys){
                         for(var i in surveys){
                             surveys[i].surveyid = surveys[i]._id;
+                            if(surveys[i].questionlist){
+                                surveys[i].questionCount = surveys[i].questionlist.length;
+                            }
+
                         }
                         mongoPool.release(db);
                         callback(err,surveys);
