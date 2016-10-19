@@ -1614,7 +1614,7 @@ aclHandler.registerWait(function(acl){
     var exportDomainList = {
         "flipkart":[
             "title","brand","modelnumber","color","keyfeature","price","simtype","pcamera","scamera",
-            "screen","Resolution","RAM","ROM","ext","os","osversionnum","osversionname","battery",
+            "screen","Resolution","RAM","ROM","EXT","os","osversionnum","osversionname","battery",
             "rating","avgrate","reviewNum","processor","processorclock","browsetype"
         ],
         "amazonindia":[
@@ -2067,6 +2067,13 @@ aclHandler.registerWait(function(acl){
                 logger.logger.log("info","staff get surveylist",{
                     id:req.session.uid
                 });
+
+                for(var surveyIndex in msg){
+                    if(msg[surveyIndex].questionlist){
+                        msg[surveyIndex].questionCount = msg[surveyIndex].questionlist.length;
+                    }
+                }
+
                 res.status(200);
                 successMsg.body = msg;
 
