@@ -860,7 +860,7 @@ export var Newsurvey = React.createClass({
                                     </div>
                                 </nav>
 
-                                <form className="form-horizontal">
+                                <div className="form-horizontal">
                                     <div className="form-group">
                                         <label id="surveynameform" htmlFor="suveynameinput" className="col-sm-2 control-label">Survey Name</label>
                                         <div className="col-sm-10">
@@ -876,7 +876,7 @@ export var Newsurvey = React.createClass({
                                     </div>
 
 
-                                </form>
+                                </div>
                                 <div className="col-sm-offset-2 col-sm-10" style={saveButtonStype}>
                                     <a className="btn btn-primary"
                                        id = "surveynamesavebutton"

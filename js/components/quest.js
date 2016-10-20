@@ -13,7 +13,8 @@ export var Quest = React.createClass({
         return{
             survey:null,
             currentIndex:0,
-            ifsubmit:false
+            ifsubmit:false,
+            previndex:0
         }
     },
     contextTypes: {
@@ -91,38 +92,61 @@ export var Quest = React.createClass({
 
 
             if(direction == "right"){
-                var that  = this;
-                var nextindex = this.state.currentIndex+step;
-                var amatchindex = _.findIndex(this.state.answer.answerlist,function(item){
-                    return item.questionid == that.state.survey.questionlist[that.state.currentIndex]._id;
-                });
-                if(amatchindex>=0){
-                    var sindexarr = this.state.answer.answerlist[amatchindex].selectindexlist;
-                    console.log(sindexarr);
-                    for(var sindex in sindexarr){
-                        var selectjumpindex = sindexarr[sindex];
-                        console.log(selectjumpindex);
-                        console.log(this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid)
-                        if(this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid &&
-                            this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid != -1
-                        ){
-                            nextindex = _.findIndex(this.state.survey.questionlist,function(item){
-                                return item._id == that.state.survey.questionlist[that.state.currentIndex].selectlist[selectjumpindex].qid;
-                            });
-                            console.log("herrrrrrrrrrrrrrrr")
-                            console.log(nextindex)
-                            break;
+                var currentQ = this.state.survey.questionlist[this.state.currentIndex];
+                if((currentQ.type == Constant.QTYPE_DESCRIPTION ||
+                    currentQ.type==Constant.QTYPE_DESCRIPTION_IMAGE_TEXT||
+                    currentQ.type==Constant.QTYPE_DESCRIPTION_RECORD_TEXT) &&
+                    currentQ.selectlist &&
+                    currentQ.selectlist.length>0 &&
+                    currentQ.selectlist[0].qid &&
+                    currentQ.selectlist[0].qid != -1){
+                    var that = this;
+
+                    var nextindex = _.findIndex(this.state.survey.questionlist,function(item){
+                        return item._id == currentQ.selectlist[0].qid;
+                    });
+                    if(nextindex<0){
+                        nextindex = this.state.currentIndex+step;
+                    }
+                    this.setState({
+                        previndex:this.state.currentIndex,
+                        currentIndex:nextindex
+                    })
+                }
+                else{
+                    var that  = this;
+                    var nextindex = this.state.currentIndex+step;
+                    var amatchindex = _.findIndex(this.state.answer.answerlist,function(item){
+                        return item.questionid == that.state.survey.questionlist[that.state.currentIndex]._id;
+                    });
+                    if(amatchindex>=0){
+                        var sindexarr = this.state.answer.answerlist[amatchindex].selectindexlist;
+                        for(var sindex in sindexarr){
+                            var selectjumpindex = sindexarr[sindex];
+                            if(this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid &&
+                                this.state.survey.questionlist[this.state.currentIndex].selectlist[selectjumpindex].qid != -1
+                            ){
+                                nextindex = _.findIndex(this.state.survey.questionlist,function(item){
+                                    return item._id == that.state.survey.questionlist[that.state.currentIndex].selectlist[selectjumpindex].qid;
+                                });
+                                if(nextindex<0){
+                                    nextindex = this.state.currentIndex+step;
+                                }
+                                break;
+                            }
                         }
                     }
+                    this.setState({
+                        previndex:this.state.currentIndex,
+                        currentIndex:nextindex
+                    })
                 }
-                this.setState({
-                    currentIndex:nextindex
-                })
+
 
             }
             else{
                 this.setState({
-                    currentIndex:this.state.currentIndex-step
+                    currentIndex:this.state.previndex
                 })
             }
 
@@ -527,8 +551,8 @@ export var Quest = React.createClass({
                             <select
                                 style={{marginTop:"30px"}}
                                 className="form-control input-lg"
-                                    value={scoreValue}
-                                    onChange={this.scorevalueChange(si)}
+                                value={scoreValue}
+                                onChange={this.scorevalueChange(si)}
                             >
                                 {oarray}
                             </select>
