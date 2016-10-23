@@ -101,6 +101,18 @@ class modelDetailSpider(Spider):
         for fi,fd in enumerate(dfeaturemap["displayTag"]):
             info[fd] = dfeaturemap["value"][fi].strip()
 
+        info["keyfeature"] = "|".join(dfeaturemap["value"])
+        if "Resolution" in info:
+            screenResStr = info["Resolution"]
+            resoRe = re.search("(\d+)[^0-9]*(\d+)",screenResStr)
+            if resoRe:
+                v1 = int(resoRe.group(1))
+                v2 = int(resoRe.group(2))
+                if v1>=v2:
+                    info["Resolution"] = str(v1)+"*"+str(v2)
+                else:
+                    info["Resolution"] = str(v2)+"*"+str(v1)
+
         infos.append(info)
 
         item["infos"] = infos

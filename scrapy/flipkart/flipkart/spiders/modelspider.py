@@ -107,7 +107,7 @@ class modelSpider(Spider):
             for featureItem in featureListSel:
                 fstr = featureItem.extract().strip()
                 stroragema = re.search("(ROM|RAM)",fstr)
-                screenma = re.search("[0-9.]\s*inch",fstr)
+                screenma = re.search("\d+\.{0,1}\d*\s*inch",fstr)
                 camerama = re.search("Camera",fstr)
                 batteryma = re.search("[0-9.]+\s*mAh",fstr)
                 processorma = re.search(".*Processor",fstr)
