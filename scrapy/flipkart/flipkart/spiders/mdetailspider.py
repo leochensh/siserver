@@ -57,13 +57,13 @@ class modelDetailSpider(Spider):
         dfeaturemap = {
             "featureTag":[["SIM","Type"],["Operating","System"],["Model","Number"],
                           ["Network", "Type"],["Browse","Type"],["Processor","Clock","Speed"],
-                          ["Resolution"]],
+                          ["Resolution"],["Model","Name"],"Color"],
             "displayTag":["simtype","os","modelnumber",
                           "network","browsetype","processorclock",
-                          "Resolution"],
+                          "Resolution","modelname","color"],
             "value":["","","",
                      "","","",
-                     ""]
+                     "","",""]
         }
 
         for fi,ff in enumerate(dfeaturemap["featureTag"]): 
@@ -93,13 +93,21 @@ class modelDetailSpider(Spider):
         #     if len(avgratingsel)>0:
         #         avgRate = avgratingsel[0].extract().strip()
         # rmatch = self.rc.search(reviewLink)
-        
+
         info = {
             "modleid":str(self.urlMap[oldurl]["_id"])
         }
 
+        brandSelector = response.xpath(
+            '//div[contains(@class,"_1joEet")]/div[contains(@class,"_1HEvv0"]/a[contains(@class,"_1KHd47")]/text()')
+        if len(brandSelector)>=4:
+            brandStr = brandSelector[3].extract().strip()
+            if brandStr:
+                info["brand"] = brandStr
         for fi,fd in enumerate(dfeaturemap["displayTag"]):
-            info[fd] = dfeaturemap["value"][fi].strip()
+            tempValue = dfeaturemap["value"][fi].strip()
+            if tempValue:
+                info[fd] = dfeaturemap["value"][fi].strip()
 
         info["keyfeature"] = "|".join(dfeaturemap["value"])
         if "Resolution" in info:

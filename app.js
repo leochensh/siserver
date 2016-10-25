@@ -1613,7 +1613,7 @@ aclHandler.registerWait(function(acl){
 
     var exportDomainList = {
         "flipkart":[
-            "title","brand","modelnumber","color","keyfeature","price","simtype","pcamera","scamera",
+            "title","brand","modelnumber","modelname","color","keyfeature","price","simtype","pcamera","scamera",
             "screen","Resolution","RAM","ROM","EXT","os","osversionnum","osversionname","battery",
             "rating","avgrate","reviewNum","processor","processorclock","browsetype"
         ],
