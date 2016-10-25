@@ -2868,6 +2868,9 @@ aclHandler.registerWait(function(acl){
                         }
                         else if(q.type == dict.QTYPE_SEQUENCE){
                             var sortlist = [];
+                            for(var j in q.selectlist){
+                                sortlist.push("")
+                            }
                             var qfi = _.findIndex(calist,function(item){
                                 return item.questionid == q._id;
                             });
