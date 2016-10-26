@@ -98,8 +98,7 @@ class modelDetailSpider(Spider):
             "modleid":str(self.urlMap[oldurl]["_id"])
         }
 
-        brandSelector = response.xpath(
-            '//div[contains(@class,"_1joEet")]/div[contains(@class,"_1HEvv0"]/a[contains(@class,"_1KHd47")]/text()')
+        brandSelector = response.xpath('//div[contains(@class,"_1joEet")]/div[contains(@class,"_1HEvv0")]/a[contains(@class,"_1KHd47")]/text()')
         if len(brandSelector)>=4:
             brandStr = brandSelector[3].extract().strip()
             if brandStr:
