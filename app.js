@@ -1611,16 +1611,107 @@ aclHandler.registerWait(function(acl){
     //     }
     // });
 
+    //var exportDomainList = {
+    //    "flipkart":[
+    //        "title","brand","modelnumber","modelname","color","keyfeature","price","simtype","pcamera","scamera",
+    //        "screen","Resolution","RAM","ROM","EXT","os","osversionnum","osversionname","battery",
+    //        "rating","avgrate","reviewNum","processor","processorclock","browsetype"
+    //    ],
+    //    "amazonindia":[
+    //        "title","brand","color","specialfeature","price","Camera",
+    //        "RAM","os","battery",
+    //        "avgrate","reviewNum"
+    //    ]
+    //};
+
+    var matchDigital = function(v){
+        var matchRes = v.match(/[0-9.]+/);
+        if(matchRes){
+            return matchRes[0]
+        }
+        else{
+            return ""
+        }
+    }
+
     var exportDomainList = {
         "flipkart":[
-            "title","brand","modelnumber","modelname","color","keyfeature","price","simtype","pcamera","scamera",
-            "screen","Resolution","RAM","ROM","EXT","os","osversionnum","osversionname","battery",
-            "rating","avgrate","reviewNum","processor","processorclock","browsetype"
+            {in:"title",out:"title",op:null},
+            {in:"brand",out:"brand",op:null},
+            {in:"modelname",out:"modelname",op:null},
+            {in:"modelnumber",out:"modelnumber",op:null},
+            {in:"color",out:"color",op:null},
+            {in:"color",out:"update-color",op:function(v){
+                var carray = [];
+                var colorReArray =
+                    [/black|Black/,/White|white/,/red|Red/,
+                        /blue|Blue/,/golden|Golden/,/grey|Grey/,
+                        /silver|Silver/,/green|Green/,/brown|Brown/,
+                        /orange|Orange/,/yellow|Yellow/
+                    ];
+                for(var reitem in colorReArray){
+                    var cre = colorReArray[reitem];
+                    var matchRes = v.match(cre);
+                    if(matchRes){
+                        carray.push(matchRes[0].toLowerCase());
+                    }
+                }
+                return carray.join("&");
+            }},
+            {in:"keyfeature",out:"keyfeature",op:null},
+            {in:"price",out:"price",op:null},
+            {in:"simtype",out:"simtype",op:null},
+            {in:"pcamera",out:"pcamera(MP)",op:matchDigital},
+            {in:"scamera",out:"scamera(MP)",op:matchDigital},
+            {in:"screen",out:"screen",op:matchDigital},
+            {in:"Resolution",out:"Resolution",op:null},
+            {in:"RAM",out:"RAM(GB)",op:matchDigital},
+            {in:"ROM",out:"ROM(GB)",op:matchDigital},
+            {in:"EXT",out:"EXT(GB)",op:matchDigital},
+            {in:"os",out:"osinfo",op:null},
+            {in:"os",out:"os",op:function(v){
+                return v.split(" ")[0]
+            }},
+            {in:"os",out:"osversionnum",op:matchDigital},
+            {in:"os",out:"osversionname",op:function(v){
+                var rem = v.match(/[^\s]+\s+([^\s]+])\s+[^\s]+/);
+                if(rem){
+                    return rem[1]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"battery",out:"battery(mAh)",op:matchDigital},
+            {in:"rating",out:"ratingNum",op:null},
+            {in:"avgrate",out:"avgrate",op:null},
+            {in:"reviewNum",out:"reviewNum",op:null},
+            {in:"processor",out:"processor",op:null},
+            {in:"processor",out:"processorOwner",op:function(v){
+                var rem = v.match("Exynos|MT|Qualcomm|SC|Media|Spreadtrum|MSM|Intel|Atom|Snapdragon");
+                if(rem){
+                    return rem[0]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"processorclock",out:"processorclock",op:null},
+            {in:"browsetype",out:"browsetype",op:null}
         ],
+
         "amazonindia":[
-            "title","brand","color","specialfeature","price","Camera",
-            "RAM","os","battery",
-            "avgrate","reviewNum"
+            {in:"title",out:"title",op:null},
+            {in:"brand",out:"brand",op:null},
+            {in:"color",out:"color",op:null},
+            {in:"specialfeature",out:"specialfeature",op:null},
+            {in:"price",out:"price",op:null},
+            {in:"Camera",out:"Camera",op:null},
+            {in:"RAM",out:"RAM",op:null},
+            {in:"os",out:"os",op:null},
+            {in:"battery",out:"battery",op:null},
+            {in:"avgrate",out:"avgrate",op:null},
+            {in:"reviewNum",out:"reviewNum",op:null}
         ]
     };
 
@@ -1631,16 +1722,36 @@ aclHandler.registerWait(function(acl){
 
             Admin.getSpiderDetailData(sid,function(err,models){
                 var data = [];
-                data.push(exportDomainList[sname]);
+                data.push(_.pluck(exportDomainList[sname],"out"));
                 for(var mindex in models){
                     var pitem = [];
                     for (var tagindex in exportDomainList[sname]){
-                        if (models[mindex][exportDomainList[sname][tagindex]]){
-                            pitem.push(models[mindex][exportDomainList[sname][tagindex]]);
+                        var currentMapObj = exportDomainList[sname][tagindex];
+                        var inKey = currentMapObj.in;
+                        var opFunc = currentMapObj.op;
+                        if(inKey in models[mindex]){
+                            var inValue = models[mindex][inKey];
+                            if(inValue){
+                                if(opFunc){
+                                    pitem.push(opFunc(inValue));
+                                }
+                                else{
+                                    pitem.push(inValue);
+                                }
+                            }
+                            else{
+                                pitem.push("")
+                            }
                         }
                         else{
-                            pitem.push("");
+                            pitem.push("")
                         }
+                        //if (models[mindex][exportDomainList[sname][tagindex]]){
+                        //    pitem.push(models[mindex][exportDomainList[sname][tagindex]]);
+                        //}
+                        //else{
+                        //    pitem.push("");
+                        //}
                     }
                     data.push(pitem);
                 }
