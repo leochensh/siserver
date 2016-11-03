@@ -30,7 +30,10 @@ class amazonIndiaModelDetailSpider(Spider):
         for model in modelList:
             if "href" in model:
                 self.urlMap[model["href"]] = model;
-                yield SplashRequest(model["href"], self.parse, args={'wait': 1,'timeout':180})
+                trueHref = model["href"]
+                if trueHref and trueHref[0:4]!= "http":
+                    trueHref = "http://www.amazon.in"+trueHref
+                yield SplashRequest(trueHref, self.parse, args={'wait': 1,'timeout':180})
 
     def buildXpathContainList(self,key,flist):
         rstr = '['

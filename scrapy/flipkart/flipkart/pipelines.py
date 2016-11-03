@@ -129,7 +129,10 @@ class amazonIndiamodelSpiderPipeline(object):
 
                 info["spiderid"] = self.spiderid
                 info["brandid"] = brandId
-                self.db[self.collection_name].insert(info)
+
+                productFind = self.db[self.collection_name].find_one({"spiderid":self.spiderid,"title":info["title"]})
+                if not productFind:
+                    self.db[self.collection_name].insert(info)
             return item
         else:
             return item
