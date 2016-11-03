@@ -100,5 +100,8 @@ class amazonInmodelSpider(Spider):
             print "++++++++++++++++++++++++++++++"
             print "current page is "+str(self.currentStart)
             print "++++++++++++++++++++++++++++++"
-            yield SplashRequest(self.baseUrl+str(self.currentStart)+self.tailUrl, self.parse, args={'wait': 10,'timeout':180})
+            if self.currentStart<=400:
+                yield SplashRequest(self.baseUrl+str(self.currentStart)+self.tailUrl, self.parse, args={'wait': 10,'timeout':180})
+            else:
+                return
 
