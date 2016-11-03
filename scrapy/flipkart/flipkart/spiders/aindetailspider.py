@@ -49,13 +49,13 @@ class amazonIndiaModelDetailSpider(Spider):
         dfeaturemap = {
             "featureTag":[["OS"],["RAM"],["Connectivity","technologies"],
                           ["Special", "features"],["Other", "camera","features"],["Colour"],
-                          ["Battery", "Power","Rating"]],
+                          ["Battery", "Power","Rating"],["Item","model","number"]],
             "displayTag":["os","RAM","network",
                           "specialfeature","Camera","color",
-                          "battery"],
+                          "battery","modelnumber"],
             "value":["","","",
                      "","","",
-                     ""]
+                     "",""]
         }
 
         for fi,ff in enumerate(dfeaturemap["featureTag"]): 
@@ -73,6 +73,15 @@ class amazonIndiaModelDetailSpider(Spider):
 
         for fi,fd in enumerate(dfeaturemap["displayTag"]):
             info[fd] = dfeaturemap["value"][fi].strip()
+
+        featureBulletList = response.xpath('//div[contains(@id,"feature-bullets")]/ul/li/text()');
+        ftbList = []
+        for fb in featureBulletList:
+            fstr = fb.extract().strip()
+            if fstr:
+                ftbList.append(fstr)
+
+        info["keyfeature"] = "|".join(ftbList)
 
         if len(info["os"]) == 0 and len(info["RAM"]) ==0 and len(info["network"])==0 and len(info["color"]) == 0 :
             yield SplashRequest(oldurl,self.parse,args={"wait":1,"timeout":180})

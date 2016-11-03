@@ -57,13 +57,19 @@ class modelDetailSpider(Spider):
         dfeaturemap = {
             "featureTag":[["SIM","Type"],["Operating","System"],["Model","Number"],
                           ["Network", "Type"],["Browse","Type"],["Processor","Clock","Speed"],
-                          ["Resolution"],["Model","Name"],"Color"],
+                          ["Resolution"],["Model","Name"],["Color"],
+                          ["Processor","Type"]
+                          ],
             "displayTag":["simtype","os","modelnumber",
                           "network","browsetype","processorclock",
-                          "Resolution","modelname","color"],
+                          "Resolution","modelname","color",
+                          "processor"
+                          ],
             "value":["","","",
                      "","","",
-                     "","",""]
+                     "","","",
+                     ""
+                     ]
         }
 
         for fi,ff in enumerate(dfeaturemap["featureTag"]): 
