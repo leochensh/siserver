@@ -29,10 +29,11 @@ class amazonIndiaModelDetailSpider(Spider):
         modelList = db["model"].find({"spiderid":self.spiderid})
         for model in modelList:
             if "href" in model:
-                self.urlMap[model["href"]] = model;
+                # self.urlMap[model["href"]] = model;
                 trueHref = model["href"]
                 if trueHref and trueHref[0:4]!= "http":
                     trueHref = "http://www.amazon.in"+trueHref
+                self.urlMap[trueHref] = model;
                 yield SplashRequest(trueHref, self.parse, args={'wait': 1,'timeout':180})
 
     def buildXpathContainList(self,key,flist):
@@ -77,9 +78,11 @@ class amazonIndiaModelDetailSpider(Spider):
         for fi,fd in enumerate(dfeaturemap["displayTag"]):
             info[fd] = dfeaturemap["value"][fi].strip()
 
-        featureBulletList = response.xpath('//div[contains(@id,"feature-bullets")]/ul/li/text()');
+        featureBulletList = response.xpath('//div[contains(@id,"feature-bullets")]/ul/li/text()')
         ftbList = []
         for fb in featureBulletList:
+            print "____________________________________"
+            print fb
             fstr = fb.extract().strip()
             if fstr:
                 ftbList.append(fstr)
