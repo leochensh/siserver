@@ -78,7 +78,7 @@ class amazonIndiaModelDetailSpider(Spider):
         for fi,fd in enumerate(dfeaturemap["displayTag"]):
             info[fd] = dfeaturemap["value"][fi].strip()
 
-        featureBulletList = response.xpath('//div[contains(@id,"feature-bullets")]/ul/li/text()')
+        featureBulletList = response.xpath('//div[contains(@id,"feature-bullets")]/ul/li/span/text()')
         ftbList = []
         for fb in featureBulletList:
             print "____________________________________"
