@@ -1761,7 +1761,7 @@ aclHandler.registerWait(function(acl){
                 }
             }},
             {in:"keyfeature",out:"screen",op:function(v){
-                var smatch = v.match(/([0-9.]+)[-\s]*inch]/)
+                var smatch = v.match(/([0-9.]+)[-\s]*inch/)
                 if(smatch){
                     return smatch[1];
                 }
@@ -1770,9 +1770,16 @@ aclHandler.registerWait(function(acl){
                 }
             }},
             {in:"keyfeature",out:"Resolution",op:function(v){
-                var rmatch = v.match(/([0-9]+)[x\s]*([0-9]+)/);
+                var rmatch = v.match(/([0-9]+)\s*x\s*([0-9]+)/);
                 if(rmatch){
-                    return rmatch[1]+"*"+rmatch[2];
+                    var s1 = parseInt(rmatch[1]);
+                    var s2 = parseInt(rmatch[2]);
+                    if(s1>=s2){
+                        return s1+"*"+s2;
+                    }
+                    else{
+                        return s2+"*"+s1;
+                    }
                 }
                 else{
                     return "";
