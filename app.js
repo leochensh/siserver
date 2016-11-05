@@ -1703,15 +1703,130 @@ aclHandler.registerWait(function(acl){
         "amazonindia":[
             {in:"title",out:"title",op:null},
             {in:"brand",out:"brand",op:null},
+            {in:"modelname",out:"modelname",op:null},
+            {in:"modelnumber",out:"modelnumber",op:null},
             {in:"color",out:"color",op:null},
-            {in:"specialfeature",out:"specialfeature",op:null},
+            {in:"color",out:"update-color",op:function(v){
+                var carray = [];
+                var colorReArray =
+                    [/black|Black/,/White|white/,/red|Red/,
+                        /blue|Blue/,/golden|Golden/,/grey|Grey/,
+                        /silver|Silver/,/green|Green/,/brown|Brown/,
+                        /orange|Orange/,/yellow|Yellow/
+                    ];
+                for(var reitem in colorReArray){
+                    var cre = colorReArray[reitem];
+                    var matchRes = v.match(cre);
+                    if(matchRes){
+                        carray.push(matchRes[0].toLowerCase());
+                    }
+                }
+                return carray.join("&");
+            }},
+            {in:"keyfeature",out:"keyfeature",op:null},
             {in:"price",out:"price",op:null},
-            {in:"Camera",out:"Camera",op:null},
-            {in:"RAM",out:"RAM",op:null},
-            {in:"os",out:"os",op:null},
-            {in:"battery",out:"battery",op:null},
+            {in:"specialfeature",out:"simtype",op:function(v){
+                var rem = v.match(/Dual\s*SIM/);
+                if(rem){
+                    return "Dual SIM";
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"Camera",out:"pcamera(MP)",op:function(v){
+                var mpattern = /([0-9.]+)\s*MP/g;
+                var fmatch = mpattern.exec(v);
+                if(fmatch){
+                    return fmatch[1]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"Camera",out:"scamera(MP)",op:function(v){
+                var mpattern = /([0-9.]+)\s*MP/g;
+                var fmatch = mpattern.exec(v);
+                if(fmatch){
+                    var secondMatch = mpattern.exec(v);
+                    if(secondMatch){
+                        return secondMatch[1]
+                    }
+                    else{
+                        return ""
+                    }
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"keyfeature",out:"screen",op:function(v){
+                var smatch = v.match(/([0-9.]+)[-\s]*inch]/)
+                if(smatch){
+                    return smatch[1];
+                }
+                else{
+                    return "";
+                }
+            }},
+            {in:"keyfeature",out:"Resolution",op:function(v){
+                var rmatch = v.match(/([0-9]+)[x\s]*([0-9]+)/);
+                if(rmatch){
+                    return rmatch[1]+"*"+rmatch[2];
+                }
+                else{
+                    return "";
+                }
+            }},
+            {in:"RAM",out:"RAM(GB)",op:matchDigital},
+            {in:"keyfeature",out:"ROM(GB)",op:function(v){
+                var romatch = v.match(/([0-9.]+)\s*GB\s*internal/);
+                if(romatch){
+                    return romatch[1];
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"keyfeature",out:"EXT(GB)",op:function(v){
+                var extmatch = v.match(/up\s*to\s*([0-9.]+)GB/);
+                if(extmatch){
+                    return extmatch[1];
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"os",out:"osinfo",op:null},
+            {in:"os",out:"os",op:function(v){
+                return v.split(" ")[0]
+            }},
+            {in:"os",out:"osversionnum",op:matchDigital},
+            {in:"os",out:"osversionname",op:null},
+            {in:"battery",out:"battery(mAh)",op:matchDigital},
+            {in:"reviewNum",out:"ratingNum",op:null},
             {in:"avgrate",out:"avgrate",op:null},
-            {in:"reviewNum",out:"reviewNum",op:null}
+            {in:"reviewNum",out:"reviewNum",op:null},
+            {in:"processor",out:"processor",op:null},
+            {in:"keyfeature",out:"processorOwner",op:function(v){
+                var rem = v.match("Exynos|Mediatek|MT|Qualcomm|SC|Media|Spreadtrum|MSM|Intel|Atom|Snapdragon");
+                if(rem){
+                    return rem[0]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"keyfeature",out:"processorclock",op:function(v){
+                var clockMatch = v.match(/[0-9.]+\s*GHz/);
+                if(clockMatch){
+                    return clockMatch[0]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"browsetype",out:"browsetype",op:null}
         ]
     };
 

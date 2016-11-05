@@ -91,17 +91,15 @@ class amazonInmodelSpider(Spider):
 
             infos.append(info)
 
-        if len(infos) == 0:
-            return
-        else:
+        if len(infos) != 0:
             item['infos'] = infos
             yield item
-            self.currentStart+=self.parseStep
-            print "++++++++++++++++++++++++++++++"
-            print "current page is "+str(self.currentStart)
-            print "++++++++++++++++++++++++++++++"
-            if self.currentStart<=400:
-                yield SplashRequest(self.baseUrl+str(self.currentStart)+self.tailUrl, self.parse, args={'wait': 10,'timeout':180})
-            else:
-                return
+        self.currentStart+=self.parseStep
+        print "++++++++++++++++++++++++++++++"
+        print "current page is "+str(self.currentStart)
+        print "++++++++++++++++++++++++++++++"
+        if self.currentStart<=400:
+            yield SplashRequest(self.baseUrl+str(self.currentStart)+self.tailUrl, self.parse, args={'wait': 10,'timeout':180})
+        else:
+            return
 

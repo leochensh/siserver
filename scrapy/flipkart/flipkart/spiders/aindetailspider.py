@@ -81,8 +81,6 @@ class amazonIndiaModelDetailSpider(Spider):
         featureBulletList = response.xpath('//div[contains(@id,"feature-bullets")]/ul/li/span/text()')
         ftbList = []
         for fb in featureBulletList:
-            print "____________________________________"
-            print fb
             fstr = fb.extract().strip()
             if fstr:
                 ftbList.append(fstr)
