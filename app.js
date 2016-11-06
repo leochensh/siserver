@@ -2973,6 +2973,15 @@ aclHandler.registerWait(function(acl){
                             duration = (etime-stime)/(1000*60);
                         }
                     }
+
+                    if(currentA.begintime){
+                        var btime = new Date(currentA.begintime);
+                        var year = btime.getFullYear();
+                        var month = btime.getMonth()+1;
+                        var date = btime.getDate();
+                        dstring = year+"/"+month+"/"+date;
+                    }
+
                     var namestring = currentA.namestatic?currentA.namestatic:currentA.name;
                     var aNameList = namestring.split("_");
                     var bias = 0;
@@ -3109,17 +3118,28 @@ aclHandler.registerWait(function(acl){
                             });
                             if(qfi>=0){
                                 if(calist[qfi].sortlist){
-                                    var sorted = _.sortBy(calist[qfi].sortlist,function(item){
-                                        return item.sort
-                                    })
+                                    var maxS = q.selectlist.length;
 
-                                    for(var qi in sorted){
-                                        /*
-                                         var nub =parseInt(sorted[qi].index)+1;
-                                         sortlist[qi] = nub.toString();
-                                         */
-                                        sortlist[qi] = parseInt(sorted[qi].index)+1;
+                                    for(var si in calist[qfi].sortlist){
+                                        var csort = calist[qfi].sortlist[si];
+                                        var sortIndex = parseInt(csort.index);
+                                        var sortSort = parseInt(csort.sort);
+                                        if(sortIndex<maxS){
+                                            sortlist[sortIndex] = maxS-(sortSort-1);
+                                        }
                                     }
+                                    //
+                                    // var sorted = _.sortBy(calist[qfi].sortlist,function(item){
+                                    //     return item.sort
+                                    // })
+                                    //
+                                    // for(var qi in sorted){
+                                    //     /*
+                                    //      var nub =parseInt(sorted[qi].index)+1;
+                                    //      sortlist[qi] = nub.toString();
+                                    //      */
+                                    //     sortlist[qi] = parseInt(sorted[qi].index)+1;
+                                    // }
                                 }
                             }
 

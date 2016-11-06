@@ -642,12 +642,42 @@ export var Quest = React.createClass({
             if(this.state.ifsubmit){
                 mainPart = (
                     <div className="container">
-                        <h2>Submit success! Thanks for your cooperation.</h2>
-                        <p>
-                            <a className="btn btn-danger btn-lg"
-                               onClick={this.frontclick}
-                               role="button">Create My Survey</a>
-                        </p>
+                        <div className="row">
+                            <div className="col-md-3">
+                                <div style={{position:"absolute",top:"0px",left:"0px",width:"270px",height:"136px",backgroundColor:"#00c7ff"}}>
+                                    <div style={{position:"absolute",top:"0px",right:"46px",textAlign:"right"}}>
+                                        <h2 style={{color:"#FFFFFF",fontSize:"38px"}}>Submit</h2>
+
+                                    </div>
+                                    <div style={{position:"absolute",top:"45px",right:"46px",textAlign:"right"}}>
+                                        <h2 style={{color:"#FFFFFF",fontSize:"38px"}}><b> Success!</b></h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col-md-offset-0 col-md-5">
+                                <div style={{position:"absolute",top:"0px",left:"0px",width:"100%",height:"136px"}}>
+                                    <div style={{position:"absolute",top:"0px",left:"50px",textAlign:"left"}}>
+                                        <h2 style={{color:"#666666",fontSize:"48px"}}> Thanks for</h2>
+
+                                    </div>
+                                    <div style={{position:"absolute",top:"45px",left:"50px",textAlign:"left"}}>
+                                        <h2 style={{color:"#666666",fontSize:"48px"}}> your cooperation.</h2>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col-md-4">
+                                <div style={{position:"absolute",top:"24px",left:"0px",width:"100%"}}>
+                                    <a onClick={this.frontclick}>
+                                        <img src="image/button.png" style={{width:"294px",height:"96px"}}/>
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        
                         {endAlert}
                     </div>)
             }

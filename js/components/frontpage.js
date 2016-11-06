@@ -35,7 +35,7 @@ export var Frontpage = React.createClass({
 
         return (
             <div  className="row" style={{position:"relative"}} >
-                <img style={{position:"absolute",top:"px",width:"1400px",height:"580px"}}src="image/background.png"/>
+                <img style={{position:"absolute",width:"100%",height:"580px"}}src="image/background.png"/>
                 <div className="row" >
                     <div className="col-md-2 col-md-offset-5">
                         <a style={{position:"absolute",top:"20px"}}>
@@ -50,7 +50,7 @@ export var Frontpage = React.createClass({
 
                         <div style={{position:"absolute",top:"250px",left:"150px"}}>
 
-                           <p><h1 style={{color:"#FFFFFF"}}>Survey Details<strong> | Insight Future</strong></h1></p>
+                           <p><h1 style={{color:"#FFFFFF"}}>Survey Aspects<strong> |  Future Insights</strong></h1></p>
                         </div>
                     </div>
 
@@ -59,7 +59,7 @@ export var Frontpage = React.createClass({
                     <div className="col-md-4 col-md-offset-8"      >
                     <a
                         type="button"
-                        href={Constant.BASE_IMAGEURL+"Ouresa用户手册.rar"}
+                        href="/usermanul.rar"
                         style={{position:"absolute",top:"320px",left:"160px"}}
 
                         ><h3 style={{color:"#FFFFFF"}}><strong>Download Manual</strong></h3></a>

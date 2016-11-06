@@ -115,7 +115,7 @@ export var Addfeedback = React.createClass({
         return(
             <div className="row" style={{position:"relative"}}>
                 <div className="col-md-3">
-                    <div className="row"style={{position:"absolute",top:"20px",left:"100px",width:"300px",height:"120px",backgroundColor:"#00c7ff"}}>
+                    <div className="row" style={{position:"absolute",top:"20px",left:"100px",width:"300px",height:"120px",backgroundColor:"#00c7ff"}}>
                     <div style={{position:"absolute",top:"10px",left:"60px"}}>
                         <h2 style={{color:"#FFFFFF"}}>Thank you for</h2>
 
