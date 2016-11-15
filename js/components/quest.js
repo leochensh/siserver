@@ -399,8 +399,17 @@ export var Quest = React.createClass({
             });
 
             if(alertIndex>=0){
+                var imgContent = "";
+                if(metalist[alertIndex].img){
+                    imgContent = <img
+                        src={Constant.BASE_IMAGEURL+metalist[alertIndex].img}
+                        className="img-rounded"
+                        style={{maxHeight:"200px"}}
+                        alt="Responsive image"/>
+                }
                 beforeAlert = <div className="alert alert-success" role="alert">
                     {this.changeCLTextToHtml(metalist[alertIndex].text)}
+                    {imgContent}
                 </div>
             }
 
@@ -410,8 +419,17 @@ export var Quest = React.createClass({
             });
 
             if(endalertIndex>=0){
+                var imgContent = "";
+                if(metalist[endalertIndex].img){
+                    imgContent = <img
+                        src={Constant.BASE_IMAGEURL+metalist[endalertIndex].img}
+                        className="img-rounded"
+                        style={{maxHeight:"200px"}}
+                        alt="Responsive image"/>
+                }
                 endAlert = <div className="alert alert-success" role="alert">
                     {this.changeCLTextToHtml(metalist[endalertIndex].text)}
+                    {imgContent}
                 </div>
             }
 

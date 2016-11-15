@@ -592,6 +592,38 @@ export var Newsurvey = React.createClass({
         }
 
     },
+    onDropMetaImage: function (index) {
+        var that = this;
+        function handleUpload(files){
+            console.log(files[0].name);
+            var data = new FormData();
+            data.append("name",files[0].name);
+            data.append("file",files[0]);
+            $("#ajaxloading").show();
+
+            $.ajax({
+                url: Constant.BASE_URL+"staff/upload/image",
+                data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'POST',
+                success: function(data){
+                    $("#ajaxloading").hide();
+                    var imgUrl = JSON.parse(data).body;
+                    SisDispatcher.dispatch({
+                        actionType: Constant.METAIMGCHANGE,
+                        index:index,
+                        img:imgUrl
+                    });
+                },
+                error:function(jxr,scode){
+                    $("#ajaxloading").hide();
+                }
+            });
+        }
+        return handleUpload;
+    },
     componentDidMount(){
         $("#suveynameinput").popover({
             title:"Tip 1",
@@ -662,6 +694,14 @@ export var Newsurvey = React.createClass({
         var metalist = [];
         for(var i in this.props.newsurvey.metainfolist){
             var cm = this.props.newsurvey.metainfolist[i];
+            var img = "";
+            if(cm.img){
+                img = <img
+                    src={Constant.BASE_IMAGEURL+cm.img}
+                    className="img-rounded"
+                    style={{maxHeight:"200px"}}
+                    alt="Responsive image"/>
+            }
             var mp = <div className="panel panel-default">
                 <div className="panel-heading">
                     <div className="row">
@@ -684,10 +724,23 @@ export var Newsurvey = React.createClass({
                         </label>
                         <div className="col-sm-10">
                             <textarea type="text"
-                                   onChange = {this.metatextchange(i)}
-                                   className="form-control">
+                                      onChange = {this.metatextchange(i)}
+                                      className="form-control">
                                 {cm.text}
                             </textarea>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <label className="col-sm-2 control-label">
+                            Image:
+                        </label>
+                        <div className="col-sm-6">
+                                <Dropzone onDrop={this.onDropMetaImage(parseInt(i))} accept="image/*">
+                                    <div>Drop image file here or click.</div>
+                                </Dropzone>
+                        </div>
+                        <div className="col-sm-4">
+                            {img}
                         </div>
                     </div>
                     <div className="row">
@@ -698,7 +751,7 @@ export var Newsurvey = React.createClass({
                             <select className="form-control"
                                     value={cm.qid}
                                     onChange={this.metaselectchange(i)}
-                                    >
+                            >
                                 {dpoptionsList}
                             </select>
                         </div>
@@ -827,16 +880,16 @@ export var Newsurvey = React.createClass({
 
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             <a type="button"
-                                                    disabled={ifDisablePublish}
-                                                    onClick={this.publishsurvey}
-                                                    className="btn btn-primary">
+                                               disabled={ifDisablePublish}
+                                               onClick={this.publishsurvey}
+                                               className="btn btn-primary">
                                                 <span className="glyphicon glyphicon-check" aria-hidden="true"></span>
                                                 <span>&nbsp;&nbsp;Publish it</span>
                                             </a>
                                             &nbsp;&nbsp;
                                             <a type="button"
-                                                    onClick={this.cleanall}
-                                                    className="btn btn-warning">
+                                               onClick={this.cleanall}
+                                               className="btn btn-warning">
                                                 <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
                                                 <span>&nbsp;&nbsp;Clean data</span>
                                             </a>
@@ -928,7 +981,7 @@ export var Newsurvey = React.createClass({
                                         <input type="radio"
                                                onChange={this.ownChecked}
                                                name="optionsRadios" checked={this.state.publishToPrivate}/>
-                                            Publish this survey to own.
+                                        Publish this survey to own.
                                     </label>
                                 </div>
                                 <div className="radio">
@@ -936,7 +989,7 @@ export var Newsurvey = React.createClass({
                                         <input type="radio"
                                                onChange={this.allChecked}
                                                name="optionsRadios" checked={!this.state.publishToPrivate}/>
-                                            Publish this survey to all users.
+                                        Publish this survey to all users.
                                     </label>
                                 </div>
 
@@ -990,7 +1043,7 @@ export var Newsurvey = React.createClass({
                                                placeholder=""
                                                value={this.props.newsurvey.surveyname}
                                                onChange={this.handleChange.bind(this,"surveyname")}
-                                            />
+                                        />
                                     </div>
                                 </form>
 

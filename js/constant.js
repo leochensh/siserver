@@ -17,6 +17,7 @@ export var Constant = {
     ADDNEWMETA:"addnewmeta",
     METATEXTCHANGE:"metatextchange",
     METASELECTCHANGE:"metaselectchange",
+    METAIMGCHANGE:"metaimgchange",
     DELETEMETA:"deletemeta",
     SURVEYDATABATCHCHANGE:"surveydatabatchchange",
     LOADCSV:"loadcsv",
@@ -234,7 +235,7 @@ export var Constant = {
                 url:"sadmin/spiderstatistics/model/batteryaverageprice",
                 labeltag:"batteryrange",
                 datatag:"count"
-            },
+            }
         ]
     },
 

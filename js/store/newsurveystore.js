@@ -211,6 +211,23 @@ class NewsurveyStore extends Store{
                 opProc();
             },opInterval);
         }
+        else if(payload.actionType == Constant.METAIMGCHANGE){
+            var index = payload.index;
+            var img = payload.img;
+
+
+            var metainfolist = surveyData.metainfolist;
+            metainfolist[index].img = img;
+
+            this.__emitChange();
+            addToProc({
+                type:"namechange"
+            });
+
+            setTimeout(function(){
+                opProc();
+            },opInterval);
+        }
         else if(payload.actionType == Constant.METASELECTCHANGE){
             var index = payload.index;
             var select = payload.select;

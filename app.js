@@ -4079,7 +4079,20 @@ function parseV4List(input){
         "录音文本题":dict.QTYPE_DESCRIPTION_RECORD_TEXT,
         "图片上传文本题":dict.QTYPE_DESCRIPTION_IMAGE_TEXT,
         "选项排序题":dict.QTYPE_SEQUENCE,
-        "数字题":dict.QTYPE_SCORE
+        "数字题":dict.QTYPE_SCORE,
+
+        "Single":dict.QTYPE_SINGLESELECT,
+        "SingleText":dict.QTYPE_SINGLESELECT_TEXT,
+        "SingleRecord":dict.QTYPE_SINGLESELECT_RECORD_TEXT,
+        "Multiple":dict.QTYPE_MULTISELECT,
+        "MultipleText":dict.QTYPE_MULTISELECT_TEXT,
+        "MultipleRecord":dict.QTYPE_MULTISELECT_RECORD_TEXT,
+        "Text":dict.QTYPE_DESCRIPTION,
+        "RecordText":dict.QTYPE_DESCRIPTION_RECORD_TEXT,
+        "ImageText":dict.QTYPE_DESCRIPTION_IMAGE_TEXT,
+        "Sort":dict.QTYPE_SEQUENCE,
+        "Score":dict.QTYPE_SCORE
+
     };
 
 
