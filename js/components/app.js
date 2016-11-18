@@ -154,6 +154,9 @@ export var App = React.createClass({
     homeclick(){
         this.context.router.push("/home");
     },
+    frontclick(){
+        this.context.router.push("/frontpage");
+    },
     loginclick(){
         var newstate = {};
         newstate.iferrors = false;
@@ -444,10 +447,16 @@ export var App = React.createClass({
         }
         return (
             <div>
-                <nav className="navbar navbar-default navbar-fixed-top" style={{backgroundColor:"#FFFFFF"}}>
+                <nav className="navbar navbar-default navbar-fixed-top" style={{backgroundColor:"#FFFFFF",borderWidth:"0 0 0px"}}>
                     <div className="container-fluid">
                         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style={{position:"relative"}}>
                             <ul className="nav navbar-nav">
+                                <li>
+                                    <a onClick={this.frontclick}>
+                                        <img src="image/LOGO_text.png"/>
+                                    </a>
+                                </li>
+                                <li style={{paddingTop:"15px"}}>│</li>
 
                                 <li><a onClick={this.faqclick}>FAQ</a></li>
                                 <li><a onClick={this.feedbackzzlclick}>Feedback</a></li>
@@ -460,7 +469,7 @@ export var App = React.createClass({
                                 <li style={logoutStyle}><a onClick={this.resetpassClick}>Setting</a></li>
                                 <li style={logoutStyle}><a onClick={this.logoutClick}>Logout</a></li>
                                 <li style={iflogoutStyle}><a onClick={this.loginclick}>Login</a></li>
-                                <li style={iflogoutStyle}><a type="button" onClick={this.handleRegisterClick} className="btn" style={{backgroundColor:"#00c7ff",color:"#FFFFFF"}} >Register</a></li>
+                                <li style={iflogoutStyle}><a type="button" onClick={this.handleRegisterClick} className="btn" style={{backgroundColor:"#00c7ff",color:"#FFFFFF",borderRadius:"20px",marginTop:"10px",paddingTop:"5px",height:"30px"}} >Register</a></li>
                             </ul>
 
                         </div>
@@ -488,7 +497,11 @@ export var App = React.createClass({
                 <div className="modal fade bs-example-modal-sm" id="loginsmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
                     <div className="modal-dialog modal-sm" role="document">
                         <div className="modal-content">
-                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <button type="button"
+                                    style={{marginTop:"10px",marginRight:"10px"}}
+                                    className="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                             <div className="col-sm-offset-4 col-sm-10" style={{marginTop:"20px",marginBottom:"20px"}}>
                                 <a>
                                     <img style={{width:"80px",height:"80px"}} src="image/LOGO.png"/>
@@ -540,7 +553,7 @@ export var App = React.createClass({
                                         <p> <a type="button"
                                                onClick={this.handleClick}
                                                className="btn btn-info"
-                                               style={{width:"240px",height:"40px"}}
+                                               style={{width:"240px",height:"40px",borderRadius:"20px"}}
                                             >Login</a></p>
                                     </div>
                                 </div>
@@ -549,7 +562,7 @@ export var App = React.createClass({
                                     <div className="col-sm-offset-1 col-sm-10">
                                         <p><a type="button"
                                               className="btn btn-default"
-                                              style={{width:"240px",height:"40px"}}
+                                              style={{width:"240px",height:"40px",borderRadius:"20px"}}
                                               onClick={this.handleRegisterClick}
                                             >Register</a></p>
                                     </div>
@@ -565,7 +578,9 @@ export var App = React.createClass({
                 <div className="modal fade " id="zzlregistermodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div className="modal-dialog " role="document">
                         <div className="modal-content">
-                            <button type="button" className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
+                            <button type="button"
+                                    style={{marginTop:"10px",marginRight:"10px"}}
+                                    className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
 
                             <div className="col-sm-offset-5 col-sm-10" style={{marginTop:"20px",marginBottom:"20px"}}>
                                 <a>
@@ -613,7 +628,7 @@ export var App = React.createClass({
                                     </div>
                                     <div className="col-sm-1">
                                         <a
-                                            style={{width:"126px",height:"40px"}}
+                                            style={{width:"126px",height:"40px",borderRadius:"20px"}}
                                             className={emailCheckButtonClass}
                                             onClick={this.getVerifiedCode}
                                             >{emailButtonText}</a>
@@ -662,7 +677,7 @@ export var App = React.createClass({
                                             type="button"
                                             onClick={this.handlejoinClick}
                                             className="btn btn-info"
-                                            style={{width:"388px",height:"40px"}}
+                                            style={{width:"388px",height:"40px",borderRadius:"20px"}}
                                             >Create Account</a>
                                     </div>
 
