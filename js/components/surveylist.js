@@ -300,6 +300,18 @@ export var Surveylist = React.createClass({
 
         for(var i in selist){
             var stext = Constant.SURVEYSTATUSMAP[selist[i].status];
+            if(stext == "Published"){
+                if(selist[i].publishstatus){
+                    if(selist[i].publishstatus == Constant.SURVEYPUBLISHSTATUS_PRIVATEPERSONAL ||
+                        selist[i].publishstatus == Constant.SURVEYPUBLISHSTATUS_PRIVATEORG){
+                        stext = "Private Published";
+                    }
+                    else if(selist[i].publishstatus == Constant.SURVEYPUBLISHSTATUS_PUBLICORG ||
+                        selist[i].publishstatus == Constant.SURVEYPUBLISHSTATUS_PUBLICPERSONAL){
+                        stext = "Public Published";
+                    }
+                }
+            }
             var trclass = "";
             if(selist[i].status == Constant.SURVEYSTATUS_PROPOSE){
                 trclass = "danger";

@@ -458,6 +458,8 @@ export var App = React.createClass({
                                 </li>
                                 <li style={{paddingTop:"15px"}}>│</li>
 
+                                <li><a href="http://10.150.17.10:81">Link</a></li>
+
                                 <li><a onClick={this.faqclick}>FAQ</a></li>
                                 <li><a onClick={this.feedbackzzlclick}>Feedback</a></li>
                                 <li style={logoutStyle}><a onClick={this.homeclick}>Home</a></li>

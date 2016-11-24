@@ -426,7 +426,7 @@ export var Question = React.createClass({
                                    onClick={this.deleteselection(i)}
                                    className="btn btn-danger right">
                                     <span className="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                                    <span>&nbsp;&nbsp;Delete</span>
+                                    <span>&nbsp;&nbsp;Delete Selection</span>
                                 </a>
                             </div>
                             <div className="col-md-2 col-md-offset-5">
@@ -659,8 +659,17 @@ export var Question = React.createClass({
             <div className="panel panel-default">
                 <div className="panel-heading">
                     <div className="row">
-                        <div className="col-md-4">
+                        <div className="col-md-1">
                             <span className={colorClass}>{parseInt(this.props.index)+1}</span>
+                        </div>
+
+                        <div className="col-md-3">
+                            <a type="button"
+                               onClick={this.deletequestion}
+                               className="btn btn-warning">
+                                <span className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
+                                <span>&nbsp;&nbsp;Delete Question</span>
+                            </a>
                         </div>
 
                         <form className="col-md-6 form-inline">
@@ -719,12 +728,7 @@ export var Question = React.createClass({
                     </a>
                     &nbsp;&nbsp;
                     &nbsp;&nbsp;
-                    <a type="button"
-                            onClick={this.deletequestion}
-                            className="btn btn-danger">
-                        <span className="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
-                        <span>&nbsp;&nbsp;Delete question</span>
-                    </a>
+
                 </div>
 
                 <div className="modal fade" id="deletemodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

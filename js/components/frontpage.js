@@ -22,7 +22,7 @@ export var Frontpage = React.createClass({
         $("#zzlregistermodal").modal("show");
     },
     DownloadClick(){
-
+        
     },
     handleLoginClick(){
         $("#zzldownloadddmodal").modal("hide");
@@ -46,7 +46,7 @@ export var Frontpage = React.createClass({
                 </div>
                 <div className="row" >
                     <div  >
-                        <img style={{position:"absolute",top:"250px",width:"680px",height:"80px"}} src="image/blue background.png"/>
+                        <img style={{position:"absolute",top:"250px",width:"750px",height:"80px"}} src="image/blue background.png"/>
 
                         <div style={{position:"absolute",top:"250px",left:"150px"}}>
 
@@ -56,7 +56,7 @@ export var Frontpage = React.createClass({
 
                 </div>
                 <div calssName="row" >
-                    <div className="col-md-4 col-md-offset-8"      >
+                    <div className="col-md-4 col-md-offset-8">
                     <a
                         type="button"
                         href="/usermanul.rar"
@@ -83,7 +83,7 @@ export var Frontpage = React.createClass({
                                <a
                                    type="button"
                                    onClick={this.handleClick}
-                                   ><img  src="image/QR code.png"/></a>
+                                   ><img style={{maxWidth:"100px"}}  src="image/1479981556.png"/></a>
                             </div>
                     </div>
                 </div>
@@ -116,7 +116,7 @@ export var Frontpage = React.createClass({
                                     <div className="col-sm-10 col-sm-offset-1">
                                         <a
                                             type="button"
-                                            onClick={this.DownloadClick}
+                                            href={Constant.BASE_URL+"downloadapk"}
                                             className="btn btn-info"
                                             style={{width:"240px",height:"40px"}}
                                             >Download for Android</a>
