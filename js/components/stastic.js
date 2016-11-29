@@ -584,11 +584,11 @@ export var Stastic = React.createClass({
                         }
                     }
                     else if(sq.type == Constant.QTYPE_SINGLESELECT ||
-                            sq.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
-                            sq.type == Constant.QTYPE_SINGLESELECT_TEXT ||
-                            sq.type == Constant.QTYPE_MULTISELECT ||
-                            sq.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
-                            sq.type == Constant.QTYPE_MULTISELECT_TEXT){
+                        sq.type == Constant.QTYPE_SINGLESELECT_RECORD_TEXT ||
+                        sq.type == Constant.QTYPE_SINGLESELECT_TEXT ||
+                        sq.type == Constant.QTYPE_MULTISELECT ||
+                        sq.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
+                        sq.type == Constant.QTYPE_MULTISELECT_TEXT){
                         var tselectlist = sq.selectlist;
                         for(var fsindex in tselectlist){
                             var curs = tselectlist[fsindex];
@@ -766,11 +766,11 @@ export var Stastic = React.createClass({
                     var labelList = [];
                     var valueList = [];
                     var valuePercentList = [];
-                   /* var scortscore = new array[ScoreNum];
-                    for(var z in scortscore ){
-                        scortscore[z] = 0;
-                    }
-                    */
+                    /* var scortscore = new array[ScoreNum];
+                     for(var z in scortscore ){
+                     scortscore[z] = 0;
+                     }
+                     */
                     var scortscore = [];
                     for(var z =0;z< ScoreNum;z++){
                         scortscore[z] = 0;
@@ -800,7 +800,7 @@ export var Stastic = React.createClass({
                     var allscore = 0;
                     for(var j in q.selectlist){
                         labelList.push("S" + (parseInt(j) + 1));
-                      //  alert(scortscore[j]);
+                        //  alert(scortscore[j]);
                         allscore += scortscore[j];
                     }
                     for(var k in scortscore){
@@ -1053,18 +1053,18 @@ export var Stastic = React.createClass({
                     var qtStyle = {
                         display:"none"
                     };
-                    if(q.text || q.image){
+                    if(q.text || q.image || q.imagelist){
                         qtStyle = {};
                     }
                     var imgContent = [];
                     if(q.image){
                         imgContent.push(
-                                <span>
+                            <span>
                                 <img
-                            src={Constant.BASE_IMAGEURL+q.image}
-                            className="img-rounded"
-                            style={{maxHeight:"100px"}}
-                            alt="Responsive image"/>
+                                    src={Constant.BASE_IMAGEURL+q.image}
+                                    className="img-rounded"
+                                    style={{maxHeight:"100px"}}
+                                    alt="Responsive image"/>
                                 </span>
                         )
 
