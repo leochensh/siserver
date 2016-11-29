@@ -1056,13 +1056,34 @@ export var Stastic = React.createClass({
                     if(q.text || q.image){
                         qtStyle = {};
                     }
-                    var imgContent = "";
+                    var imgContent = [];
                     if(q.image){
-                        imgContent = <img
+                        imgContent.push(
+                                <span>
+                                <img
                             src={Constant.BASE_IMAGEURL+q.image}
                             className="img-rounded"
                             style={{maxHeight:"100px"}}
                             alt="Responsive image"/>
+                                </span>
+                        )
+
+                    }
+
+                    if(q.imagelist){
+                        var imageSplit = q.imagelist.split(",")
+                        for(var imageIndex in imageSplit){
+                            var ci = imageSplit[imageIndex];
+                            imgContent.push(
+                                <span>
+                                    <img
+                                        src={Constant.BASE_IMAGEURL+ci}
+                                        className="img-rounded"
+                                        style={{maxHeight:"100px"}}
+                                    />
+                                </span>
+                            )
+                        }
                     }
 
                     var audioContent = ""
