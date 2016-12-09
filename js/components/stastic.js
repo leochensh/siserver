@@ -18,7 +18,8 @@ export var Stastic = React.createClass({
             ifexport:false,
             exporturl:null,
             filterList:[],
-            asindex:null
+            asindex:null,
+            answerTextList:{}
         }
     },
     contextTypes: {
@@ -308,6 +309,87 @@ export var Stastic = React.createClass({
         var inFunc = function(){
             that.state.asindex = index;
             $("#deleteanswer").modal("show");
+
+        };
+        return inFunc;
+    },
+    searchAnswerText(index){
+
+        var that = this;
+        var inFunc = function(){
+
+            if(index in that.state.answerTextList){
+                console.log(index);
+                var stext = that.state.answerTextList[index].searchText;
+                stext = stext.replace(/\*/g,"[^\s]*");
+                var sreg = new RegExp(stext);
+                console.log(stext);
+                var q = that.state.survey.questionlist[index];
+                var snum = _.reduce(that.state.answerlist,function(memo,item){
+                    console.log("haha");
+                    var alist = item.answerlist;
+                    var qfi = _.findIndex(alist,function(item){
+                        return item.questionid == q._id;
+                    });
+                    if(qfi>=0){
+                        var answer = alist[qfi];
+                        if(answer.text.search(sreg)>=0){
+                            if(memo.searchNum>=0){
+                                memo.searchNum += 1;
+                            }
+                            else{
+                                memo.searchNum = 1;
+                            }
+                            if(memo.totalAnswerNum>=0){
+                                memo.totalAnswerNum += 1;
+                            }
+                            else{
+                                memo.totalAnswerNum = 1;
+                            }
+
+                        }
+                        else{
+                            if(memo.totalAnswerNum>=0){
+                                memo.totalAnswerNum += 1;
+                            }
+                            else{
+                                memo.totalAnswerNum = 1;
+                            }
+                        }
+                        return memo;
+
+                    }
+                    else{
+                        return memo;
+                    }
+                },{totalAnswerNum:0,searchNum:0});
+                console.log(snum);
+                that.state.answerTextList[index].searchNum = snum.searchNum;
+                that.state.answerTextList[index].totalAnswer = snum.totalAnswerNum;
+                that.setState({
+                    answerTextList:that.state.answerTextList
+                })
+            }
+        };
+        return inFunc;
+    },
+    answerSearchTextChange(index){
+        var that = this;
+        var inFunc = function(event){
+            if(index in that.state.answerTextList){
+                that.state.answerTextList[index].searchText = event.target.value;
+            }
+            else{
+                that.state.answerTextList[index] = {
+                    searchText:event.target.value,
+                    searchNum:-1,
+                    totalAnswerNum:-1
+
+                }
+            }
+            that.setState({
+                answerTextList:that.state.answerTextList
+            })
 
         };
         return inFunc;
@@ -828,6 +910,42 @@ export var Stastic = React.createClass({
                         <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
                         </RgraphControl>
                     )
+                }
+                else if(q.type == Constant.QTYPE_DESCRIPTION ||
+                    q.type == Constant.QTYPE_DESCRIPTION_IMAGE_TEXT||
+                    q.type == Constant.QTYPE_DESCRIPTION_RECORD_TEXT){
+                    var searchTxt = "";
+                    if(qindex in this.state.answerTextList){
+                        if(this.state.answerTextList[qindex].totalAnswer>=0){
+                            searchTxt = <div className="alert alert-success">
+                                This string occur {this.state.answerTextList[qindex].searchNum} times in {this.state.answerTextList[qindex].totalAnswer} answers.
+                            </div>;
+                        }
+                    }
+                    var formBody =
+                        <div >
+                            <div className="form-inline">
+                                <div className="form-group">
+                                    <label for="exampleInputAmount">Text Search</label>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <div className="input-group">
+                                        <input
+                                            onChange={this.answerSearchTextChange(qindex)}
+                                            value={qindex in this.state.answerTextList?this.state.answerTextList[qindex].searchText:""}
+                                            type="text" className="form-control" id="exampleInputAmount" placeholder="Text with wild card match"/>
+                                    </div>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                </div>
+                                <a
+                                    onClick={this.searchAnswerText(qindex)}
+                                    className="btn btn-primary">Search</a>
+                            </div>
+                            <div className="row">
+                                {searchTxt}
+                            </div>
+                        </div>
+
+                    slist.push(formBody)
                 }
 
 
