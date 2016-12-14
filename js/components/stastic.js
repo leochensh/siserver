@@ -19,8 +19,35 @@ export var Stastic = React.createClass({
             exporturl:null,
             filterList:[],
             asindex:null,
-            answerTextList:{}
+            answerTextList:{},
+            currentPageNum:0,
+            totalPage:0,
+            itemPerPage:50
         }
+    },
+    pageDecrease(){
+        if(this.state.currentPageNum>0){
+            this.setState({
+                currentPageNum:this.state.currentPageNum-1
+            })
+        }
+    },
+    pageIncrease(){
+        if(this.state.currentPageNum<this.state.totalPage-1){
+            this.setState({
+                currentPageNum:this.state.currentPageNum+1
+            })
+        }
+    },
+    setPage(index){
+        var that = this;
+        var infunc = function(){
+            that.setState({
+                currentPageNum:index
+            })
+        }
+        return infunc;
+
     },
     contextTypes: {
         router: React.PropTypes.object.isRequired
@@ -540,7 +567,9 @@ export var Stastic = React.createClass({
             }
         }
         this.setState({
-            answerlist:outputList
+            currentPageNum:0,
+            answerlist:outputList,
+            totalPage:Math.ceil(outputList.length/this.state.itemPerPage)
         })
     },
     addFilter(){
@@ -586,7 +615,8 @@ export var Stastic = React.createClass({
                 }
             }
             that.setState({
-                filterList:that.state.filterList
+                filterList:that.state.filterList,
+
             });
             that.filterAnswer();
         }
@@ -926,7 +956,7 @@ export var Stastic = React.createClass({
                         <div >
                             <div className="form-inline">
                                 <div className="form-group">
-                                    <label for="exampleInputAmount">Text Search</label>
+                                    <label htmlFor="exampleInputAmount">Text Search</label>
                                     &nbsp;&nbsp;&nbsp;&nbsp;
                                     <div className="input-group">
                                         <input
@@ -966,18 +996,21 @@ export var Stastic = React.createClass({
             }
         }
         var mlist = [];
-        for(var i in this.state.answerlist){
-            var a = this.state.answerlist[i];
+        var i = 0;
+
+        while(i<this.state.itemPerPage && this.state.currentPageNum*this.state.itemPerPage+i<this.state.answerlist.length){
+            var a = this.state.answerlist[this.state.currentPageNum*this.state.itemPerPage+i];
             var deleteButton = "";
             if(this.props.loginInfo.ifLogin){
                 deleteButton = <a
                     type="button"
-                    onClick={this.deleteAnswerClick(i)}
+                    onClick={this.deleteAnswerClick(this.state.currentPageNum*this.state.itemPerPage+i)}
                     className="btn btn-danger">Delete</a>;
             }
             mlist.push(
-                <tr className="row">
-                    <td className="col-md-1">{(parseInt(i)+1)}</td>
+                <tr key={"item"+(parseInt(this.state.currentPageNum*this.state.itemPerPage+i)+1)}
+                    className="row">
+                    <td className="col-md-1">{(parseInt(this.state.currentPageNum*this.state.itemPerPage+i)+1)}</td>
                     <td className="col-md-5">{a.name?a.name:""}</td>
                     <td className="col-md-2">{new Date(a.ctime).toLocaleString()}</td>
                     <td className="col-md-1">{a.investigatorid?"Android Client":"Web"}</td>
@@ -985,7 +1018,7 @@ export var Stastic = React.createClass({
                         <div className="btn-group" role="group" >
                             <a
                                 type="button"
-                                onClick={this.viewdetail(i)}
+                                onClick={this.viewdetail(this.state.currentPageNum*this.state.itemPerPage+i)}
                                 className="btn btn-info">View</a>
 
                             {deleteButton}
@@ -994,7 +1027,41 @@ export var Stastic = React.createClass({
                     </td>
                 </tr>
             )
+            i+=1;
         }
+
+        var answerListNavArray = [];
+        var panchorNum = 0;
+        while(panchorNum<this.state.totalPage){
+            var activeTag = "";
+            if(panchorNum == this.state.currentPageNum){
+                activeTag = "active";
+            }
+            answerListNavArray.push(
+                <li className={activeTag}><a onClick={this.setPage(panchorNum)}>{parseInt(panchorNum+1)}</a></li>
+            );
+            panchorNum+=1;
+        }
+        var pagiContent =
+            <nav aria-label="Page navigation">
+                <ul className="pagination">
+                    <li>
+                        <a onClick={this.pageDecrease} aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {answerListNavArray}
+                    <li>
+                        <a onClick={this.pageIncrease} aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>;
+
+
+
+
         var detailModal = [];
         if(this.state.detailid && this.state.answerlist[this.state.detailid]){
             var ca = this.state.answerlist[this.state.detailid];
@@ -1307,6 +1374,7 @@ export var Stastic = React.createClass({
                                     {mlist}
                                     </tbody>
                                 </table>
+                                {pagiContent}
                             </div>
 
                         </div>
