@@ -68,7 +68,9 @@ export var RgraphControl = React.createClass({
         var oplist = [];
         for(var i in this.state.options){
             oplist.push(
-                <option value={this.state.options[i]}>
+                <option
+                    key={"rgraphop"+i+"gid"+this.props.gid}
+                    value={this.state.options[i]}>
                     {this.state.options[i]}
                 </option>
             )

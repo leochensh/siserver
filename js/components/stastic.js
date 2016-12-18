@@ -346,14 +346,14 @@ export var Stastic = React.createClass({
         var inFunc = function(){
 
             if(index in that.state.answerTextList){
-                console.log(index);
+                // console.log(index);
                 var stext = that.state.answerTextList[index].searchText;
                 stext = stext.replace(/\*/g,"[^\s]*");
                 var sreg = new RegExp(stext);
-                console.log(stext);
+                // console.log(stext);
                 var q = that.state.survey.questionlist[index];
                 var snum = _.reduce(that.state.answerlist,function(memo,item){
-                    console.log("haha");
+                    // console.log("haha");
                     var alist = item.answerlist;
                     var qfi = _.findIndex(alist,function(item){
                         return item.questionid == q._id;
@@ -390,7 +390,7 @@ export var Stastic = React.createClass({
                         return memo;
                     }
                 },{totalAnswerNum:0,searchNum:0});
-                console.log(snum);
+                // console.log(snum);
                 that.state.answerTextList[index].searchNum = snum.searchNum;
                 that.state.answerTextList[index].totalAnswer = snum.totalAnswerNum;
                 that.setState({
@@ -782,7 +782,9 @@ export var Stastic = React.createClass({
                         valuePercentList.push(Math.floor(parseInt(snum)/parseInt(totalNum)*100)+"%");
 
                         slist.push(
-                            <div className="row">
+                            <div
+                                key={"qindex"+qindex+"select"+j}
+                                className="row">
                                 <div className="col-md-4" >
                                     <div  className="alert alert-success">
                                         <span className="grey">{parseInt(j)+1}</span>
@@ -799,7 +801,9 @@ export var Stastic = React.createClass({
                         )
                     }
                     slist.push(
-                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
+                        <RgraphControl
+                            key={"rgraphindexselect"+qindex}
+                            gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
                         </RgraphControl>
                     )
                 }
@@ -849,7 +853,9 @@ export var Stastic = React.createClass({
                         valueList.push(snum);
                         valuePercentList.push(Math.floor(parseInt(snum)/parseInt(totalNum)*100)+"%");
                         slist.push(
-                            <div className="row">
+                            <div
+                                key={"qindex"+qindex+"score"+i}
+                                className="row">
                                 <div className="col-md-4" >
                                     <div  className="alert alert-success">
                                         <span className="red">{parseInt(i)}</span>
@@ -867,7 +873,9 @@ export var Stastic = React.createClass({
                         )
                     }
                     slist.push(
-                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
+                        <RgraphControl
+                            key={"rgraphindexscore"+qindex}
+                            gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
                         </RgraphControl>
                     )
 
@@ -919,7 +927,9 @@ export var Stastic = React.createClass({
                         valueList.push(parseInt(scortscore[k]));
                         valuePercentList.push(Math.floor(parseInt(scortscore[k])/parseInt(allscore)*100)+"%");
                         slist.push(
-                            <div className="row">
+                            <div
+                                key={"qindex"+qindex+"scoreindex"+k}
+                                className="row">
                                 <div className="col-md-4" >
                                     <div  className="alert alert-success">
                                         <span className="red">{parseInt(k)+1}</span>
@@ -937,7 +947,9 @@ export var Stastic = React.createClass({
                         )
                     }
                     slist.push(
-                        <RgraphControl gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
+                        <RgraphControl
+                            key={"rgraphindexseq"+qindex}
+                            gid={"g"+q._id} labels={labelList} values={valueList} pervalues={valuePercentList}>
                         </RgraphControl>
                     )
                 }
@@ -953,7 +965,7 @@ export var Stastic = React.createClass({
                         }
                     }
                     var formBody =
-                        <div >
+                        <div key={"qindexdes"+qindex}>
                             <div className="form-inline">
                                 <div className="form-group">
                                     <label htmlFor="exampleInputAmount">Text Search</label>
@@ -980,7 +992,9 @@ export var Stastic = React.createClass({
 
 
 
-                var qbody = <div className="panel panel-default">
+                var qbody = <div
+                    key={"qstapanel"+(parseInt(qindex)+1)}
+                    className="panel panel-default">
                     <div className="panel-heading">
                         <span className="green">{parseInt(qindex)+1}</span>
                         <span>&nbsp;&nbsp;{q.title}</span>
@@ -1038,7 +1052,9 @@ export var Stastic = React.createClass({
                 activeTag = "active";
             }
             answerListNavArray.push(
-                <li className={activeTag}><a onClick={this.setPage(panchorNum)}>{parseInt(panchorNum+1)}</a></li>
+                <li
+                    key={"page"+panchorNum}
+                    className={activeTag}><a onClick={this.setPage(panchorNum)}>{parseInt(panchorNum+1)}</a></li>
             );
             panchorNum+=1;
         }
