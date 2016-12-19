@@ -93,6 +93,11 @@ class parktelMSpider(Spider):
 
             pageSel = response.xpath('//div[contains(@class,"pages")]/ol/li/a/text()')
             if len(pageSel)>0:
+
+                for p in pageSel:
+                    print "CCCCCCCCCCCCCCCCCCCC"
+                    print p.extract().strip()
+
                 pstr = pageSel[len(pageSel)-1].extract().strip()
                 print "++++++++++++++++++++++++++++"
                 print pstr
