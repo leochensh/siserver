@@ -44,7 +44,7 @@ class parktelMSpider(Spider):
 
         # productList = response.xpath('//div[contains(@class,"gd-row")]/div[contains(@class,"gd-col")]/div[contains(@class,"product-unit")]/div[contains(@class,"pu-details")]')
         productList = response.xpath('//div[contains(@class,"category-products")]/ol/li/div/div/h2[contains(@class,"product-name")]')
-
+        maxPage = self.currentStart
         for product in productList:
 
             # productTitleSel = product.xpath('div[contains(@class,"pu-title")]/a[contains(@class,"fk-display-block")]')
@@ -91,6 +91,17 @@ class parktelMSpider(Spider):
 
 
 
+            pageSel = response.xpath('//div[contains(@class,"pages")]/ol/li/a/text()')
+            if len(pageSel)>0:
+                pstr = pageSel[len(pageSel)-1].extract().strip()
+                try:
+                    intpstr = int(pstr)
+                    maxPage = intpstr
+                except ValueError:
+                    npstr = pageSel[len(pageSel)-2].extract().strip()
+                    maxPage = int(npstr)
+
+
             info = {
                 "brand": brand,
                 "title": ptitle,
@@ -98,7 +109,7 @@ class parktelMSpider(Spider):
             }
             infos.append(info)
 
-        if len(infos) == 0:
+        if self.currentStart+self.parseStep>maxPage:
             if self.currentBrandIndex<len(self.brandList)-1:
                 self.currentBrandIndex += 1
                 self.currentStart = 1
