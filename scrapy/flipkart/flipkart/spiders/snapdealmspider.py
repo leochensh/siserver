@@ -31,7 +31,7 @@ class snapDealMSpider(Spider):
         infos = []
 
         # productList = response.xpath('//div[contains(@class,"gd-row")]/div[contains(@class,"gd-col")]/div[contains(@class,"product-unit")]/div[contains(@class,"pu-details")]')
-        productList = response.xpath('//div[contains(@class,"col-xs-6") and contains(@class,"favDp") and contains(@class,"product-tuple-listing"]')
+        productList = response.xpath('//div[contains(@class,"col-xs-6") and contains(@class,"favDp") and contains(@class,"product-tuple-listing")]')
 
         for product in productList:
 
