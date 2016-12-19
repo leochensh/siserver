@@ -32,7 +32,7 @@ class snapDealModelDetailSpider(Spider):
         print modelList
         for model in modelList:
             if "href" in model:
-                self.urlMap[self.baseUrl+model["href"]] = model
+                self.urlMap[model["href"]] = model
                 yield SplashRequest(model["href"], self.parse, args={'wait': 1,'timeout':180})
 
     def buildXpathContainList(self,key,flist):
@@ -140,7 +140,6 @@ class snapDealModelDetailSpider(Spider):
         #     if len(avgratingsel)>0:
         #         avgRate = avgratingsel[0].extract().strip()
         # rmatch = self.rc.search(reviewLink)
-
         info = {
             "modleid":str(self.urlMap[oldurl]["_id"])
         }
