@@ -87,7 +87,7 @@ class snapDealModelDetailSpider(Spider):
             tmprev = reviewnumsel[0].extract().strip()
             revn = self.rc.search(tmprev)
             if revn:
-                price = int(revn.group(0).replace(',', ''))
+                reviewNum = int(revn.group(0).replace(',', ''))
 
         dfeaturemap = {
             "featureTag":[["Brand"],["SIMs"],["Operating","System"],["Model"],
@@ -159,6 +159,7 @@ class snapDealModelDetailSpider(Spider):
         info["rating"] = rating
         info["avgrate"] = avgrate
         info["reviewNum"] = reviewNum
+        info["spiderid"] = self.spiderid
 
         if "Resolution" in info:
             screenResStr = info["Resolution"]
