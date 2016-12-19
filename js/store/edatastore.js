@@ -6,7 +6,7 @@ import async from "async"
 
 
 var edata = {
-    targetList:["flipkart","amazonindia","snapdeal"],
+    targetList:["flipkart","amazonindia","snapdeal","jumia"],
     currentIndex:0,
     spiderlist:[null,null],
     currentstatistic:"Brands statistics|0",
