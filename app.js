@@ -1548,6 +1548,7 @@ aclHandler.registerWait(function(acl){
     app.post("/sadmin/createspider",acl.middleware(1),function(req,res){
         var spidername = req.body.spidername;
         if(spidername){
+            console.log("first place");
             Admin.createSpider(spidername,function(err,msg){
                 if(msg == "BUSY"){
                     res.status(409);
@@ -1560,6 +1561,8 @@ aclHandler.registerWait(function(acl){
                     res.send(JSON.stringify(errorMsg));
                 }
                 else{
+                    console.log("I am here")
+                    console.log(spidername)
 
                     if(spidername == "flipkart"){
                         flipkartModelSpider(function(){
