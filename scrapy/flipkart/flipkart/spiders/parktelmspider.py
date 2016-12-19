@@ -110,11 +110,15 @@ class parktelMSpider(Spider):
                     print npstr
                     maxPage = int(npstr)
 
-
+            ptarray = ptitle.split("|")
+            color = ""
+            if len(ptarray)==2:
+                color = ptarray[1].strip()
             info = {
                 "brand": brand,
                 "title": ptitle,
                 "href": phref,
+                "color":color
             }
             infos.append(info)
 
