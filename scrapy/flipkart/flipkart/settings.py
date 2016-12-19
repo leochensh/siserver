@@ -84,6 +84,8 @@ ITEM_PIPELINES = {
     'flipkart.pipelines.snapDealmDetailSpiderPipeline':300,
     'flipkart.pipelines.jumiaMSpiderPipeline':300,
     'flipkart.pipelines.jumialDetailSpiderPipeline':300,
+    'flipkart.pipelines.parktelMSpiderPipeline':300,
+    'flipkart.pipelines.parktelDetailSpiderPipeline':300,
 
 }
 
