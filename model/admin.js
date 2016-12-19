@@ -1049,6 +1049,7 @@ Admin.createSpider = function(sname,callback){
                         callback(err,"BUSY");
                     }
                     else{
+                        console.log("not found busy spider")
                         collection.find({name:sname}).sort({ctime:-1}).limit(1).next(function (err,newspider){
                             if(newspider){
                                 var tdiff = new Date() - new Date(newspider.ctime);
@@ -1067,6 +1068,17 @@ Admin.createSpider = function(sname,callback){
                                         callback(err,result.insertedId);
                                     })
                                 }
+                            }
+                            else{
+                                var ns = {
+                                    name:sname,
+                                    ctime:new Date(),
+                                    status:dict.SPIDERSTATU_ACTIVE
+                                };
+                                collection.insertOne(ns,function(err,result){
+                                    mongoPool.release(db);
+                                    callback(err,result.insertedId);
+                                })
                             }
 
                         })
