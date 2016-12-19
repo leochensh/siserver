@@ -94,11 +94,15 @@ class parktelMSpider(Spider):
             pageSel = response.xpath('//div[contains(@class,"pages")]/ol/li/a/text()')
             if len(pageSel)>0:
                 pstr = pageSel[len(pageSel)-1].extract().strip()
+                print "++++++++++++++++++++++++++++"
+                print pstr
                 try:
                     intpstr = int(pstr)
                     maxPage = intpstr
                 except ValueError:
                     npstr = pageSel[len(pageSel)-2].extract().strip()
+                    print "___________________________________"
+                    print npstr
                     maxPage = int(npstr)
 
 
