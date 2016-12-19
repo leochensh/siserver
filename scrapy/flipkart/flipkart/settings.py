@@ -79,7 +79,9 @@ ITEM_PIPELINES = {
     'flipkart.pipelines.modelSpiderPipeline':300,
     'flipkart.pipelines.modelDetailSpiderPipeline':300,
     'flipkart.pipelines.amazonIndiamodelSpiderPipeline':300,
-    'flipkart.pipelines.ainModelDetailSpiderPipeline':300
+    'flipkart.pipelines.ainModelDetailSpiderPipeline':300,
+    'flipkart.pipelines.snapDealMSpiderPipeline':300,
+    'flipkart.pipelines.snapDealmDetailSpiderPipeline':300
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
