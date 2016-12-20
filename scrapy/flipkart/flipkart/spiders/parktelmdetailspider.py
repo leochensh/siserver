@@ -123,13 +123,16 @@ class parktelModelDetailSpider(Spider):
             # fselector = response.xpath('//li[contains(div/text(),"'+ff+'")]')
             fselector = response.xpath('//tr'+self.buildXpathContainList('td/text()',ff))
 
-            for logf in fselector:
-                print "????????????????"
-                print logf.xpath('td/text()')[0].extract().strip()
-                print logf.xpath('td/text()')[1].extract().strip()
+            # for logf in fselector:
+            #     print "????????????????"
+            #     print logf.xpath('td/text()')[0].extract().strip()
+            #     print logf.xpath('td/text()')[1].extract().strip()
 
             if len(fselector)>0:
-                dfeaturemap["value"][fi] = fselector.xpath('td/text()')[1].extract().strip()
+                if len(fselector.xpath('td/text()')) == 2:
+                    dfeaturemap["value"][fi] = fselector.xpath('td/text()')[1].extract().strip()
+                elif len(fselector.xpath('td/span/text()'))>0:
+                    dfeaturemap["value"][fi] = fselector.xpath('td/span/text()')[0].extract().strip()
             # else:
             #     # fselector = response.xpath('//tr[contains(td/text(),"'+ff+'")]')
             #     fselector = response.xpath('//tr'+self.buildXpathContainList('td/text()',ff))
