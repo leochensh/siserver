@@ -125,7 +125,7 @@ class parktelModelDetailSpider(Spider):
 
             for logf in fselector:
                 print "????????????????"
-                print logf.extract().strip()
+                print logf.xpath('td/text()').extract().strip()
 
             if len(fselector)>0:
                 dfeaturemap["value"][fi] = fselector.xpath('td/text()')[1].extract().strip()
