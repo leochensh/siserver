@@ -122,6 +122,11 @@ class parktelModelDetailSpider(Spider):
         for fi,ff in enumerate(dfeaturemap["featureTag"]):
             # fselector = response.xpath('//li[contains(div/text(),"'+ff+'")]')
             fselector = response.xpath('//tr'+self.buildXpathContainList('td/text()',ff))
+
+            for logf in fselector:
+                print "????????????????"
+                print logf.extract().strip()
+
             if len(fselector)>0:
                 dfeaturemap["value"][fi] = fselector.xpath('td/text()')[1].extract().strip()
             # else:
