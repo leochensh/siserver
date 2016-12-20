@@ -3061,7 +3061,7 @@ aclHandler.registerWait(function(acl){
                 console.log("enter final")
                 var qout = [];
                 var firstQ = [ "No.","duration","Interviewer","Visit Date",
-                    "Country","City","Customer","Male","Female"];
+                    "Country","City","Customer","Male","Female","latitude","longitude"];
 
                 for(var qindex in survey.questionlist){
                     var q = survey.questionlist[qindex];
@@ -3126,6 +3126,9 @@ aclHandler.registerWait(function(acl){
                     var female = "";
                     var duration = "";
 
+                    var latitude = currentA.latitude?currentA.latitude:"";
+                    var longitude = currentA.longitude?currentA.longitude:"";
+
                     if(currentA.begintime && currentA.endtime){
                         var stime = new Date(currentA.begintime);
                         var etime = new Date(currentA.endtime);
@@ -3168,7 +3171,7 @@ aclHandler.registerWait(function(acl){
                     }
 
                     firstQ = [(parseInt(aindex)+1),duration,currentA.investigatorname?currentA.investigatorname:"",
-                        dstring,country,city,customer,male,female];
+                        dstring,country,city,customer,male,female,latitude,longitude];
 
 
                     for(var qindex in survey.questionlist){
