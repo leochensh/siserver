@@ -866,9 +866,10 @@ aclHandler.registerWait(function(acl){
     app.post("/editor/survey/create",acl.middleware(2),function(req,res){
         var name = req.body.name;
         var type = req.body.type;
+        var ifallowrepeat = req.body.ifallowrepeat?req.body.ifallowrepeat:false;
 
         if(name && (type == dict.TYPE_SURVEY || type == dict.TYPE_TEMPLATE)){
-            Staff.createSurvey(req.session.orgid,req.session.uid,name,type,function(err,sur){
+            Staff.createSurvey(req.session.orgid,req.session.uid,name,type,ifallowrepeat,function(err,sur){
                 logger.logger.log("info","staff create survey",{
                     id:sur,
                     editorid:req.session.uid});
@@ -889,9 +890,10 @@ aclHandler.registerWait(function(acl){
         var name = req.body.name;
         var surveyid = req.body.id;
         var metainfo = req.body.metainfo;
+        var ifallowrepeat = req.body.ifallowrepeat?req.body.ifallowrepeat:false;
 
         if(name && ObjectID.isValid(surveyid)){
-            Staff.editSurvey(name,surveyid,metainfo,function(err,msg){
+            Staff.editSurvey(name,surveyid,metainfo,ifallowrepeat,function(err,msg){
                 if(msg == "notfound"){
                     res.status(404);
                     errorMsg.code = "survey not found";
@@ -2580,23 +2582,57 @@ aclHandler.registerWait(function(acl){
 
     app.post("/anonymous/survey/answer/add",function(req,res){
         var surveyid = req.body.surveyid;
-        if(surveyid && ObjectID.isValid(surveyid) && req.body.answerlist){
-            Staff.saveAnswers(req.body,null,function(err,msg){
-                logger.logger.log("info","anonymous send survey answer",{
-                    surveyid:surveyid,
-                    answerid:msg
-                });
-                res.status(200);
-                successMsg.body = msg;
+        var answerSList = req.session.answersurveylist?req.session.answersurveylist:[];
+        var fid = _.indexOf(answerSList,surveyid);
+        console.log("fid is "+fid);
+        console.log("11111111111")
+        Staff.getSurveyGeneralInfo(surveyid,function(err,msg){
+            console.log("2222222222222222");
+            console.log(req.session.answersurveylist);
+            var allowsubmit = false;
+            if(msg.ifallowrepeat && msg.ifallowrepeat == "true"){
+                allowsubmit = true;
+            }
+            if(!allowsubmit && fid>=0){
+                allowsubmit = false;
+            }
+            else{
+                allowsubmit = true;
+            }
+            if(allowsubmit){
+                console.log(333333333333333333333)
+                if(surveyid && ObjectID.isValid(surveyid) && req.body.answerlist){
+                    if(fid<0){
+                        answerSList.push(surveyid);
+                    }
+                    req.session.answersurveylist = answerSList;
+                    Staff.saveAnswers(req.body,null,function(err,msg){
+                        logger.logger.log("info","anonymous send survey answer",{
+                            surveyid:surveyid,
+                            answerid:msg
+                        });
+                        res.status(200);
+                        successMsg.body = msg;
 
-                res.send(JSON.stringify(successMsg));
-            })
-        }
-        else{
-            res.status(406);
-            errorMsg.code = "wrong";
-            res.send(JSON.stringify(errorMsg));
-        }
+                        res.send(JSON.stringify(successMsg));
+                    })
+                }
+                else{
+                    res.status(406);
+                    errorMsg.code = "wrong";
+                    res.send(JSON.stringify(errorMsg));
+                }
+
+            }
+            else{
+                res.status(409);
+                errorMsg.code = "wrong";
+                res.send(JSON.stringify(errorMsg));
+            }
+        })
+        
+        
+
     });
 
     app.get("/investigator/survey/answer/list/:pagesize/:pagenum",acl.middleware(2),function(req,res){

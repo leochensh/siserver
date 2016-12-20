@@ -7,6 +7,7 @@ import {Emailcheck} from "../components/emailcheck";
 
 var surveyData = {
     surveyname:"",
+    ifallowrepeat:false,
     ifSaved:false,
     surveyid:null,
     ifSurveyNameEmpty:false,
@@ -44,7 +45,8 @@ var opProc = function(){
             $("#ajaxloading").show();
             var data = {
                 name:surveyData.surveyname,
-                id:surveyData.surveyid
+                id:surveyData.surveyid,
+                ifallowrepeat:surveyData.ifallowrepeat
             };
             if(surveyData.metainfolist && surveyData.metainfolist.length>0){
                 data.metainfo = JSON.stringify(surveyData.metainfolist);
@@ -388,6 +390,7 @@ class NewsurveyStore extends Store{
             if(survey){
                 surveyData = {
                     surveyname:survey.name,
+                    ifallowrepeat:survey.ifallowrepeat,
                     ifSaved:true,
                     surveyid:survey._id,
                     ifSurveyNameEmpty:false,
@@ -395,7 +398,7 @@ class NewsurveyStore extends Store{
                     qlist:[],
                     type:survey.type,
                     metainfolist:survey.metainfolist
-                }
+                };
                 var nqlist = survey.questionlist;
                 for(var i in nqlist){
                     var nq = {
@@ -405,11 +408,11 @@ class NewsurveyStore extends Store{
                         type:nqlist[i].type,
                         selectlist:nqlist[i].selectlist,
                         scorelist:nqlist[i].scorelist
-                    }
+                    };
                     if(nqlist[i].ifhasprecedent){
                         var findex = _.findIndex(nqlist,function(item){
                             return nqlist[i].precedentid == item._id;
-                        })
+                        });
                         if(findex>=0){
                             nq.precedentindex = findex;
 
@@ -439,49 +442,23 @@ class NewsurveyStore extends Store{
             }
 
 
-            //if(surveyData.ifSaved){
-            //    $("#ajaxloading").show();
-            //    var that = this;
-            //    $.ajax({
-            //        url: Constant.BASE_URL+"editor/survey/edit",
-            //        data: $.param({
-            //            name:value,
-            //            id:surveyData.surveyid
-            //        }),
-            //        type: 'PUT',
-            //        contentType: 'application/x-www-form-urlencoded',
-            //        success: function (data) {
-            //            $("#ajaxloading").hide();
-            //            $("#surveynameform").popover("show");
-            //            setTimeout(function(){
-            //                $("#surveynameform").popover("hide");
-            //            },1000);
-            //            var msg = JSON.parse(data);
-            //            surveyData.surveyname = value;
-            //            SisDispatcher.dispatch({
-            //                actionType: Constant.CAUSECHANGE,
-            //            });
-            //        },
-            //        error:function(jxr,scode){
-            //            $("#ajaxloading").hide();
-            //        },
-            //        statusCode:{
-            //            406:function(){
-            //
-            //            },
-            //            500:function(){
-            //                that.context.router.push("/login");
-            //            },
-            //            409:function(){
-            //
-            //            }
-            //        }
-            //    });
-            //}
-            //else{
-            //    surveyData.surveyname = value;
-            //    this.__emitChange();
-            //}
+        }
+        else if(payload.actionType == Constant.SURVEYALLOWREPEATSUBMIT){
+            var value = payload.value;
+
+            surveyData.ifallowrepeat = value;
+            this.__emitChange();
+            if(surveyData.ifSaved){
+                addToProc({
+                    type:"namechange"
+                });
+
+                setTimeout(function(){
+                    opProc();
+                },opInterval);
+            }
+
+
         }
         else if(payload.actionType == Constant.SURVEYADDNEWQUESTION){
             var q = payload.value;

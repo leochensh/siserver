@@ -68,7 +68,7 @@ Staff.changeStaffPass = function(staffname,oldpass,newpass,callback){
     });
 };
 
-Staff.createSurvey = function(orgid,uid,name,type,callback){
+Staff.createSurvey = function(orgid,uid,name,type,ifallowrepeat,callback){
     mongoPool.acquire(function(err,db){
         if(err){
 
@@ -81,7 +81,8 @@ Staff.createSurvey = function(orgid,uid,name,type,callback){
                     editorid:uid,
                     type:type,
                     status:dict.SURVEYSTATUS_EDIT,
-                    ctime:new Date()
+                    ctime:new Date(),
+                    ifallowrepeat:ifallowrepeat
                 };
                 collection.insertOne(newsurvey,function(err,result){
                     mongoPool.release(db);
@@ -129,12 +130,12 @@ Staff.getEditorSurveyList = function(editorid,callback){
 
                 collection.find({editorid:editorid,type:dict.TYPE_SURVEY},{orgid:0,questionlist:0})
                     .sort({ctime:-1}).toArray(function(err,surveys){
-                        mongoPool.release(db);
-                        getEditorListName(surveys,function(newsurveys){
-                            callback(err,newsurveys);
-                        })
+                    mongoPool.release(db);
+                    getEditorListName(surveys,function(newsurveys){
+                        callback(err,newsurveys);
+                    })
 
-                    });
+                });
             });
         }
     });
@@ -200,7 +201,7 @@ Staff.getTemplateList = function(callback){
 };
 
 
-Staff.editSurvey = function(name,surveyid,metainfo,callback){
+Staff.editSurvey = function(name,surveyid,metainfo,ifallowrepeat,callback){
     mongoPool.acquire(function(err,db){
         if(err){
 
@@ -217,15 +218,18 @@ Staff.editSurvey = function(name,surveyid,metainfo,callback){
                             collection.updateOne({_id:ObjectID(surveyid)},
                                 {$set:{
                                     name:name,
+                                    ifallowrepeat:ifallowrepeat,
                                     metainfolist:JSON.parse(metainfo)}},function(err,result){
-                                mongoPool.release(db);
-                                callback(err,result);
-                            });
+                                    mongoPool.release(db);
+                                    callback(err,result);
+                                });
                         }
                         else{
                             collection.updateOne({_id:ObjectID(surveyid)},
                                 {$set:{
-                                    name:name}},function(err,result){
+                                    name:name,
+                                    ifallowrepeat:ifallowrepeat
+                                }},function(err,result){
                                     mongoPool.release(db);
                                     callback(err,result);
                                 });
@@ -665,6 +669,37 @@ Staff.getSurveyDetail = function(surveyid,callback){
     });
 };
 
+Staff.getSurveyGeneralInfo = function(surveyid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("surveys",function(err,surveycollection){
+                console.log("_______________________")
+                console.log(surveycollection)
+                surveycollection.find({_id:ObjectID(surveyid)})
+                    .limit(1).next(function(err,survey){
+                        console.log("xxxxxxxxxxxxxxxxx")
+                        if(survey){
+                            console.log("yyyyyyyyyyyyyyyyy")
+                            mongoPool.release(db);
+                            callback(err,survey);
+
+                        }
+                        else{
+                            mongoPool.release(db);
+                            callback(err,"notfound")
+                        }
+                    }
+                );
+
+
+            });
+        }
+    });
+}
+
 Staff.getSurveyFullDetail = function(surveyid,callback){
     mongoPool.acquire(function(err,db){
         if(err){
@@ -755,11 +790,11 @@ var processAnswers = function(answers,db,callback){
             db.collection("surveys",function(error,surveycollection){
                 surveycollection.find({_id:ObjectID(answer.surveyid)},{name:1})
                     .limit(1).next(function(err,survey){
-                        if(survey){
-                            answer.surveyname = survey.name;
-                        }
-                        cb();
-                    })
+                    if(survey){
+                        answer.surveyname = survey.name;
+                    }
+                    cb();
+                })
             });
         }
         else{
@@ -788,8 +823,8 @@ Staff.getAnswerList = function(pagesize,pagenum,staffid,callback){
                 else{
                     collection.find({investigatorid:staffid},{_id:1,surveyid:1,ctime:1})
                         .skip(pagenum*pagesize).limit(pagesize).toArray(function(err,answers){
-                            processAnswers(answers,db,callback)
-                        });
+                        processAnswers(answers,db,callback)
+                    });
                 }
 
             });
@@ -807,31 +842,31 @@ Staff.getAnswerDetail = function(answerid,callback){
                 collection.find({_id:ObjectID(answerid)})
                     .limit(1).next(function(err,answer){
 
-                        if(answer){
-                            if(answer.investigatorid){
-                                db.collection("admins",function(err,admincollection){
-                                    admincollection.find({_id:ObjectID(answer.investigatorid)})
-                                        .limit(1).next(function(err,admin){
-                                            if(admin){
-                                                answer.investigatorname = admin.name;
-                                            }
+                    if(answer){
+                        if(answer.investigatorid){
+                            db.collection("admins",function(err,admincollection){
+                                admincollection.find({_id:ObjectID(answer.investigatorid)})
+                                    .limit(1).next(function(err,admin){
+                                    if(admin){
+                                        answer.investigatorname = admin.name;
+                                    }
 
-                                            mongoPool.release(db);
-                                            callback(err,answer);
-                                        })
-                                });
-                            }
-                            else{
-                                mongoPool.release(db);
-                                callback(err,answer);
-                            }
-
+                                    mongoPool.release(db);
+                                    callback(err,answer);
+                                })
+                            });
                         }
                         else{
                             mongoPool.release(db);
-                            callback(err,"notfound");
+                            callback(err,answer);
                         }
-                    });
+
+                    }
+                    else{
+                        mongoPool.release(db);
+                        callback(err,"notfound");
+                    }
+                });
             });
         }
     });
@@ -880,9 +915,9 @@ Staff.getVersionInfo = function(platform,callback){
             db.collection("versions",function(err,collection){
                 collection.find({platform:platform},{_id:0,orgid:0}).sort({ctime:-1})
                     .limit(1).next(function(err,ver){
-                        mongoPool.release(db);
-                        callback(err,ver);
-                    })
+                    mongoPool.release(db);
+                    callback(err,ver);
+                })
             });
         }
     });

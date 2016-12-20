@@ -366,6 +366,11 @@ export var Quest = React.createClass({
             },
             error:function(jxr,scode){
 
+            },
+            statusCode:{
+                409:function(){
+                    alert("You are not allowed to submit this answer twice.")
+                }
             }
         });
     },

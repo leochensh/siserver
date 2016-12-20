@@ -36,6 +36,7 @@ export var Constant = {
     TEMPLATETOSURVEY:"templatetosurvey",
     EDITSURVEY:"editsurvey",
     SURVEYNAMECHANGE:"surveynamechange",
+    SURVEYALLOWREPEATSUBMIT:"suveyallowrepeatsubmit",
     SURVEYADDNEWQUESTION:"surveyaddnewquestion",
     SURVEYQUESTIONEDIT:"surveyquestionedit",
     SURVEYQUESTIONDELETE:"surveyquestiondelete",

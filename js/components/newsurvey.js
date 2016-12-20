@@ -53,6 +53,12 @@ export var Newsurvey = React.createClass({
             value:event.target.value
         })
     },
+    surveyRepeatChange(event){
+        SisDispatcher.dispatch({
+            actionType:Constant.SURVEYALLOWREPEATSUBMIT,
+            value:event.target.checked
+        })
+    },
     cleanall(){
         $("#cleanall").modal("show");
     },
@@ -255,7 +261,8 @@ export var Newsurvey = React.createClass({
             url: Constant.BASE_URL+"editor/survey/create",
             data: $.param({
                 name:that.props.newsurvey.surveyname,
-                type:"survey"
+                type:"survey",
+                ifallowrepeat:that.props.newsurvey.ifallowrepeat
             }),
             type: 'POST',
             contentType: 'application/x-www-form-urlencoded',
@@ -305,7 +312,8 @@ export var Newsurvey = React.createClass({
                     url: Constant.BASE_URL+"editor/survey/edit",
                     data: $.param({
                         name:that.props.newsurvey.surveyname,
-                        id:that.props.newsurvey.surveyid
+                        id:that.props.newsurvey.surveyid,
+                        ifallowrepeat:that.props.newsurvey.ifallowrepeat
                     }),
                     type: 'PUT',
                     contentType: 'application/x-www-form-urlencoded',
@@ -916,7 +924,7 @@ export var Newsurvey = React.createClass({
                                 <div className="form-horizontal">
                                     <div className="form-group">
                                         <label id="surveynameform" htmlFor="suveynameinput" className="col-sm-2 control-label">Survey Name</label>
-                                        <div className="col-sm-10">
+                                        <div className="col-sm-4">
                                             <input type="text"
                                                    className="form-control"
                                                    id="suveynameinput"
@@ -924,6 +932,14 @@ export var Newsurvey = React.createClass({
                                                    onKeyPress={this.keypress}
                                                    onChange={this.surveyNameChange}
                                                    placeholder="Survey Name"/>
+                                        </div>
+                                        <label className="col-sm-2 col-sm-offset-2 control-label">If allow repeat submit</label>
+
+                                        <div className="col-sm-2">
+                                            <input type="checkbox"
+                                                   onChange={this.surveyRepeatChange}
+                                                   checked={this.props.newsurvey.ifallowrepeat}
+                                                   />
                                         </div>
 
                                     </div>
