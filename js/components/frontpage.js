@@ -38,7 +38,7 @@ export var Frontpage = React.createClass({
                 <img style={{position:"absolute",width:"100%",height:"580px"}}src="image/background.png"/>
                 <div className="row" >
                     <div className="col-md-2 col-md-offset-5">
-                        <a style={{position:"absolute",top:"20px"}}>
+                        <a style={{position:"absolute",top:"-20px",zIndex:"1500"}}>
                             <img style={{width:"100px",height:"100px"}} src="image/LOGO.png"/>
                         </a>
                     </div>
@@ -89,14 +89,20 @@ export var Frontpage = React.createClass({
                 </div>
                 <div className="row"     >
                         <div style={{position:"absolute",top:"555px",left:"520px"}} >
-                           <h6 style={{color:"#FFFFFF"}}>© Copyright 2016 Ouresa. All rights reserved.</h6>
+                           <h6 style={{color:"#FFFFFF"}}>© Copyright 2016 Ouresa. All rights reserved.</h6>>
                         </div>
                 </div>
 
-                <div className="modal fade bs-example-modal-sm" id="zzldownloadddmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div
+
+                    style={{minWidth:"400px",zIndex:1501}}
+                    className="modal fade bs-example-modal-sm" id="zzldownloadddmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
                     <div className="modal-dialog modal-sm" role="document">
                         <div className="modal-content">
-                            <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <button
+                                style={{marginTop:"10px",marginRight:"15px"}}
+
+                                type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 
                             <div className="row" style={{marginTop:"20px"}}>
                                 <div className="col-sm-3 col-sm-offset-2">
@@ -106,7 +112,7 @@ export var Frontpage = React.createClass({
                                 </div>
                                 <div className="col-sm-3 col-sm-offset-1">
 
-                                        <img style={{width:"80px",height:"80px"}} src="image/QR code.png"/>
+                                        <img style={{width:"80px",height:"80px"}} src="image/1479981556.png"/>
 
                                 </div>
                             </div>
@@ -118,7 +124,7 @@ export var Frontpage = React.createClass({
                                             type="button"
                                             href={Constant.BASE_URL+"downloadapk"}
                                             className="btn btn-info"
-                                            style={{width:"240px",height:"40px"}}
+                                            style={{width:"240px",height:"40px",borderRadius:"20px"}}
                                             >Download for Android</a>
                                     </div>
 
@@ -129,7 +135,7 @@ export var Frontpage = React.createClass({
                                             type="button"
                                             onClick={this.handleLoginClick}
                                             className="btn btn-info"
-                                            style={{width:"240px",height:"40px"}}
+                                            style={{width:"240px",height:"40px",borderRadius:"20px"}}
                                             >Login</a>
                                     </div>
 
@@ -141,7 +147,7 @@ export var Frontpage = React.createClass({
                                             type="button"
                                             onClick={this.zzlregisterClick}
                                             className="btn btn-default"
-                                            style={{width:"240px",height:"40px"}}
+                                            style={{width:"240px",height:"40px",borderRadius:"20px"}}
                                             >Register</a>
                                     </div>
 

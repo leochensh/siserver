@@ -496,11 +496,13 @@ export var App = React.createClass({
                         </div>
                     </div>
                 </div>
-                <div className="modal fade bs-example-modal-sm" id="loginsmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div
+                    style={{zIndex:1501}}
+                    className="modal fade bs-example-modal-sm" id="loginsmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
                     <div className="modal-dialog modal-sm" role="document">
                         <div className="modal-content">
                             <button type="button"
-                                    style={{marginTop:"10px",marginRight:"10px"}}
+                                    style={{marginTop:"10px",marginRight:"15px"}}
                                     className="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -577,11 +579,13 @@ export var App = React.createClass({
                     </div>
                 </div>
 
-                <div className="modal fade " id="zzlregistermodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div className="modal fade "
+                     style={{zIndex:1501}}
+                     id="zzlregistermodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div className="modal-dialog " role="document">
                         <div className="modal-content">
                             <button type="button"
-                                    style={{marginTop:"10px",marginRight:"10px"}}
+                                    style={{marginTop:"10px",marginRight:"14px"}}
                                     className="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span className="sr-only">Close</span></button>
 
                             <div className="col-sm-offset-5 col-sm-10" style={{marginTop:"20px",marginBottom:"20px"}}>
