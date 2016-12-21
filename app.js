@@ -2194,7 +2194,8 @@ aclHandler.registerWait(function(acl){
     app.post("/sadmin/exportspider",acl.middleware(1),function(req,res){
         var sid = req.body.spiderid;
         var sname = req.body.spidername;
-        if(sid && ObjectID.isValid(sid) && sname && (sname == "flipkart" || sname == "amazonindia")){
+        if(sid && ObjectID.isValid(sid) && sname &&
+            (sname == "flipkart" || sname == "amazonindia" || sname == "snapdeal" || sname == "jumia" || sname == "parktel")){
 
             Admin.getSpiderDetailData(sid,function(err,models){
                 var data = [];
