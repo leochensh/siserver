@@ -1996,6 +1996,198 @@ aclHandler.registerWait(function(acl){
                 }
             }},
             {in:"browsetype",out:"browsetype",op:null}
+        ],
+        "snapdeal":[
+            {in:"title",out:"title",op:null},
+            {in:"brand",out:"brand",op:null},
+            {in:"modelname",out:"modelname",op:null},
+            {in:"modelnumber",out:"modelnumber",op:null},
+            {in:"color",out:"color",op:null},
+            {in:"color",out:"update-color",op:function(v){
+                var carray = [];
+                var colorReArray =
+                    [/black|Black/,/White|white/,/red|Red/,
+                        /blue|Blue/,/golden|Golden/,/grey|Grey/,
+                        /silver|Silver/,/green|Green/,/brown|Brown/,
+                        /orange|Orange/,/yellow|Yellow/
+                    ];
+                for(var reitem in colorReArray){
+                    var cre = colorReArray[reitem];
+                    var matchRes = v.match(cre);
+                    if(matchRes){
+                        carray.push(matchRes[0].toLowerCase());
+                    }
+                }
+                return carray.join("&");
+            }},
+            {in:"keyfeature",out:"keyfeature",op:null},
+            {in:"price",out:"price",op:null},
+            {in:"simtype",out:"simtype",op:null},
+            {in:"pcamera",out:"pcamera(MP)",op:matchDigital},
+            {in:"scamera",out:"scamera(MP)",op:matchDigital},
+            {in:"screen",out:"screen",op:matchDigital},
+            {in:"Resolution",out:"Resolution",op:null},
+            {in:"RAM",out:"RAM(GB)",op:matchDigital},
+            {in:"ROM",out:"ROM(GB)",op:matchDigital},
+            {in:"EXT",out:"EXT(GB)",op:matchDigital},
+            {in:"os",out:"osinfo",op:null},
+            {in:"os",out:"os",op:function(v){
+                return v.split(" ")[0]
+            }},
+            {in:"os",out:"osversionnum",op:matchDigital},
+            {in:"os",out:"osversionname",op:function(v){
+                var rem = v.match(/[^\s]+\s+([^\s]+])\s+[^\s]+/);
+                if(rem){
+                    return rem[1]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"battery",out:"battery(mAh)",op:matchDigital},
+            {in:"rating",out:"ratingNum",op:null},
+            {in:"avgrate",out:"avgrate",op:null},
+            {in:"reviewNum",out:"reviewNum",op:null},
+            {in:"processor",out:"processor",op:null},
+            {in:"processor",out:"processorOwner",op:function(v){
+                var rem = v.match("Exynos|MT|Qualcomm|SC|Media|Spreadtrum|MSM|Intel|Atom|Snapdragon");
+                if(rem){
+                    return rem[0]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"processorclock",out:"processorclock",op:null},
+            {in:"browsetype",out:"browsetype",op:null}
+        ],
+        "jumia":[
+            {in:"title",out:"title",op:null},
+            {in:"brand",out:"brand",op:null},
+            {in:"modelname",out:"modelname",op:null},
+            {in:"modelnumber",out:"modelnumber",op:null},
+            {in:"color",out:"color",op:null},
+            {in:"color",out:"update-color",op:function(v){
+                var carray = [];
+                var colorReArray =
+                    [/black|Black/,/White|white/,/red|Red/,
+                        /blue|Blue/,/golden|Golden/,/grey|Grey/,
+                        /silver|Silver/,/green|Green/,/brown|Brown/,
+                        /orange|Orange/,/yellow|Yellow/
+                    ];
+                for(var reitem in colorReArray){
+                    var cre = colorReArray[reitem];
+                    var matchRes = v.match(cre);
+                    if(matchRes){
+                        carray.push(matchRes[0].toLowerCase());
+                    }
+                }
+                return carray.join("&");
+            }},
+            {in:"keyfeature",out:"keyfeature",op:null},
+            {in:"price",out:"price",op:null},
+            {in:"simtype",out:"simtype",op:null},
+            {in:"pcamera",out:"pcamera(MP)",op:matchDigital},
+            {in:"scamera",out:"scamera(MP)",op:matchDigital},
+            {in:"screen",out:"screen",op:matchDigital},
+            {in:"Resolution",out:"Resolution",op:null},
+            {in:"RAM",out:"RAM(GB)",op:matchDigital},
+            {in:"ROM",out:"ROM(GB)",op:matchDigital},
+            {in:"EXT",out:"EXT(GB)",op:matchDigital},
+            {in:"os",out:"osinfo",op:null},
+            {in:"os",out:"os",op:function(v){
+                return v.split(" ")[0]
+            }},
+            {in:"os",out:"osversionnum",op:matchDigital},
+            {in:"os",out:"osversionname",op:function(v){
+                var rem = v.match(/[^\s]+\s+([^\s]+])\s+[^\s]+/);
+                if(rem){
+                    return rem[1]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"battery",out:"battery(mAh)",op:matchDigital},
+            {in:"rating",out:"ratingNum",op:null},
+            {in:"avgrate",out:"avgrate",op:null},
+            {in:"reviewNum",out:"reviewNum",op:null},
+            {in:"processor",out:"processor",op:null},
+            {in:"processor",out:"processorOwner",op:function(v){
+                var rem = v.match("Exynos|MT|Qualcomm|SC|Media|Spreadtrum|MSM|Intel|Atom|Snapdragon");
+                if(rem){
+                    return rem[0]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"processorclock",out:"processorclock",op:null},
+            {in:"browsetype",out:"browsetype",op:null}
+        ],
+        "parktel":[
+            {in:"title",out:"title",op:null},
+            {in:"brand",out:"brand",op:null},
+            {in:"modelname",out:"modelname",op:null},
+            {in:"modelnumber",out:"modelnumber",op:null},
+            {in:"color",out:"color",op:null},
+            {in:"color",out:"update-color",op:function(v){
+                var carray = [];
+                var colorReArray =
+                    [/black|Black/,/White|white/,/red|Red/,
+                        /blue|Blue/,/golden|Golden/,/grey|Grey/,
+                        /silver|Silver/,/green|Green/,/brown|Brown/,
+                        /orange|Orange/,/yellow|Yellow/
+                    ];
+                for(var reitem in colorReArray){
+                    var cre = colorReArray[reitem];
+                    var matchRes = v.match(cre);
+                    if(matchRes){
+                        carray.push(matchRes[0].toLowerCase());
+                    }
+                }
+                return carray.join("&");
+            }},
+            {in:"keyfeature",out:"keyfeature",op:null},
+            {in:"price",out:"price",op:null},
+            {in:"simtype",out:"simtype",op:null},
+            {in:"pcamera",out:"pcamera(MP)",op:matchDigital},
+            {in:"scamera",out:"scamera(MP)",op:matchDigital},
+            {in:"screen",out:"screen",op:matchDigital},
+            {in:"Resolution",out:"Resolution",op:null},
+            {in:"RAM",out:"RAM(GB)",op:matchDigital},
+            {in:"ROM",out:"ROM(GB)",op:matchDigital},
+            {in:"EXT",out:"EXT(GB)",op:matchDigital},
+            {in:"os",out:"osinfo",op:null},
+            {in:"os",out:"os",op:function(v){
+                return v.split(" ")[0]
+            }},
+            {in:"os",out:"osversionnum",op:matchDigital},
+            {in:"os",out:"osversionname",op:function(v){
+                var rem = v.match(/[^\s]+\s+([^\s]+])\s+[^\s]+/);
+                if(rem){
+                    return rem[1]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"battery",out:"battery(mAh)",op:matchDigital},
+            {in:"rating",out:"ratingNum",op:null},
+            {in:"avgrate",out:"avgrate",op:null},
+            {in:"reviewNum",out:"reviewNum",op:null},
+            {in:"processor",out:"processor",op:null},
+            {in:"processor",out:"processorOwner",op:function(v){
+                var rem = v.match("Exynos|MT|Qualcomm|SC|Media|Spreadtrum|MSM|Intel|Atom|Snapdragon");
+                if(rem){
+                    return rem[0]
+                }
+                else{
+                    return ""
+                }
+            }},
+            {in:"processorclock",out:"processorclock",op:null},
+            {in:"browsetype",out:"browsetype",op:null}
         ]
     };
 
