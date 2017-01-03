@@ -86,7 +86,8 @@ ITEM_PIPELINES = {
     'flipkart.pipelines.jumialDetailSpiderPipeline':300,
     'flipkart.pipelines.parktelMSpiderPipeline':300,
     'flipkart.pipelines.parktelDetailSpiderPipeline':300,
-
+    'flipkart.pipelines.nairalandMSpiderPipeline':300,
+    'flipkart.pipelines.nairalandDetailSpiderPipeline':300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
