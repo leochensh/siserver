@@ -58,7 +58,7 @@ class nairalandMSpider(Spider):
             infos.append(info)
 
 
-        if len(infos) == 0:
+        if self.currentStart>=100 or len(infos) == 0:
         # if self.currentStart >= 2:
             return
         else:

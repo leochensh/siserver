@@ -62,10 +62,12 @@ export var Constant = {
     TARGETCLICK:"targetclick",
     CREATESPIDER:"createspider",
     GETSPIDERLIST:"getspiderlist",
+    GETHOTWORDBRAND:"gethotwordbrand",
     SPIDERLISTUPDATE:"spiderlistupdate",
     EXPORTSPIDERDATA:"exportspiderdata",
     SHOWSPIDERSTATISTIC:"showspiderstatistic",
     SPIDERSTASTICCHANGE:"spiderstasticchange",
+    HOTWORDBRANDCHANGE:"hotwordbrandchange",
     DELETESPIDER:"deletespider",
 
 

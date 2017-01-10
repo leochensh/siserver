@@ -1970,6 +1970,70 @@ Admin.getbatterybyavgpriceForModel = function(sid,callback){
     });
 };
 
+
+Admin.getHotWordBrand = function(sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("brand",function(err,collection){
+                collection.find({spiderid:sid}).toArray(function(err,brands){
+                    mongoPool.release(db);
+                    callback(err,brands);
+                })
+            });
+        }
+    });
+};
+
+Admin.getHotWordBrandStastic = function(bid,sid,callback){
+    mongoPool.acquire(function(err,db){
+        if(err){
+
+        }
+        else{
+            db.collection("keyword",function(err,collection){
+                collection.find({spiderid:sid,brandid:bid}).toArray(function(err,words){
+                    var wordCountArray = [];
+                    console.log("+++++++++++++++++++++++here")
+                    async.each(words,function(w,cb){
+                        var word = w.word;
+                        var wcount = w.count;
+                        var wtcount = 0;
+                        collection.find({spiderid:sid,word:word}).toArray(function(err,nwords){
+                            for(var nwitem in nwords){
+                                var nw = nwords[nwitem];
+                                wtcount += nw.count;
+                            }
+                            // console.log(1+Math.log(wcount));
+                            // console.log(Math.log(wtcount/(wtcount-wcount)));
+                            wordCountArray.push({
+                                word:word,
+                                tf:(1+Math.log(wcount))*Math.log(wtcount/(wtcount-wcount+1))
+                            });
+
+                            cb();
+                        })
+                    },function(err){
+                        mongoPool.release(db);
+                        var sortArray = _.sortBy(wordCountArray,function(item){
+                            return item.tf;
+                        });
+                        sortArray = _.last(sortArray,10).reverse();
+
+                        callback(err,sortArray);
+
+                    });
+
+
+
+                })
+            });
+        }
+    });
+}
+
 function groupAndSort(data,iftotal,totalfunc,groupcallback,grouptoarray,sortcallback,ifslice){
     var total = 0;
     if(iftotal){

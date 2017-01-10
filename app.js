@@ -2248,64 +2248,118 @@ aclHandler.registerWait(function(acl){
         var sid = req.body.spiderid;
         var sname = req.body.spidername;
         if(sid && ObjectID.isValid(sid) && sname &&
-            (sname == "flipkart" || sname == "amazonindia" || sname == "snapdeal" || sname == "jumia" || sname == "parktel")){
-
-            Admin.getSpiderDetailData(sid,function(err,models){
-                var data = [];
-                data.push(_.pluck(exportDomainList[sname],"out"));
-                for(var mindex in models){
-                    var pitem = [];
-                    for (var tagindex in exportDomainList[sname]){
-                        var currentMapObj = exportDomainList[sname][tagindex];
-                        var inKey = currentMapObj.in;
-                        var opFunc = currentMapObj.op;
-                        if(inKey in models[mindex]){
-                            var inValue = models[mindex][inKey];
-                            if(inValue){
-                                if(opFunc){
-                                    pitem.push(opFunc(inValue));
+            (sname == "flipkart" || sname == "amazonindia" || sname == "snapdeal" || sname == "jumia" || sname == "parktel" || sname == "nairaland")){
+            if(sname!="nairaland"){
+                Admin.getSpiderDetailData(sid,function(err,models){
+                    var data = [];
+                    data.push(_.pluck(exportDomainList[sname],"out"));
+                    for(var mindex in models){
+                        var pitem = [];
+                        for (var tagindex in exportDomainList[sname]){
+                            var currentMapObj = exportDomainList[sname][tagindex];
+                            var inKey = currentMapObj.in;
+                            var opFunc = currentMapObj.op;
+                            if(inKey in models[mindex]){
+                                var inValue = models[mindex][inKey];
+                                if(inValue){
+                                    if(opFunc){
+                                        pitem.push(opFunc(inValue));
+                                    }
+                                    else{
+                                        pitem.push(inValue);
+                                    }
                                 }
                                 else{
-                                    pitem.push(inValue);
+                                    pitem.push("")
                                 }
                             }
                             else{
                                 pitem.push("")
                             }
+                            //if (models[mindex][exportDomainList[sname][tagindex]]){
+                            //    pitem.push(models[mindex][exportDomainList[sname][tagindex]]);
+                            //}
+                            //else{
+                            //    pitem.push("");
+                            //}
                         }
-                        else{
-                            pitem.push("")
-                        }
-                        //if (models[mindex][exportDomainList[sname][tagindex]]){
-                        //    pitem.push(models[mindex][exportDomainList[sname][tagindex]]);
-                        //}
-                        //else{
-                        //    pitem.push("");
-                        //}
+                        data.push(pitem);
                     }
-                    data.push(pitem);
-                }
-                var name = sname+ new Date().toISOString() + ".xlsx";
-                var ws_name = "SheetJS";
+                    var name = sname+ new Date().toISOString() + ".xlsx";
+                    var ws_name = "SheetJS";
 
-                function Workbook() {
-                    if(!(this instanceof Workbook)) return new Workbook();
-                    this.SheetNames = [];
-                    this.Sheets = {};
-                }
+                    function Workbook() {
+                        if(!(this instanceof Workbook)) return new Workbook();
+                        this.SheetNames = [];
+                        this.Sheets = {};
+                    }
 
-                var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
+                    var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
 
-                /* add worksheet to workbook */
-                wb.SheetNames.push(ws_name);
-                wb.Sheets[ws_name] = ws;
+                    /* add worksheet to workbook */
+                    wb.SheetNames.push(ws_name);
+                    wb.Sheets[ws_name] = ws;
 
-                /* write file */
-                XLSX.writeFile(wb, 'uploads/'+name);
-                successMsg.body = name;
+                    /* write file */
+                    XLSX.writeFile(wb, 'uploads/'+name);
+                    successMsg.body = name;
 
-                res.send(JSON.stringify(successMsg));
-            })
+                    res.send(JSON.stringify(successMsg));
+                })
+            }
+            else{
+                Admin.getHotWordBrand(sid,function(err,brands){
+                    var data = [];
+                    var bname = [];
+                    bname.push("Brands");
+                    var bstart = 0;
+                    while(bstart<=9){
+                        bname.push("Hotword#"+(parseInt(bstart)+1));
+                        bname.push("Index");
+                        bstart+=1;
+                    }
+                    data.push(bname);
+                    async.each(brands,function(item,cb){
+                        var bid = item._id.toString();
+                        var brandname = item.name;
+                        var bname = [brandname];
+                        console.log("Brand name is "+brandname);
+                        Admin.getHotWordBrandStastic(bid,sid,function(err,datas){
+                            for(var di in datas){
+                                console.log("Word is "+datas[di].word);
+                                bname.push(datas[di].word);
+                                bname.push(datas[di].tf);
+                            }
+                            data.push(bname);
+                            cb(null);
+                        })
+                    },function(err){
+                        var name = sname+ new Date().toISOString() + ".xlsx";
+                        var ws_name = "SheetJS";
+
+                        function Workbook() {
+                            if(!(this instanceof Workbook)) return new Workbook();
+                            this.SheetNames = [];
+                            this.Sheets = {};
+                        }
+
+                        var wb = new Workbook(), ws = sheet_from_array_of_arrays(data);
+
+                        /* add worksheet to workbook */
+                        wb.SheetNames.push(ws_name);
+                        wb.Sheets[ws_name] = ws;
+
+                        /* write file */
+                        XLSX.writeFile(wb, 'uploads/'+name);
+                        successMsg.body = name;
+
+                        res.send(JSON.stringify(successMsg));
+                    })
+
+
+                })
+            }
+
 
 
         }
@@ -2591,6 +2645,43 @@ aclHandler.registerWait(function(acl){
         if(sid && ObjectID.isValid(sid)){
 
             Admin.getbatterybyavgpriceForModel(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/hotword/brandlist/:spiderid",acl.middleware(1),function(req,res){
+        var sid = req.params.spiderid;
+        if(sid && ObjectID.isValid(sid)){
+
+            Admin.getHotWordBrand(sid,function(err,result){
+
+                res.status(200);
+                successMsg.body = result;
+                res.send(JSON.stringify(successMsg));
+            })
+        }
+        else{
+            res.status(406);
+            errorMsg.code = "wrong";
+            res.send(JSON.stringify(errorMsg));
+        }
+    });
+
+    app.get("/sadmin/spiderstatistics/hotword/stastic/:brandid/:spiderid",acl.middleware(1),function(req,res){
+        var bid = req.params.brandid;
+        var spiderid = req.params.spiderid;
+        if(bid && ObjectID.isValid(bid) && spiderid && ObjectID.isValid(spiderid)){
+
+            Admin.getHotWordBrandStastic(bid,spiderid,function(err,result){
 
                 res.status(200);
                 successMsg.body = result;

@@ -64,7 +64,7 @@ class nairalandModelDetailSpider(Spider):
                     info = {
                         "brandid": model["brandid"],
                         "spiderid":model["spiderid"],
-                        "word":word
+                        "word":word.lower()
                     }
                     infos.append(info)
 

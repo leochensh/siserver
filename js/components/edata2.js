@@ -182,6 +182,8 @@ export var Edata2 = React.createClass({
         SisDispatcher.dispatch({
             actionType: Constant.GETSPIDERLIST
         });
+        
+        
     },
     exportClick(index){
         var that = this;
@@ -206,8 +208,14 @@ export var Edata2 = React.createClass({
                     actionType: Constant.SHOWSPIDERSTATISTIC,
                     index:index
                 });
+                if(that.props.edata.targetList[that.props.edata.currentIndex]!="nairaland"){
+                    $("#spiderstatistic").modal("show");
+                }
+                else{
+                    $("#hotwordstatistic").modal("show");
+                }
 
-                $("#spiderstatistic").modal("show");
+
             }
 
         };
@@ -240,6 +248,12 @@ export var Edata2 = React.createClass({
     stasticchange(event){
         SisDispatcher.dispatch({
             actionType: Constant.SPIDERSTASTICCHANGE,
+            value:event.target.value
+        });
+    },
+    hotwordbrandchange(event){
+        SisDispatcher.dispatch({
+            actionType: Constant.HOTWORDBRANDCHANGE,
             value:event.target.value
         });
     },
@@ -387,6 +401,16 @@ export var Edata2 = React.createClass({
                 </optgroup>
             )
         }
+
+        var hotwordoptions = [];
+        for(var hi in this.props.edata.hotkeybrandlist){
+            var chw = this.props.edata.hotkeybrandlist[hi];
+            hotwordoptions.push(
+                <option value={hi}>
+                    {chw.name}
+                </option>
+            )
+        }
         return (
             <div id="wrapper">
                 <div id="sidebar-wrapper">
@@ -424,6 +448,31 @@ export var Edata2 = React.createClass({
                             <div id="scrollright" className="col-md-12">
                                 {spiderList}
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="modal fade" id="hotwordstatistic" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div className="modal-dialog modal-lg" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 className="modal-title" >Hot Word Statistic</h4>
+                            </div>
+                            <div className="modal-body">
+                                <select
+                                    value={this.props.edata.hotkeybrandindex}
+                                    onChange={this.hotwordbrandchange}
+                                    className="form-control">
+                                    {hotwordoptions}
+                                </select>
+
+                                <canvas id="hotwordbarcanvas" width="850px" height="750px" >
+                                    [No canvas support]
+                                </canvas>
+
+                            </div>
+
                         </div>
                     </div>
                 </div>
