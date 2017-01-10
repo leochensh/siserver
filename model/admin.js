@@ -1994,7 +1994,7 @@ Admin.getHotWordBrandStastic = function(bid,sid,callback){
         }
         else{
             db.collection("keyword",function(err,collection){
-                collection.find({spiderid:sid,brandid:bid}).toArray(function(err,words){
+                collection.find({spiderid:sid,brandid:bid}).sort({count:-1}).limit(1000).toArray(function(err,words){
                     var wordCountArray = [];
                     console.log("+++++++++++++++++++++++here")
                     async.each(words,function(w,cb){
