@@ -67,7 +67,9 @@ export var Constant = {
     EXPORTSPIDERDATA:"exportspiderdata",
     SHOWSPIDERSTATISTIC:"showspiderstatistic",
     SPIDERSTASTICCHANGE:"spiderstasticchange",
+    SPIDERSTASTICCHANGEALL:"spiderstasticchangeall",
     HOTWORDBRANDCHANGE:"hotwordbrandchange",
+    HOTWORDBRANDCHANGEALL:"hotwordbrandchangeall",
     DELETESPIDER:"deletespider",
 
 

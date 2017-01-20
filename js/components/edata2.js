@@ -21,7 +21,9 @@ export var Edata2 = React.createClass({
         return{
             brandList:[],
             brandCheckList:[],
-            stasticItemIndex:0
+            stasticItemIndex:0,
+            stasticsingle:true,
+            activestatisticindex:-1
         }
     },
     handleChange(name,event){
@@ -32,7 +34,12 @@ export var Edata2 = React.createClass({
     },
     targetclick(index){
         var that = this;
+
         var infunc = function(event){
+            that.setState({
+                stasticsingle:true,
+                activestatisticindex:-1
+            })
             SisDispatcher.dispatch({
                 actionType: Constant.TARGETCLICK,
                 index:index
@@ -71,16 +78,16 @@ export var Edata2 = React.createClass({
         };
         return ifunc;
     },
-    stasticchange(event){
-        this.setState({
-            stasticItemIndex:event.target.value
-        });
-        var that = this;
-        setTimeout(function(){
-            that.cleaCanvas();
-            that.redrawcanvas();
-        },300);
-    },
+    // stasticchange(event){
+    //     this.setState({
+    //         stasticItemIndex:event.target.value
+    //     });
+    //     var that = this;
+    //     setTimeout(function(){
+    //         that.cleaCanvas();
+    //         that.redrawcanvas();
+    //     },300);
+    // },
     getSingleBrandModelNum(bi){
         var brand = this.state.brandList[bi];
         var count = 0;
@@ -203,17 +210,20 @@ export var Edata2 = React.createClass({
         var that = this;
         var infunc = function(){
             var spi = that.props.edata.spiderlist[that.props.edata.currentIndex][index];
+            that.setState({
+                activestatisticindex:index
+            })
             if(spi.status == Constant.SPIDERSTATU_DONE){
                 SisDispatcher.dispatch({
                     actionType: Constant.SHOWSPIDERSTATISTIC,
                     index:index
                 });
-                if(that.props.edata.targetList[that.props.edata.currentIndex]!="nairaland"){
-                    $("#spiderstatistic").modal("show");
-                }
-                else{
-                    $("#hotwordstatistic").modal("show");
-                }
+                // if(that.props.edata.targetList[that.props.edata.currentIndex]!="nairaland"){
+                //     $("#spiderstatistic").modal("show");
+                // }
+                // else{
+                //     $("#hotwordstatistic").modal("show");
+                // }
 
 
             }
@@ -246,16 +256,51 @@ export var Edata2 = React.createClass({
         context.clearRect(0, 0, canvas.width,canvas.height);
     },
     stasticchange(event){
-        SisDispatcher.dispatch({
-            actionType: Constant.SPIDERSTASTICCHANGE,
-            value:event.target.value
-        });
+        if(event.target.value == "all"){
+            this.setState({
+                stasticsingle:false
+            });
+            SisDispatcher.dispatch({
+                actionType: Constant.SPIDERSTASTICCHANGEALL,
+                value:event.target.value
+            });
+        }
+        else{
+            this.setState({
+                stasticsingle:true
+            });
+            SisDispatcher.dispatch({
+                actionType: Constant.SPIDERSTASTICCHANGE,
+                value:event.target.value
+            });
+        }
+
+
     },
     hotwordbrandchange(event){
-        SisDispatcher.dispatch({
-            actionType: Constant.HOTWORDBRANDCHANGE,
-            value:event.target.value
-        });
+        if(event.target.value == "all"){
+            this.setState({
+                stasticsingle:false
+            });
+            var value = event.target.value;
+            setTimeout(function(){
+                SisDispatcher.dispatch({
+                    actionType: Constant.HOTWORDBRANDCHANGEALL,
+                    value:value
+                });
+            },100)
+
+        }
+        else{
+            this.setState({
+                stasticsingle:true
+            });
+            SisDispatcher.dispatch({
+                actionType: Constant.HOTWORDBRANDCHANGE,
+                value:event.target.value
+            });
+        }
+
     },
     render() {
         var targeList = [];
@@ -280,8 +325,118 @@ export var Edata2 = React.createClass({
             }
         }
 
+        var spiderstatisticoptions = [];
+        for(var oi in Constant.SPIDERSTASTICMAP){
+            var optgrouplist = [];
+            for (var suboi in Constant.SPIDERSTASTICMAP[oi]){
+                optgrouplist.push(
+                    <option value={oi+"|"+suboi}>
+                        {Constant.SPIDERSTASTICMAP[oi][suboi].name}
+                    </option>
+                )
+            }
+            spiderstatisticoptions.push(
+                <optgroup label={oi}>
+                    {optgrouplist}
+                </optgroup>
+            )
+        }
+        spiderstatisticoptions.push(
+            <optgroup label="ALL">
+                <option value="all">
+                    ALL
+                </option>
+            </optgroup>
+        )
+
+        var hotwordoptions = [];
+        for(var hi in this.props.edata.hotkeybrandlist){
+            var chw = this.props.edata.hotkeybrandlist[hi];
+            hotwordoptions.push(
+                <option value={hi}>
+                    {chw.name}
+                </option>
+            )
+        }
+        hotwordoptions.push(
+            <option value="all">
+                ALL
+            </option>
+        )
 
         var spiderList = [];
+
+        var canvasArea = <canvas id="barcanvas" width="850px" height="750px" >
+            [No canvas support]
+        </canvas>;
+
+        if(this.props.edata.targetList[this.props.edata.currentIndex]=="nairaland"){
+            canvasArea = <canvas id="hotwordbarcanvas" width="850px" height="750px" >
+                [No canvas support]
+            </canvas>
+        }
+
+        if(!this.state.stasticsingle){
+            if(this.props.edata.targetList[this.props.edata.currentIndex]=="nairaland"){
+                var carray = [];
+                for(var hi in this.props.edata.hotkeybrandlist){
+                    var chw = this.props.edata.hotkeybrandlist[hi];
+                    carray.push(
+                        <div>
+                            <h2>
+                                {chw.name}
+                            </h2>
+                            <canvas id={"hotwordbarcanvas"+hi} width="850px" height="750px" >
+                                [No canvas support]
+                            </canvas>
+                        </div>
+
+                    );
+                }
+                canvasArea = carray;
+            }
+            else{
+                var bsarray = [];
+                for(var bsi in Constant.SPIDERSTASTICMAP["Brands statistics"]){
+                    var cbs = Constant.SPIDERSTASTICMAP["Brands statistics"][bsi];
+                    bsarray.push(
+                        <div>
+                            <h3>
+                                {cbs.name}
+                            </h3>
+                            <canvas id={"barcanvas"+bsi} width="850px" height="750px" >
+                                [No canvas support]
+                            </canvas>
+                        </div>
+                    )
+                }
+                var marray = [];
+                for(var bsi in Constant.SPIDERSTASTICMAP["Models Statistics"]){
+                    var cbs = Constant.SPIDERSTASTICMAP["Models Statistics"][bsi];
+                    marray.push(
+                        <div>
+                            <h3>
+                                {cbs.name}
+                            </h3>
+                            <canvas id={"barcanvasm"+bsi} width="850px" height="750px" >
+                                [No canvas support]
+                            </canvas>
+                        </div>
+                    )
+                }
+                canvasArea = <div>
+                    <h2>
+                        Brands statistics
+                    </h2>
+                    {bsarray}
+                    <h2>
+                        Models Statistics
+                    </h2>
+                    {marray}
+                </div>
+            }
+
+        }
 
         var clist = this.props.edata.spiderlist[this.props.edata.currentIndex];
         if(clist && clist.length>0){
@@ -300,6 +455,32 @@ export var Edata2 = React.createClass({
                     downLink = <a href={Constant.BASE_IMAGEURL+clist[spi].downlink}>
                         Download
                     </a>
+                }
+                var c = ""
+                if(spi == this.state.activestatisticindex){
+                    if(this.props.edata.targetList[this.props.edata.currentIndex]!="nairaland"){
+                        c = <div>
+                            <select
+                                value={this.props.edata.currentstatistic}
+                                onChange={this.stasticchange}
+                                className="form-control">
+                                {spiderstatisticoptions}
+                            </select>
+                            {canvasArea}
+                        </div>
+                    }
+                    else{
+                        c = <div>
+                            <select
+                                value={this.props.edata.hotkeybrandindex}
+                                onChange={this.hotwordbrandchange}
+                                className="form-control">
+                                {hotwordoptions}
+                            </select>
+                            {canvasArea}
+                        </div>
+                    }
+
                 }
 
                 spiderList.push(
@@ -378,6 +559,7 @@ export var Edata2 = React.createClass({
                                 </div>
                             </div>
 
+                            {c}
                         </div>
 
                     </div>
@@ -385,32 +567,7 @@ export var Edata2 = React.createClass({
             }
         }
 
-        var spiderstatisticoptions = [];
-        for(var oi in Constant.SPIDERSTASTICMAP){
-            var optgrouplist = [];
-            for (var suboi in Constant.SPIDERSTASTICMAP[oi]){
-                optgrouplist.push(
-                    <option value={oi+"|"+suboi}>
-                        {Constant.SPIDERSTASTICMAP[oi][suboi].name}
-                    </option>
-                )
-            }
-            spiderstatisticoptions.push(
-                <optgroup label={oi}>
-                    {optgrouplist}
-                </optgroup>
-            )
-        }
 
-        var hotwordoptions = [];
-        for(var hi in this.props.edata.hotkeybrandlist){
-            var chw = this.props.edata.hotkeybrandlist[hi];
-            hotwordoptions.push(
-                <option value={hi}>
-                    {chw.name}
-                </option>
-            )
-        }
         return (
             <div id="wrapper">
                 <div id="sidebar-wrapper">
@@ -479,7 +636,7 @@ export var Edata2 = React.createClass({
 
                 <div className="modal fade" id="spiderstatistic" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
                     <div className="modal-dialog modal-lg" role="document">
-                        <div className="modal-content">
+                        <div className="modal-content" style={{overflowY:"scroll"}}>
                             <div className="modal-header">
                                 <button type="button" className="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <h4 className="modal-title" id="myModalLabel">Statistic</h4>
@@ -492,9 +649,7 @@ export var Edata2 = React.createClass({
                                     {spiderstatisticoptions}
                                 </select>
 
-                                <canvas id="barcanvas" width="850px" height="750px" >
-                                    [No canvas support]
-                                </canvas>
+                                {canvasArea}
 
                             </div>
 

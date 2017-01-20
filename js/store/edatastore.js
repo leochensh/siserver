@@ -74,6 +74,131 @@ var getStatistic = function(){
     }
 }
 
+var getStatisticall = function(){
+    var spiderid = edata.statisticid;
+    async.forEachOf(Constant.SPIDERSTASTICMAP["Brands statistics"],function(v,index,cb){
+        if(v.url){
+            var url = v.url+"/"+spiderid;
+            var labeltag = v.labeltag;
+            var datatag = v.datatag;
+            $.ajax({
+                url: Constant.BASE_URL+url,
+                type: 'GET',
+                success: function (data) {
+                    $("#pleaseWaitDialog").modal("hide");
+                    var msg = JSON.parse(data).body;
+                    console.log(msg);
+                    var dataA = [];
+                    var labelA = [];
+                    if(msg.total){
+                        labelA.push("Total");
+                        dataA.push(msg.total);
+                    }
+                    for(var i in msg.models){
+                        labelA.push(msg.models[i][labeltag].split("(")[0]);
+                        dataA.push(msg.models[i][datatag]);
+                    }
+                    console.log(labeltag);
+                    console.log(datatag);
+                    console.log(msg.models);
+                    var canvas  = document.getElementById("barcanvas"+index);
+                    var context = canvas.getContext('2d');
+                    context.clearRect(0, 0, canvas.width,canvas.height);
+
+                    new RGraph.Bar({
+                        id: "barcanvas"+index,
+                        data: dataA,
+                        options: {
+                            gutterLeft:100,
+                            gutterBottom:150,
+                            labelsAbove:true,
+                            textAngle:30,
+                            labels: labelA,
+                            shadow: true,
+                            colors: ['red'],
+                            strokestyle: 'rgba(0,0,0,0)'
+                        }
+                    }).draw();
+                    cb();
+
+
+                },
+                error:function(jxr,scode){
+                    $("#pleaseWaitDialog").modal("hide");
+                    cb();
+                }
+            });
+        }
+        else{
+            cb()
+        }
+    },function(err){
+
+    });
+
+    async.forEachOf(Constant.SPIDERSTASTICMAP["Models Statistics"],function(v,index,cb){
+        if(v.url){
+            var url = v.url+"/"+spiderid;
+            var labeltag = v.labeltag;
+            var datatag = v.datatag;
+            $.ajax({
+                url: Constant.BASE_URL+url,
+                type: 'GET',
+                success: function (data) {
+                    $("#pleaseWaitDialog").modal("hide");
+                    var msg = JSON.parse(data).body;
+                    console.log(msg);
+                    var dataA = [];
+                    var labelA = [];
+                    if(msg.total){
+                        labelA.push("Total");
+                        dataA.push(msg.total);
+                    }
+                    for(var i in msg.models){
+                        labelA.push(msg.models[i][labeltag].split("(")[0]);
+                        dataA.push(msg.models[i][datatag]);
+                    }
+                    console.log(labeltag);
+                    console.log(datatag);
+                    console.log(msg.models);
+                    var canvas  = document.getElementById("barcanvasm"+index);
+                    var context = canvas.getContext('2d');
+                    context.clearRect(0, 0, canvas.width,canvas.height);
+
+                    new RGraph.Bar({
+                        id: "barcanvasm"+index,
+                        data: dataA,
+                        options: {
+                            gutterLeft:100,
+                            gutterBottom:150,
+                            labelsAbove:true,
+                            textAngle:30,
+                            labels: labelA,
+                            shadow: true,
+                            colors: ['red'],
+                            strokestyle: 'rgba(0,0,0,0)'
+                        }
+                    }).draw();
+                    cb();
+
+
+                },
+                error:function(jxr,scode){
+                    $("#pleaseWaitDialog").modal("hide");
+                    cb();
+                }
+            });
+        }
+        else{
+            cb()
+        }
+    },function(err){
+
+    });
+
+
+}
+
 
 var getHotWordBrandList = function(){
     $("#pleaseWaitDialog").modal("show");
@@ -139,6 +264,66 @@ var getHotWordCount = function(){
             $("#pleaseWaitDialog").modal("hide");
         }
     });
+};
+
+var getHotWordCountAll = function(){
+    // $("#pleaseWaitDialog").modal("show");
+
+    async.forEachOf(edata.hotkeybrandlist,function(v,index,cb){
+        var sid = edata.statisticid;
+        var bid = v._id;
+        console.log(v.name)
+        console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{")
+        console.log("hotwordbarcanvas"+index);
+        console.log(edata.hotkeybrandlist)
+        var canvas = document.getElementById("hotwordbarcanvas"+0);
+        console.log(canvas);
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width,canvas.height);
+        $("#ajaxloading").show();
+        $.ajax({
+            url: Constant.BASE_URL+"sadmin/spiderstatistics/hotword/stastic/"+bid+"/"+sid,
+            type: 'GET',
+            success: function (data) {
+                $("#ajaxloading").hide();
+                var msg = JSON.parse(data).body;
+                // edata.hotkeybrandlist = msg;
+                // SisDispatcher.dispatch({
+                //     actionType: Constant.SPIDERLISTUPDATE
+                // });
+                var dataA = [];
+                var labelA = [];
+                for(var i in msg){
+                    dataA.push(msg[i].tf);
+                    labelA.push(msg[i].word);
+                }
+                new RGraph.Bar({
+                    id: "hotwordbarcanvas"+index,
+                    data: dataA,
+                    options: {
+                        gutterLeft:100,
+                        gutterBottom:150,
+                        labelsAbove:false,
+                        textAngle:30,
+                        labels: labelA,
+                        shadow: true,
+                        colors: ['red'],
+                        strokestyle: 'rgba(0,0,0,0)'
+                    }
+                }).draw();
+                cb();
+            },
+            error:function(jxr,scode){
+                $("#ajaxloading").hide();
+                $("#pleaseWaitDialog").modal("hide");
+                cb();
+            }
+        });
+    },function(err){
+
+    });
+
+
 };
 
 class Edatastore extends Store{
@@ -276,11 +461,23 @@ class Edatastore extends Store{
             this.__emitChange();
             getStatistic();
         }
+        else if(payload.actionType == Constant.SPIDERSTASTICCHANGEALL){
+            var value = payload.value;
+            edata.currentstatistic = value;
+            this.__emitChange();
+             getStatisticall();
+        }
         else if(payload.actionType == Constant.HOTWORDBRANDCHANGE){
             var value = payload.value;
             edata.hotkeybrandindex = value;
             this.__emitChange();
             getHotWordCount();
+        }
+        else if(payload.actionType == Constant.HOTWORDBRANDCHANGEALL){
+            var value = payload.value;
+            edata.hotkeybrandindex = value;
+            this.__emitChange();
+            getHotWordCountAll();
         }
         else if(payload.actionType == Constant.DELETESPIDER){
             var sp = edata.spiderlist[edata.currentIndex][payload.index];
