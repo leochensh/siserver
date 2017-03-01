@@ -296,11 +296,11 @@ export var Question = React.createClass({
     },
     deletequestion(){
         //this.props.dhandle();
-        $("#deletemodal").modal("show");
+        $("#deletemodal"+this.props.index).modal("show");
     },
     confirmDeleteQuestion(){
         this.props.dhandle();
-        $("#deletemodal").modal("hide");
+        $("#deletemodal"+this.props.index).modal("hide");
     },
     questionUp(){
         this.props.uphandle();
@@ -731,7 +731,7 @@ export var Question = React.createClass({
 
                 </div>
 
-                <div className="modal fade" id="deletemodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div className="modal fade" id={"deletemodal"+this.props.index} tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">

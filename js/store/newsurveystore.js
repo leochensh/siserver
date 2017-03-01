@@ -509,7 +509,7 @@ class NewsurveyStore extends Store{
         }
         else if(payload.actionType == Constant.SURVEYQUESTIONDELETE){
             var qindex = payload.value;
-
+            console.log(payload);
             if(surveyData.metainfolist && surveyData.metainfolist.length>0){
                 var fi = _.findIndex(surveyData.metainfolist,function(item){
                     return item.qid == surveyData.qlist[qindex].id

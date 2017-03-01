@@ -3,6 +3,7 @@ import {Constant} from "../constant"
 import {SisDispatcher} from "../dispatcher";
 import {Question} from "./question"
 import _ from "underscore"
+import async from "async"
 import crypto from "crypto"
 var Dropzone = require('react-dropzone');
 import {Emailcheck} from "./emailcheck";
