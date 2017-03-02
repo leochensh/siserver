@@ -14,7 +14,7 @@ export var Stastic = React.createClass({
             survey:null,
             answerlist:[],
             originalanswerlist:[],
-            detailid:null,
+            detailid:-1,
             ifexport:false,
             exporturl:null,
             filterList:[],
@@ -1079,7 +1079,7 @@ export var Stastic = React.createClass({
 
 
         var detailModal = [];
-        if(this.state.detailid && this.state.answerlist[this.state.detailid]){
+        if(this.state.detailid>=0 && this.state.answerlist[this.state.detailid]){
             var ca = this.state.answerlist[this.state.detailid];
             detailModal.push(
                 <div className="row">
