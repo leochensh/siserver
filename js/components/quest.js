@@ -7,6 +7,7 @@ import crypto from "crypto";
 import async from "async";
 import {Starrating} from "./starrating";
 import {Emailcheck} from "./emailcheck";
+var Dropzone = require('react-dropzone');
 
 export var Quest = React.createClass({
     getInitialState(){
@@ -384,6 +385,34 @@ export var Quest = React.createClass({
         }
         return result;
     },
+    onDropMetaImage: function (files) {
+        var that = this;
+        console.log(files[0].name);
+        var data = new FormData();
+        data.append("name",files[0].name);
+        data.append("file",files[0]);
+        $("#ajaxloading").show();
+
+        $.ajax({
+            url: Constant.BASE_URL+"staff/upload/image",
+            data: data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: function(data){
+                $("#ajaxloading").hide();
+                var imgUrl = JSON.parse(data).body;
+                that.state.answer.answerlist[that.state.currentIndex].image = imgUrl;
+                that.setState({
+                    answer:that.state.answer
+                });
+            },
+            error:function(jxr,scode){
+                $("#ajaxloading").hide();
+            }
+        });
+    },
     render(){
         if(this.state.survey){
             var metalist = [];
@@ -395,7 +424,6 @@ export var Quest = React.createClass({
             var Qlist = this.state.survey.questionlist;
             var percent = (this.state.currentIndex+1)/Qlist.length;
             var currentQ = Qlist[this.state.currentIndex];
-            console.log(this.state.currentIndex)
             //alert(currentQ._id)
             var beforeAlert = "";
 
@@ -540,6 +568,26 @@ export var Quest = React.createClass({
                                 </textarea>
                     </div>
                 )
+            }
+            if(currentType == Constant.QTYPE_DESCRIPTION_IMAGE_TEXT){
+                var img = "";
+                if(this.state.answer.answerlist[this.state.currentIndex].image){
+                    img = <img
+                        src={Constant.BASE_IMAGEURL+this.state.answer.answerlist[this.state.currentIndex].image}
+                        className="img-rounded"
+                        style={{maxHeight:"200px"}}
+                        alt="Responsive image"/>;
+                }
+                slist.push(<div className="row">
+                    <div className="col-sm-6">
+                        <Dropzone onDrop={this.onDropMetaImage} accept="image/*">
+                            <div>Drop image file here or click.</div>
+                        </Dropzone>
+                    </div>
+                    <div className="col-sm-4">
+                        {img}
+                    </div>
+                </div>)
             }
             if(currentType == Constant.QTYPE_SCORE){
                 var scorelist = this.state.answer.answerlist[this.state.currentIndex].scorelist;
@@ -700,7 +748,7 @@ export var Quest = React.createClass({
                             </div>
                         </div>
 
-                        
+
                         {endAlert}
                     </div>)
             }
