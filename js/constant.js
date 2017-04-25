@@ -40,6 +40,7 @@ export var Constant = {
     SURVEYADDNEWQUESTION:"surveyaddnewquestion",
     SURVEYQUESTIONEDIT:"surveyquestionedit",
     SURVEYQUESTIONDELETE:"surveyquestiondelete",
+    SURVEYQUESTIONSELECTIONDELETE:"survequestiondeletiondelete",
     SURVEYQUESTIONSEQUENCECHANGE:"surveyquestionsequencechange",
     PARSESURVEYDETAIL:"parsesurveydetail",
     GETADLIST:"getadlist",

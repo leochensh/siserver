@@ -231,7 +231,7 @@ export var Question = React.createClass({
         var that = this;
         var dfunc = function(){
 
-            $("#deleteindexmodal").modal("show");
+            $("#deleteindexmodal"+that.props.index).modal("show");
             that.state.deleteindex = index;
 
 
@@ -239,14 +239,22 @@ export var Question = React.createClass({
         return dfunc;
     },
     confirmDeleteSelection(){
-        var slist = this.props.qdata.selectlist;
-        if(this.state.deleteindex){
-            slist.splice(this.state.deleteindex,1);
-            this.informChange({
-                selectlist:slist
-            })
+        // var slist = this.props.qdata.selectlist;
+        // if(this.state.deleteindex){
+        //     slist.splice(this.state.deleteindex,1);
+        //     this.informChange({
+        //         selectlist:slist
+        //     })
+        // }
+        console.log(this.state.deleteindex);
+        if(this.state.deleteindex>=0){
+            console.log("haha")
+            this.props.sdhandle(this.state.deleteindex);
+            $("#deleteindexmodal"+this.props.index).modal("hide");
         }
-        $("#deleteindexmodal").modal("hide");
+
+
+
 
     },
     selectionUp(index){
@@ -753,7 +761,7 @@ export var Question = React.createClass({
                     </div>
                 </div>
 
-                <div className="modal fade" id="deleteindexmodal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div className="modal fade" id={"deleteindexmodal"+this.props.index} tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">

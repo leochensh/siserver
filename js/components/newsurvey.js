@@ -467,6 +467,22 @@ export var Newsurvey = React.createClass({
         };
         return dhandler;
     },
+    selectiondeleteinform(index){
+        var that = this;
+        var sdhandler = function(sindex){
+            //var qlist = that.props.newsurvey.qlist;
+            //qlist.splice(index,1);
+            SisDispatcher.dispatch({
+                actionType: Constant.SURVEYQUESTIONSELECTIONDELETE,
+                value:{
+                    qindex:index,
+                    sindex:sindex
+                }
+            });
+
+        };
+        return sdhandler;
+    },
     metatextchange(index){
         var that = this;
         var infunc = function(event){
@@ -795,6 +811,7 @@ export var Newsurvey = React.createClass({
                 index={i}
                 qdata={q}
                 dhandle={this.questiondeleteinform(i)}
+                sdhandle = {this.selectiondeleteinform(i)}
                 uphandle={this.questionSequenceUp(i)}
                 downhandle={this.questionSequenceDown(i)}
                 qlist={this.props.newsurvey.qlist}

@@ -578,6 +578,23 @@ class NewsurveyStore extends Store{
                 }
             });
         }
+
+        else if(payload.actionType == Constant.SURVEYQUESTIONSELECTIONDELETE){
+            var qindex = payload.value.qindex;
+            var sindex = payload.value.sindex;
+            surveyData.qlist[qindex].selectlist.splice(sindex,1);
+            this.__emitChange();
+            addToProc({
+                type:"questionchange",
+                index:qindex
+            });
+
+            setTimeout(function(){
+                opProc();
+            },opInterval);
+
+        }
+
         else if(payload.actionType == Constant.SURVEYQUESTIONSEQUENCECHANGE){
             var qindex = payload.index;
             var direction = payload.direction;
