@@ -512,20 +512,31 @@ export var Stastic = React.createClass({
     },
     filterAnswer(){
         var outputList = [];
+        // console.log("++++++++++++++++++++++++++++++++++++++");
+        // console.log(this.state.filterList);
         for(var i in this.state.originalanswerlist){
             var currentAnswer = this.state.originalanswerlist[i];
             var ifFilter = true;
+            // console.log("++++++++++++++++++++++++++++++++++++++");
+            // console.log("for answer "+i);
+
             for(var j in this.state.filterList){
                 var currentFilter = this.state.filterList[j];
                 var cfValue = currentFilter.qvalue;
+                // console.log("for filter "+j);
+                // console.log("this filter is for question num "+cfValue);
+
                 if(cfValue!="none"){
                     var currentQ = this.state.survey.questionlist[cfValue];
+
                     var fansweindex = _.findIndex(currentAnswer.answerlist,function(item){
                         return item.questionid == currentQ._id;
                     });
+                    // console.log("this question is num "+fansweindex+" in answer list");
                     if(fansweindex>=0){
                         var qanswer = currentAnswer.answerlist[fansweindex];
                         if(currentFilter.checklist.length>0){
+                            console.log("this question's type is "+currentQ.type)
                             if(currentQ.type == Constant.QTYPE_MULTISELECT ||
                                 currentQ.type == Constant.QTYPE_SINGLESELECT ||
                                 currentQ.type == Constant.QTYPE_MULTISELECT_RECORD_TEXT ||
@@ -534,10 +545,11 @@ export var Stastic = React.createClass({
                                 currentQ.type == Constant.QTYPE_SINGLESELECT_TEXT){
                                 var notFound = true;
                                 for(var fai in qanswer.selectindexlist){
-                                    var aiv = qanswer.selectindexlist[fai];
-                                    console.log(aiv);
-                                    console.log(currentFilter.checklist);
+                                    var aiv = parseInt(qanswer.selectindexlist[fai]);
+                                    // console.log(aiv);
+                                    // console.log(currentFilter.checklist);
                                     var findindex = _.indexOf(currentFilter.checklist,aiv);
+                                    // console.log("found filter index is ",findindex)
                                     if(findindex>=0){
                                         notFound = false;
                                         break;
