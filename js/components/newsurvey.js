@@ -761,7 +761,7 @@ export var Newsurvey = React.createClass({
                         </label>
                         <div className="col-sm-6">
                                 <Dropzone onDrop={this.onDropMetaImage(parseInt(i))} accept="image/*">
-                                    <div>Drop image file here or click.</div>
+                                    <div>Upload image</div>
                                 </Dropzone>
                         </div>
                         <div className="col-sm-4">
@@ -883,7 +883,7 @@ export var Newsurvey = React.createClass({
                         </li>
                         <li>
                             <Dropzone onDrop={this.onDrop} accept="text/csv">
-                                <div>Drop xlsx file here or click.</div>
+                                <div>Upload xlsx</div>
                             </Dropzone>
                         </li>
 
