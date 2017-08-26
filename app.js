@@ -3205,8 +3205,11 @@ aclHandler.registerWait(function(acl){
                     var start = 0;
                     while(firstSheet[letterMap[start]+currentRow]){
                         var v = firstSheet[letterMap[start]+currentRow].v;
-                        var vt = JSON.stringify(v).trim();
-                        if(vt[0] && vt[0] == "\""){
+                        var vt = ""
+                        if(JSON.stringify(v)){
+                            vt = JSON.stringify(v).trim();
+                        }
+                        if(vt.length>0 && vt[0] && vt[0] == "\""){
                             var vlength = vt.length;
                             vt = vt.substring(1,vlength-1).trim();
                         }
