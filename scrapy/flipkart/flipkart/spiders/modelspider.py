@@ -11,6 +11,7 @@ class modelSpider(Spider):
     name = "modelspider"
 
     # baseUrl = "http://www.flipkart.com/lc/pr/pv1/spotList1/spot1/productList?sid=tyy,4io&filterNone=true&acamp=false&plaOffset=0&start="
+    # newurl = "https://www.flipkart.com/mobiles/pr?otracker=categorytree&page=1&sid=tyy%2C4io&viewType=list"
     baseUrl = "https://www.flipkart.com/mobiles/pr?otracker=categorytree&page="
     # tailUrl = "&ajax=true&_=1473814010323"
     tailUrl = "&sid=tyy%2C4io"
@@ -29,7 +30,7 @@ class modelSpider(Spider):
         infos = []
 
         # productList = response.xpath('//div[contains(@class,"gd-row")]/div[contains(@class,"gd-col")]/div[contains(@class,"product-unit")]/div[contains(@class,"pu-details")]')
-        productList = response.xpath('//div[contains(@class,"col") and contains(@class,"zZCdz4")]')
+        productList = response.xpath('//div[contains(@class,"col") and contains(@class,"_2-gKeQ")]')
 
         for product in productList:
 
