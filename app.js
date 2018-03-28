@@ -1331,6 +1331,8 @@ aclHandler.registerWait(function(acl){
         var ownid = req.session.uid;
         var role = req.session.role;
         //var orgid = req.session.orgid;
+        console.log("PUBLISHTOOWN START")
+        console.log("PUBLISHTOOWN surveyid is "+surveyid)
 
         if(surveyid && ObjectID.isValid(surveyid) && ObjectID.isValid(ownid)){
             Admin.publishSurveyToOwn(surveyid,ownid,role,function(err,msg){
