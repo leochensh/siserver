@@ -459,10 +459,11 @@ export var Question = React.createClass({
                                 <textarea type="text"
                                           className="form-control"
                                           id={sid}
-                                          value={s.title}
+
                                           placeholder="Selection Title"
                                           onChange={this.selectTitleChange(i)}
                                 >
+                                    {s.title}
                                 </textarea>
                             </div>
 
@@ -707,9 +708,10 @@ export var Question = React.createClass({
                                 <textarea type="text"
                                           className="form-control"
                                           id={qid}
-                                          value={this.props.qdata.title}
+
                                           placeholder="Question Title"
                                           onChange={this.handleChange.bind(this,"title")}>
+                                    {this.props.qdata.title}
                                 </textarea>
                             </div>
                         </div>
